@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(EventKit)
 import EventKit
+#endif
 
 struct CalendarSource: Identifiable, Hashable {
     let id: String
@@ -16,6 +18,7 @@ struct CalendarSource: Identifiable, Hashable {
         case calDAV
         case unknown
 
+        #if canImport(EventKit)
         init(from ekSourceType: EKSourceType) {
             switch ekSourceType {
             case .local:
@@ -32,6 +35,7 @@ struct CalendarSource: Identifiable, Hashable {
                 self = .unknown
             }
         }
+        #endif
 
         var displayName: String {
             switch self {
@@ -82,6 +86,7 @@ struct CalendarSource: Identifiable, Hashable {
         self.isEnabled = isEnabled
     }
 
+    #if canImport(EventKit)
     init(from ekCalendar: EKCalendar) {
         self.id = ekCalendar.calendarIdentifier
         self.title = ekCalendar.title
@@ -102,6 +107,7 @@ struct CalendarSource: Identifiable, Hashable {
 
         self.isEnabled = true
     }
+    #endif
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)

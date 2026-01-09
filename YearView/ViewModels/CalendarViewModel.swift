@@ -10,7 +10,16 @@ final class CalendarViewModel {
 
     var calendars: [CalendarSource] = []
     var events: [CalendarEvent] = []
-    var displayedYear: Int
+    var displayedYear: Int {
+        didSet {
+            guard displayedYear != oldValue else { return }
+            cacheService.saveLastViewedYear(displayedYear)
+            guard hasCalendarAccess else { return }
+            Task { @MainActor in
+                await loadEvents()
+            }
+        }
+    }
     var selectedDate: Date?
     var isLoading = false
     var errorMessage: String?
@@ -25,7 +34,7 @@ final class CalendarViewModel {
     }
 
     init() {
-        self.displayedYear = Calendar.current.component(.year, from: Date())
+        self.displayedYear = cacheService.loadLastViewedYear()
     }
 
     @MainActor
@@ -169,13 +178,12 @@ final class CalendarViewModel {
     func eventColors(for date: Date) -> [Color] {
         let dayEvents = events(for: date)
         var colors: [Color] = []
-        var seenColors: Set<String> = []
+        var seenCalendarIDs: Set<String> = []
 
         for event in dayEvents {
-            let colorKey = "\(event.calendarColor.description)"
-            if !seenColors.contains(colorKey) && colors.count < 3 {
+            if !seenCalendarIDs.contains(event.calendarID) && colors.count < 3 {
                 colors.append(event.calendarColor)
-                seenColors.insert(colorKey)
+                seenCalendarIDs.insert(event.calendarID)
             }
         }
 

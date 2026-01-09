@@ -170,7 +170,8 @@ Primary integration path. Automatically includes:
 Optional direct integration for users who prefer it:
 - OAuth 2.0 with Keychain token storage
 - Read-only scopes (`calendar.readonly`, `calendar.events.readonly`)
-- Background refresh every 15 minutes
+
+Status: the repo includes a `GoogleCalendarService` prototype, but it is not fully productized (UI wiring, error states, App Review scope decisions, etc.). Treat this as **planned / experimental** until it’s exercised end-to-end.
 
 ### Deep Linking
 
@@ -191,6 +192,8 @@ Located in `YearViewTests/`:
 - **ViewModel tests** - State management, computed properties
 - **Service tests** - Caching, date utilities
 - **Utility tests** - Date calculations, color conversions
+
+Note: the test files exist in the repo, but the Xcode project does not currently include a unit test target for them. They won’t run until they’re added to a test target.
 
 ### UI Tests
 

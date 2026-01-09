@@ -1,4 +1,5 @@
 import SwiftUI
+import Observation
 
 @main
 struct YearViewWatchApp: App {
@@ -14,16 +15,19 @@ struct YearViewWatchApp: App {
 
 @Observable
 final class WatchCalendarViewModel {
-    private let eventKitService = EventKitService()
-
     var events: [CalendarEvent] = []
     var displayedMonth: Date = Date()
     var isLoading = false
     var hasCalendarAccess = false
 
+    #if canImport(EventKit)
+    private let eventKitService = EventKitService()
+    #endif
+
     @MainActor
     func requestAccess() async {
         isLoading = true
+        #if canImport(EventKit)
         do {
             hasCalendarAccess = try await eventKitService.requestAccess()
             if hasCalendarAccess {
@@ -32,17 +36,25 @@ final class WatchCalendarViewModel {
         } catch {
             hasCalendarAccess = false
         }
+        #else
+        // EventKit isn't available on this platform.
+        hasCalendarAccess = false
+        events = []
+        #endif
         isLoading = false
     }
 
     @MainActor
     func loadEvents() async {
-        let calendar = Calendar.current
+        #if canImport(EventKit)
         let startOfMonth = displayedMonth.startOfMonth
         let endOfMonth = displayedMonth.endOfMonth
 
         let ekEvents = eventKitService.fetchEvents(from: startOfMonth, to: endOfMonth)
         events = ekEvents.map { CalendarEvent(from: $0) }
+        #else
+        events = []
+        #endif
     }
 
     func events(for date: Date) -> [CalendarEvent] {

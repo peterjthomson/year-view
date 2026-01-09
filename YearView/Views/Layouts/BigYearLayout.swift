@@ -317,7 +317,11 @@ struct EventBarsOverlay: View {
 
     private func columnRange(for event: CalendarEvent) -> (start: Int, end: Int) {
         let eventStart = calendar.startOfDay(for: event.startDate)
-        let eventEnd = calendar.startOfDay(for: event.endDate)
+        
+        // All-day events use an exclusive endDate; use the last moment so single-day all-day events
+        // don't incorrectly span into the next day/column.
+        let effectiveEndDate = event.isAllDay ? event.endDate.addingTimeInterval(-1) : event.endDate
+        let eventEnd = calendar.startOfDay(for: effectiveEndDate)
 
         var startCol = 0
         var endCol = 6

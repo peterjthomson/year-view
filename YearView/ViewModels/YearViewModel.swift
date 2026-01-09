@@ -72,16 +72,16 @@ final class YearViewModel {
 }
 
 struct MonthData: Identifiable {
-    let id: UUID
     let date: Date
     let name: String
     let shortName: String
     let days: [DayData]
     let weeks: [[DayData?]]
     let weekdayHeaders: [String]
+    
+    var id: Date { date }
 
     init(date: Date, calendar: Calendar) {
-        self.id = UUID()
         self.date = date
 
         let formatter = DateFormatter()
@@ -138,15 +138,15 @@ struct MonthData: Identifiable {
 }
 
 struct DayData: Identifiable {
-    let id: UUID
     let date: Date
     let dayNumber: Int
     let isToday: Bool
     let isWeekend: Bool
     let weekday: Int
+    
+    var id: Date { date }
 
     init(date: Date, calendar: Calendar) {
-        self.id = UUID()
         self.date = date
         self.dayNumber = calendar.component(.day, from: date)
         self.isToday = calendar.isDateInToday(date)

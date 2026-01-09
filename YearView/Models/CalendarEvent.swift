@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(EventKit)
 import EventKit
+#endif
 
 struct CalendarEvent: Identifiable, Hashable {
     let id: String
@@ -17,7 +19,14 @@ struct CalendarEvent: Identifiable, Hashable {
     let videoCallURL: URL?
 
     var isMultiDay: Bool {
-        !Calendar.current.isDate(startDate, inSameDayAs: endDate)
+        let calendar = Calendar.current
+        
+        // EventKit represents all-day events with an *exclusive* endDate (typically next day at 00:00).
+        // Treat the "effective" end as the last moment of the event to avoid incorrectly marking
+        // single-day all-day events as multi-day.
+        let effectiveEndDate = isAllDay ? endDate.addingTimeInterval(-1) : endDate
+        
+        return !calendar.isDate(startDate, inSameDayAs: effectiveEndDate)
     }
 
     var duration: TimeInterval {
@@ -54,6 +63,7 @@ struct CalendarEvent: Identifiable, Hashable {
         self.videoCallURL = videoCallURL
     }
 
+    #if canImport(EventKit)
     init(from ekEvent: EKEvent) {
         self.id = ekEvent.eventIdentifier ?? UUID().uuidString
         self.title = ekEvent.title ?? "Untitled"
@@ -77,6 +87,7 @@ struct CalendarEvent: Identifiable, Hashable {
         self.hasVideoCall = hasCall
         self.videoCallURL = callURL
     }
+    #endif
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)

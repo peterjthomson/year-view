@@ -14,7 +14,7 @@ This guide helps developers set up and run Year View locally.
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-org/year-view.git
+git clone https://github.com/peterjthomson/year-view.git
 cd year-view
 ```
 
@@ -63,6 +63,8 @@ year-view/
 
 1. Select the YearView scheme
 2. Press `Cmd+U` or go to Product → Test
+
+> Note: `YearViewTests/` currently contains unit test files, but the Xcode project does not define a unit test target for them yet. Until a test target is created and the files are added to it, `Cmd+U` / CI test steps will not run these tests.
 
 ### From Command Line
 

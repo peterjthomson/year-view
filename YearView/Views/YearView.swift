@@ -10,6 +10,12 @@ struct YearView: View {
     var body: some View {
         Group {
             switch yearViewModel.layoutStyle {
+            case .bigYear:
+                BigYearLayout(
+                    year: calendarViewModel.displayedYear,
+                    selectedDate: $selectedDate,
+                    onDateTap: handleDateTap
+                )
             case .standardGrid:
                 StandardGridLayout(
                     months: yearViewModel.months(for: calendarViewModel.displayedYear),

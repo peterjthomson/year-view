@@ -18,7 +18,7 @@ final class YearViewModelTests: XCTestCase {
     // MARK: - Default State Tests
 
     func testDefaultLayoutStyle() {
-        XCTAssertEqual(viewModel.layoutStyle, .standardGrid)
+        XCTAssertEqual(viewModel.layoutStyle, .bigYear)  // Big Year is now default
     }
 
     func testDefaultShowWeekends() {
@@ -36,22 +36,32 @@ final class YearViewModelTests: XCTestCase {
     // MARK: - Layout Style Tests
 
     func testLayoutStyleCases() {
-        XCTAssertEqual(YearLayoutStyle.allCases.count, 3)
+        XCTAssertEqual(YearLayoutStyle.allCases.count, 4)
+        XCTAssertTrue(YearLayoutStyle.allCases.contains(.bigYear))
         XCTAssertTrue(YearLayoutStyle.allCases.contains(.standardGrid))
         XCTAssertTrue(YearLayoutStyle.allCases.contains(.continuousRow))
         XCTAssertTrue(YearLayoutStyle.allCases.contains(.verticalList))
     }
 
     func testLayoutStyleIcons() {
+        XCTAssertEqual(YearLayoutStyle.bigYear.icon, "calendar")
         XCTAssertEqual(YearLayoutStyle.standardGrid.icon, "square.grid.3x3")
         XCTAssertEqual(YearLayoutStyle.continuousRow.icon, "rectangle.split.3x1")
         XCTAssertEqual(YearLayoutStyle.verticalList.icon, "list.bullet")
     }
 
     func testLayoutStyleRawValues() {
+        XCTAssertEqual(YearLayoutStyle.bigYear.rawValue, "Year")
         XCTAssertEqual(YearLayoutStyle.standardGrid.rawValue, "Grid")
         XCTAssertEqual(YearLayoutStyle.continuousRow.rawValue, "Row")
         XCTAssertEqual(YearLayoutStyle.verticalList.rawValue, "List")
+    }
+
+    func testLayoutStyleDescriptions() {
+        XCTAssertEqual(YearLayoutStyle.bigYear.description, "Continuous week rows")
+        XCTAssertEqual(YearLayoutStyle.standardGrid.description, "Month grid")
+        XCTAssertEqual(YearLayoutStyle.continuousRow.description, "Horizontal scroll")
+        XCTAssertEqual(YearLayoutStyle.verticalList.description, "Vertical list")
     }
 
     // MARK: - Month Generation Tests

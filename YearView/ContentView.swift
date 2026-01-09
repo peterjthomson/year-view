@@ -169,4 +169,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environment(CalendarViewModel())
+        .environment(AppSettings())
 }

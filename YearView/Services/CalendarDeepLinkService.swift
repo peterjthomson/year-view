@@ -38,9 +38,6 @@ final class CalendarDeepLinkService {
     }
 
     func createEvent(on date: Date) {
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.year, .month, .day], from: date)
-
         #if os(iOS)
         // Open Calendar app to create new event
         if let url = URL(string: "calshow:\(date.timeIntervalSinceReferenceDate)") {
@@ -67,7 +64,8 @@ final class CalendarDeepLinkService {
     }
 
     func openGoogleCalendarEvent(eventID: String, calendarID: String) {
-        let encodedCalendarID = calendarID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? calendarID
+        // Note: calendarID reserved for future use with calendar-specific event URLs
+        _ = calendarID
         let encodedEventID = eventID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? eventID
 
         if let url = URL(string: "https://calendar.google.com/calendar/event?eid=\(encodedEventID)") {

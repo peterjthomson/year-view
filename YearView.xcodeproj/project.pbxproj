@@ -13,6 +13,7 @@
 		E1000001010 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002010 /* CalendarEvent.swift */; };
 		E1000001011 /* CalendarSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002011 /* CalendarSource.swift */; };
 		E1000001012 /* CalendarSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002012 /* CalendarSet.swift */; };
+		E1000001013 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002013 /* AppSettings.swift */; };
 		E1000001020 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002020 /* CalendarViewModel.swift */; };
 		E1000001021 /* YearViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002021 /* YearViewModel.swift */; };
 		E1000001022 /* DayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002022 /* DayViewModel.swift */; };
@@ -24,6 +25,7 @@
 		E1000001035 /* CalendarSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002035 /* CalendarSelectionView.swift */; };
 		E1000001036 /* YearPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002036 /* YearPickerView.swift */; };
 		E1000001037 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002037 /* SearchView.swift */; };
+		E1000001038 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002038 /* SettingsView.swift */; };
 		E1000001040 /* StandardGridLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002040 /* StandardGridLayout.swift */; };
 		E1000001041 /* ContinuousRowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002041 /* ContinuousRowLayout.swift */; };
 		E1000001042 /* VerticalListLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002042 /* VerticalListLayout.swift */; };
@@ -63,6 +65,7 @@
 		E1000002010 /* CalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEvent.swift; sourceTree = "<group>"; };
 		E1000002011 /* CalendarSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSource.swift; sourceTree = "<group>"; };
 		E1000002012 /* CalendarSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSet.swift; sourceTree = "<group>"; };
+		E1000002013 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		E1000002020 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
 		E1000002021 /* YearViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearViewModel.swift; sourceTree = "<group>"; };
 		E1000002022 /* DayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayViewModel.swift; sourceTree = "<group>"; };
@@ -74,6 +77,7 @@
 		E1000002035 /* CalendarSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSelectionView.swift; sourceTree = "<group>"; };
 		E1000002036 /* YearPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearPickerView.swift; sourceTree = "<group>"; };
 		E1000002037 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
+		E1000002038 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		E1000002040 /* StandardGridLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardGridLayout.swift; sourceTree = "<group>"; };
 		E1000002041 /* ContinuousRowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinuousRowLayout.swift; sourceTree = "<group>"; };
 		E1000002042 /* VerticalListLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalListLayout.swift; sourceTree = "<group>"; };
@@ -141,6 +145,7 @@
 				E1000002010 /* CalendarEvent.swift */,
 				E1000002011 /* CalendarSource.swift */,
 				E1000002012 /* CalendarSet.swift */,
+				E1000002013 /* AppSettings.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -166,6 +171,7 @@
 				E1000002035 /* CalendarSelectionView.swift */,
 				E1000002036 /* YearPickerView.swift */,
 				E1000002037 /* SearchView.swift */,
+				E1000002038 /* SettingsView.swift */,
 				E1000007016 /* Layouts */,
 			);
 			path = Views;
@@ -288,6 +294,7 @@
 				E1000001010 /* CalendarEvent.swift in Sources */,
 				E1000001011 /* CalendarSource.swift in Sources */,
 				E1000001012 /* CalendarSet.swift in Sources */,
+				E1000001013 /* AppSettings.swift in Sources */,
 				E1000001020 /* CalendarViewModel.swift in Sources */,
 				E1000001021 /* YearViewModel.swift in Sources */,
 				E1000001022 /* DayViewModel.swift in Sources */,
@@ -299,6 +306,7 @@
 				E1000001035 /* CalendarSelectionView.swift in Sources */,
 				E1000001036 /* YearPickerView.swift in Sources */,
 				E1000001037 /* SearchView.swift in Sources */,
+				E1000001038 /* SettingsView.swift in Sources */,
 				E1000001040 /* StandardGridLayout.swift in Sources */,
 				E1000001041 /* ContinuousRowLayout.swift in Sources */,
 				E1000001042 /* VerticalListLayout.swift in Sources */,

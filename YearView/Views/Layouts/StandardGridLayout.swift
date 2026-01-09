@@ -6,6 +6,7 @@ struct StandardGridLayout: View {
     let onDateTap: (Date) -> Void
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(AppSettings.self) private var appSettings
 
     private var columns: Int {
         #if os(macOS)
@@ -21,23 +22,25 @@ struct StandardGridLayout: View {
     }
 
     private var gridColumns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 16), count: columns)
+        Array(repeating: GridItem(.flexible(), spacing: 16, alignment: .topLeading), count: columns)
     }
 
     var body: some View {
         ScrollView {
-            LazyVGrid(columns: gridColumns, spacing: 16) {
+            LazyVGrid(columns: gridColumns, alignment: .leading, spacing: 16) {
                 ForEach(months) { month in
                     MonthGridView(
                         month: month,
                         selectedDate: selectedDate,
+                        appSettings: appSettings,
                         onDateTap: onDateTap
                     )
+                    .frame(maxWidth: .infinity, alignment: .topLeading)
                 }
             }
             .padding()
         }
-        .background(Color.systemGroupedBackground)
+        .background(appSettings.pageBackgroundColor)
     }
 }
 
@@ -61,4 +64,5 @@ struct StandardGridLayout: View {
         .navigationTitle("2026")
     }
     .environment(CalendarViewModel())
+    .environment(AppSettings())
 }

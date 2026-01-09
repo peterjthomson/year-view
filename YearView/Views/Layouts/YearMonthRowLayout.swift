@@ -1,27 +1,55 @@
 import SwiftUI
 
-/// Calendar.app-style year view: each month is one row, displayed as a 6-week (42 cell) strip.
+/// Calendar.app-style year view: each month is one row, displayed as a strip.
 /// The start of each month is offset so weekdays align across all months.
+/// The total width is trimmed to the last column that contains an actual day.
 struct YearMonthRowLayout: View {
     let months: [MonthData]
     @Binding var selectedDate: Date?
     let onDateTap: (Date) -> Void
 
     @Environment(CalendarViewModel.self) private var calendarViewModel
+    @Environment(AppSettings.self) private var appSettings
 
-    // 6 weeks is enough to display any month.
-    private let weeksPerMonth = 6
     private let daysPerWeek = 7
     private let outerPadding: CGFloat = 12
     private let rowSpacing: CGFloat = 0 // Spacing handled by padding/dividers
     private let headerBottomPadding: CGFloat = 8
     private let minCellWidth: CGFloat = 20
     private let minRowHeight: CGFloat = 32
+    
+    /// Use appSettings calendar for consistent week start
+    private var calendar: Calendar { appSettings.calendar }
+    
+    /// Calculate the minimum number of columns needed to display all months.
+    /// This is the maximum of (offset + days_in_month) across all months.
+    private var totalColumns: Int {
+        var maxExtent = 0
+        for month in months {
+            guard let firstDay = month.days.first?.date else { continue }
+            let firstDayWeekday = calendar.component(.weekday, from: firstDay)
+            let offset = (firstDayWeekday - calendar.firstWeekday + 7) % 7
+            let extent = offset + month.days.count
+            maxExtent = max(maxExtent, extent)
+        }
+        return maxExtent
+    }
+    
+    /// Returns the weekday number (1-7) for a given column index
+    private func weekdayForColumn(_ index: Int) -> Int {
+        let columnInWeek = index % 7
+        // Map column to absolute weekday (1=Sun, 7=Sat)
+        return (calendar.firstWeekday - 1 + columnInWeek) % 7 + 1
+    }
 
+    /// Calculate month label width based on format setting
+    private var monthLabelWidth: CGFloat {
+        appSettings.monthLabelFormat.suggestedWidth
+    }
+    
     var body: some View {
         GeometryReader { geometry in
-            let monthLabelWidth = max(64, min(140, geometry.size.width * 0.12))
-            let columns = CGFloat(weeksPerMonth * daysPerWeek) // 42
+            let columns = CGFloat(totalColumns)
 
             // Width sizing: fill the available width when possible, otherwise fall back to a minimum and allow scroll.
             let availableGridWidth = max(0, geometry.size.width - (outerPadding * 2) - monthLabelWidth)
@@ -45,8 +73,10 @@ struct YearMonthRowLayout: View {
                                 month: month,
                                 cellSize: cellSize,
                                 monthLabelWidth: monthLabelWidth,
+                                totalColumns: totalColumns,
                                 selectedDate: selectedDate,
                                 calendarViewModel: calendarViewModel,
+                                appSettings: appSettings,
                                 onDateTap: onDateTap
                             )
                             Divider()
@@ -56,26 +86,29 @@ struct YearMonthRowLayout: View {
                 .padding(outerPadding)
                 .frame(minWidth: geometry.size.width, minHeight: geometry.size.height, alignment: .topLeading)
             }
-            .background(Color.white)
+            .background(appSettings.pageBackgroundColor)
         }
     }
 
     @ViewBuilder
     private func weekdayHeader(cellSize: CGSize, monthLabelWidth: CGFloat) -> some View {
-        let symbols = Calendar.current.veryShortWeekdaySymbols
+        // Get symbols ordered by firstWeekday
+        let allSymbols = calendar.veryShortWeekdaySymbols // 0-indexed (0=Sun)
         
         HStack(spacing: 0) {
             Color.clear
                 .frame(width: monthLabelWidth, height: cellSize.height)
 
-            ForEach(0..<weeksPerMonth, id: \.self) { _ in
-                ForEach(symbols, id: \.self) { symbol in
-                    Text(symbol.uppercased())
-                        .font(.caption2)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.secondary)
-                        .frame(width: cellSize.width, height: cellSize.height)
-                }
+            ForEach(0..<totalColumns, id: \.self) { index in
+                let weekday = weekdayForColumn(index)
+                let symbolIndex = weekday - 1 // Convert 1-indexed weekday to 0-indexed symbol
+                let isWeekend = appSettings.isWeekend(weekday: weekday)
+                
+                Text(allSymbols[symbolIndex].uppercased())
+                    .font(.caption2)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(isWeekend ? appSettings.columnHeadingColor.opacity(0.7) : appSettings.columnHeadingColor)
+                    .frame(width: cellSize.width, height: cellSize.height)
             }
         }
     }
@@ -85,100 +118,151 @@ private struct MonthRow: View {
     let month: MonthData
     let cellSize: CGSize
     let monthLabelWidth: CGFloat
+    let totalColumns: Int
     let selectedDate: Date?
     let calendarViewModel: CalendarViewModel
+    let appSettings: AppSettings
     let onDateTap: (Date) -> Void
 
-    private let calendar = Calendar.current
-    private let weeksPerMonth = 6
+    private var calendar: Calendar { appSettings.calendar }
+    
+    /// Returns the weekday number (1-7) for a given column index
+    private func weekdayForColumn(_ index: Int) -> Int {
+        let columnInWeek = index % 7
+        return (calendar.firstWeekday - 1 + columnInWeek) % 7 + 1
+    }
 
+    private let verticalPadding: CGFloat = 4
+    
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            // Month Label
-            VStack(alignment: .leading, spacing: 2) {
-                Text(month.name)
-                    .font(.subheadline)
-                    .fontWeight(.bold)
-                Text(month.shortName.uppercased())
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(width: monthLabelWidth, height: cellSize.height, alignment: .leading)
-            .padding(.vertical, 4)
+            // Month Label - format based on settings
+            monthLabel
+                .frame(width: monthLabelWidth, alignment: .leading)
+                .padding(.vertical, verticalPadding)
 
             // Grid
             ZStack(alignment: .topLeading) {
-                // Weekend Backgrounds
-                weekendBackgrounds
+                // Cell Backgrounds (weekday/weekend/unused) with gridlines - fill entire row height
+                cellBackgrounds
                 
-                // Days
+                // Days - with vertical padding to center content
                 HStack(spacing: 0) {
-                    ForEach(paddedWeeks.indices, id: \.self) { weekIndex in
-                        let week = paddedWeeks[weekIndex]
-                        ForEach(0..<7, id: \.self) { dayIndex in
-                            MonthRowDayCell(
-                                day: week[dayIndex],
-                                cellSize: cellSize,
-                                isSelected: isSelected(week[dayIndex]?.date),
-                                onTap: { date in onDateTap(date) }
-                            )
-                        }
+                    ForEach(paddedDays.indices, id: \.self) { index in
+                        MonthRowDayCell(
+                            day: paddedDays[index],
+                            cellSize: cellSize,
+                            isSelected: isSelected(paddedDays[index]?.date),
+                            appSettings: appSettings,
+                            onTap: { date in onDateTap(date) }
+                        )
                     }
                 }
+                .padding(.vertical, verticalPadding)
                 
                 // Event Bars Overlay
                 EventBarsOverlay(
                     month: month,
-                    events: calendarViewModel.events,
+                    events: appSettings.filterEvents(calendarViewModel.events),
                     cellSize: cellSize,
-                    totalColumns: weeksPerMonth * 7
+                    totalColumns: totalColumns,
+                    appSettings: appSettings
                 )
+                .padding(.vertical, verticalPadding)
             }
         }
-        .padding(.vertical, 4)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Month \(month.name)")
     }
 
-    private var weekendBackgrounds: some View {
+    /// Full row height including vertical padding
+    private var fullRowHeight: CGFloat {
+        cellSize.height + (verticalPadding * 2)
+    }
+    
+    private var cellBackgrounds: some View {
         HStack(spacing: 0) {
-            ForEach(0..<(weeksPerMonth * 7), id: \.self) { index in
-                // Calculate weekday: (index + firstWeekday - 1) % 7 gives 0..6
-                // But we need to match Calendar.component(.weekday) logic where Sunday=1, Saturday=7 (usually)
-                // Symbol index 0 corresponds to firstWeekday.
-                // If firstWeekday=1 (Sun), index 0 is Sun.
-                // If firstWeekday=2 (Mon), index 0 is Mon.
+            ForEach(0..<totalColumns, id: \.self) { index in
+                let weekday = weekdayForColumn(index)
+                let isWeekend = appSettings.isWeekend(weekday: weekday)
+                let hasDay = paddedDays[index] != nil
                 
-                // We want to highlight weekends.
-                // Standard: Sun=1, Sat=7.
-                // So we need to map column index back to absolute weekday.
-                
-                let currentWeekday = (index + calendar.firstWeekday - 1) % 7 + 1
-                let isWeekend = currentWeekday == 1 || currentWeekday == 7
-                
-                if isWeekend {
-                    Color.secondarySystemGroupedBackground.opacity(0.5)
-                        .frame(width: cellSize.width, height: cellSize.height)
-                } else {
-                    Color.clear
-                        .frame(width: cellSize.width, height: cellSize.height)
+                Group {
+                    if hasDay {
+                        appSettings.backgroundColor(isWeekend: isWeekend)
+                    } else {
+                        // Weekend shading takes priority over unused cell shading
+                        appSettings.unusedCellBackgroundColor(forWeekday: weekday)
+                    }
+                }
+                .frame(width: cellSize.width, height: fullRowHeight)
+                .overlay(alignment: .trailing) {
+                    if appSettings.showGridlinesMonthRows && index < totalColumns - 1 {
+                        Rectangle()
+                            .fill(appSettings.gridlineColor)
+                            .frame(width: 1)
+                    }
                 }
             }
         }
     }
 
-    private var paddedWeeks: [[DayData?]] {
-        if month.weeks.count >= weeksPerMonth {
-            return Array(month.weeks.prefix(weeksPerMonth))
+    /// Creates a flat array of days padded to totalColumns.
+    /// The month's first day is placed at the correct weekday offset.
+    private var paddedDays: [DayData?] {
+        guard let firstDay = month.days.first?.date else {
+            return Array(repeating: nil, count: totalColumns)
         }
-        let emptyWeek: [DayData?] = Array(repeating: nil, count: 7)
-        let padding: [[DayData?]] = Array(repeating: emptyWeek, count: weeksPerMonth - month.weeks.count)
-        return month.weeks + padding
+        
+        let firstDayWeekday = calendar.component(.weekday, from: firstDay)
+        let offset = (firstDayWeekday - calendar.firstWeekday + 7) % 7
+        
+        var result: [DayData?] = Array(repeating: nil, count: totalColumns)
+        
+        for (index, day) in month.days.enumerated() {
+            let position = offset + index
+            if position < totalColumns {
+                result[position] = day
+            }
+        }
+        
+        return result
     }
 
     private func isSelected(_ date: Date?) -> Bool {
         guard let date, let selectedDate else { return false }
         return calendar.isDate(date, inSameDayAs: selectedDate)
+    }
+    
+    @ViewBuilder
+    private var monthLabel: some View {
+        switch appSettings.monthLabelFormat {
+        case .dual:
+            VStack(alignment: .leading, spacing: 2) {
+                Text(month.name)
+                    .font(appSettings.monthLabelFontSize.font)
+                    .fontWeight(.bold)
+                    .foregroundStyle(appSettings.rowHeadingColor)
+                Text(month.shortName.uppercased())
+                    .font(appSettings.monthLabelFontSize.secondaryFont)
+                    .foregroundStyle(appSettings.rowHeadingColor.opacity(0.6))
+            }
+        case .full:
+            Text(month.name)
+                .font(appSettings.monthLabelFontSize.font)
+                .fontWeight(.bold)
+                .foregroundStyle(appSettings.rowHeadingColor)
+        case .abbreviated:
+            Text(month.shortName)
+                .font(appSettings.monthLabelFontSize.font)
+                .fontWeight(.bold)
+                .foregroundStyle(appSettings.rowHeadingColor)
+        case .letter:
+            Text(String(month.name.prefix(1)))
+                .font(appSettings.monthLabelFontSize.font)
+                .fontWeight(.bold)
+                .foregroundStyle(appSettings.rowHeadingColor)
+        }
     }
 }
 
@@ -187,8 +271,9 @@ private struct EventBarsOverlay: View {
     let events: [CalendarEvent]
     let cellSize: CGSize
     let totalColumns: Int
+    let appSettings: AppSettings
     
-    private let calendar = Calendar.current
+    private var calendar: Calendar { appSettings.calendar }
     
     var body: some View {
         GeometryReader { geometry in
@@ -198,7 +283,7 @@ private struct EventBarsOverlay: View {
             ForEach(laidOutEvents, id: \.event.id) { (event, row, startCol, span) in
                 let width = CGFloat(span) * cellSize.width - 2
                 let x = CGFloat(startCol) * cellSize.width + 1
-                let y = CGFloat(row) * 6 + 18 // Offset below date number
+                let y = CGFloat(row) * 6 + 24 // Offset below date number (increased spacing)
                 
                 if y < cellSize.height {
                     RoundedRectangle(cornerRadius: 2)
@@ -250,7 +335,6 @@ private struct EventBarsOverlay: View {
             if colStart > colEnd { continue }
             let span = colEnd - colStart + 1
             
-            var placed = false
             for r in 0..<occupied.count {
                 var fits = true
                 for c in colStart...colEnd {
@@ -269,7 +353,6 @@ private struct EventBarsOverlay: View {
                         }
                     }
                     result.append((event, r, colStart, span))
-                    placed = true
                     break
                 }
             }
@@ -283,6 +366,7 @@ private struct MonthRowDayCell: View {
     let day: DayData?
     let cellSize: CGSize
     let isSelected: Bool
+    let appSettings: AppSettings
     let onTap: (Date) -> Void
 
     var body: some View {
@@ -292,22 +376,21 @@ private struct MonthRowDayCell: View {
                     onTap(day.date)
                 } label: {
                     ZStack(alignment: .top) {
+                        // Today gets a full cell background color instead of a circle
                         if day.isToday {
-                            Circle()
-                                .fill(Color.accentColor)
-                                .frame(width: 20, height: 20)
-                                .padding(.top, 4)
-                        } else if isSelected {
-                            Circle()
-                                .stroke(Color.accentColor, lineWidth: 2)
-                                .frame(width: 20, height: 20)
-                                .padding(.top, 4)
+                            Rectangle()
+                                .fill(appSettings.todayColor.opacity(0.3))
+                        }
+                        
+                        if isSelected && !day.isToday {
+                            Rectangle()
+                                .stroke(appSettings.todayColor, lineWidth: 2)
                         }
 
                         Text("\(day.dayNumber)")
                             .font(.system(size: 11))
                             .fontWeight(day.isToday ? .bold : .medium)
-                            .foregroundStyle(day.isToday ? .white : .primary)
+                            .foregroundStyle(day.isToday ? appSettings.todayColor : appSettings.dateLabelColor)
                             .frame(width: cellSize.width, alignment: .center)
                             .padding(.top, 6)
                     }
@@ -316,6 +399,7 @@ private struct MonthRowDayCell: View {
                 }
                 .buttonStyle(.plain)
             } else {
+                // Unused cell - background is handled by cellBackgrounds
                 Color.clear
                     .frame(width: cellSize.width, height: cellSize.height)
             }
@@ -333,4 +417,5 @@ private struct MonthRowDayCell: View {
         .navigationTitle("2026")
     }
     .environment(CalendarViewModel())
+    .environment(AppSettings())
 }

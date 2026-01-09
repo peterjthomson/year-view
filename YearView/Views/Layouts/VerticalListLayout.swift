@@ -5,6 +5,7 @@ struct VerticalListLayout: View {
     @Binding var selectedDate: Date?
     let onDateTap: (Date) -> Void
 
+    @Environment(AppSettings.self) private var appSettings
     @State private var scrollPosition: Int?
 
     var body: some View {
@@ -15,10 +16,11 @@ struct VerticalListLayout: View {
                         MonthListView(
                             month: month,
                             selectedDate: selectedDate,
+                            appSettings: appSettings,
                             onDateTap: onDateTap
                         )
                     } header: {
-                        MonthSectionHeader(month: month)
+                        MonthSectionHeader(month: month, appSettings: appSettings)
                     }
                     .id(index)
                 }
@@ -27,7 +29,7 @@ struct VerticalListLayout: View {
             .scrollTargetLayout()
         }
         .scrollPosition(id: $scrollPosition)
-        .background(Color.systemGroupedBackground)
+        .background(appSettings.pageBackgroundColor)
         .onAppear {
             // Scroll to current month
             let currentMonth = Calendar.current.component(.month, from: Date()) - 1
@@ -38,12 +40,14 @@ struct VerticalListLayout: View {
 
 struct MonthSectionHeader: View {
     let month: MonthData
+    let appSettings: AppSettings
 
     var body: some View {
         HStack {
             Text(month.name)
                 .font(.title)
                 .fontWeight(.bold)
+                .foregroundStyle(appSettings.rowHeadingColor)
 
             Spacer()
         }
@@ -56,6 +60,7 @@ struct MonthSectionHeader: View {
 struct MonthListView: View {
     let month: MonthData
     let selectedDate: Date?
+    let appSettings: AppSettings
     let onDateTap: (Date) -> Void
 
     @Environment(CalendarViewModel.self) private var calendarViewModel
@@ -66,13 +71,22 @@ struct MonthListView: View {
             ForEach(month.weeks.indices, id: \.self) { weekIndex in
                 WeekStripView(
                     days: month.weeks[weekIndex],
+                    weekdayNumbers: month.weekdayNumbers,
                     selectedDate: selectedDate,
+                    appSettings: appSettings,
                     onDateTap: onDateTap
                 )
 
                 if weekIndex < month.weeks.count - 1 {
-                    Divider()
-                        .padding(.vertical, 8)
+                    if appSettings.showGridlinesList {
+                        Rectangle()
+                            .fill(appSettings.gridlineColor)
+                            .frame(height: 1)
+                            .padding(.vertical, 8)
+                    } else {
+                        Divider()
+                            .padding(.vertical, 8)
+                    }
                 }
             }
         }
@@ -82,12 +96,20 @@ struct MonthListView: View {
                 .fill(.background)
                 .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
         }
+        .overlay {
+            if appSettings.showGridlinesList {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(appSettings.gridlineColor, lineWidth: 1)
+            }
+        }
     }
 }
 
 struct WeekStripView: View {
     let days: [DayData?]
+    let weekdayNumbers: [Int]
     let selectedDate: Date?
+    let appSettings: AppSettings
     let onDateTap: (Date) -> Void
 
     @Environment(CalendarViewModel.self) private var calendarViewModel
@@ -99,13 +121,17 @@ struct WeekStripView: View {
                     DayStripCell(
                         day: day,
                         isSelected: isSelected(day.date),
-                        eventColors: calendarViewModel.eventColors(for: day.date),
+                        eventColors: filteredEventColors(for: day.date),
+                        appSettings: appSettings,
                         onTap: { onDateTap(day.date) }
                     )
                 } else {
-                    Color.clear
+                    // Unused cell - weekend shading takes priority
+                    let weekday = weekdayNumbers.indices.contains(index) ? weekdayNumbers[index] : (index + 1)
+                    appSettings.unusedCellBackgroundColor(forWeekday: weekday)
                         .frame(maxWidth: .infinity)
                         .aspectRatio(1, contentMode: .fit)
+                        .clipShape(Circle())
                 }
             }
         }
@@ -115,13 +141,32 @@ struct WeekStripView: View {
         guard let selectedDate else { return false }
         return Calendar.current.isDate(date, inSameDayAs: selectedDate)
     }
+    
+    private func filteredEventColors(for date: Date) -> [Color] {
+        let dayEvents = calendarViewModel.events(for: date)
+        let filtered = appSettings.filterEvents(dayEvents)
+        var colors: [Color] = []
+        var seenCalendarIDs: Set<String> = []
+        
+        for event in filtered {
+            if !seenCalendarIDs.contains(event.calendarID) && colors.count < 3 {
+                colors.append(event.calendarColor)
+                seenCalendarIDs.insert(event.calendarID)
+            }
+        }
+        
+        return colors
+    }
 }
 
 struct DayStripCell: View {
     let day: DayData
     let isSelected: Bool
     let eventColors: [Color]
+    let appSettings: AppSettings
     let onTap: () -> Void
+    
+    private var isWeekend: Bool { appSettings.isWeekend(weekday: day.weekday) }
 
     var body: some View {
         Button(action: onTap) {
@@ -130,25 +175,25 @@ struct DayStripCell: View {
                 Text(weekdayAbbreviation)
                     .font(.caption2)
                     .fontWeight(.medium)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(isWeekend ? appSettings.columnHeadingColor.opacity(0.7) : appSettings.columnHeadingColor)
 
                 // Day number
                 ZStack {
                     if day.isToday {
                         Circle()
-                            .fill(Color.accentColor)
+                            .fill(appSettings.todayColor)
                     } else if isSelected {
                         Circle()
-                            .stroke(Color.accentColor, lineWidth: 2)
-                    } else if day.isWeekend {
+                            .stroke(appSettings.todayColor, lineWidth: 2)
+                    } else {
                         Circle()
-                            .fill(.quaternary.opacity(0.5))
+                            .fill(appSettings.backgroundColor(isWeekend: isWeekend))
                     }
 
                     Text("\(day.dayNumber)")
                         .font(.system(.callout, design: .rounded))
                         .fontWeight(day.isToday ? .bold : .regular)
-                        .foregroundStyle(day.isToday ? .white : .primary)
+                        .foregroundStyle(day.isToday ? .white : appSettings.dateLabelColor)
                 }
                 .frame(width: 36, height: 36)
 
@@ -194,4 +239,5 @@ struct DayStripCell: View {
         .navigationTitle("2026")
     }
     .environment(CalendarViewModel())
+    .environment(AppSettings())
 }

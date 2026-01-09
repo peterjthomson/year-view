@@ -5,6 +5,7 @@ struct ContinuousRowLayout: View {
     @Binding var selectedDate: Date?
     let onDateTap: (Date) -> Void
 
+    @Environment(AppSettings.self) private var appSettings
     @State private var scrollPosition: Int?
 
     var body: some View {
@@ -15,6 +16,7 @@ struct ContinuousRowLayout: View {
                         MonthColumnView(
                             month: month,
                             selectedDate: selectedDate,
+                            appSettings: appSettings,
                             onDateTap: onDateTap,
                             height: geometry.size.height
                         )
@@ -27,7 +29,7 @@ struct ContinuousRowLayout: View {
             .scrollTargetBehavior(.viewAligned)
             .scrollPosition(id: $scrollPosition)
         }
-        .background(Color.systemGroupedBackground)
+        .background(appSettings.pageBackgroundColor)
         .onAppear {
             // Scroll to current month
             let currentMonth = Calendar.current.component(.month, from: Date()) - 1
@@ -39,6 +41,7 @@ struct ContinuousRowLayout: View {
 struct MonthColumnView: View {
     let month: MonthData
     let selectedDate: Date?
+    let appSettings: AppSettings
     let onDateTap: (Date) -> Void
     let height: CGFloat
 
@@ -50,16 +53,19 @@ struct MonthColumnView: View {
             Text(month.name)
                 .font(.title2)
                 .fontWeight(.bold)
+                .foregroundStyle(appSettings.rowHeadingColor)
                 .padding(.bottom, 4)
 
             // Days in vertical list
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 4) {
                     ForEach(month.days) { day in
+                        let filteredEvents = appSettings.filterEvents(calendarViewModel.events(for: day.date))
                         DayRowView(
                             day: day,
-                            events: calendarViewModel.events(for: day.date),
+                            events: filteredEvents,
                             isSelected: isSelected(day.date),
+                            appSettings: appSettings,
                             onTap: { onDateTap(day.date) }
                         )
                     }
@@ -80,7 +86,10 @@ struct DayRowView: View {
     let day: DayData
     let events: [CalendarEvent]
     let isSelected: Bool
+    let appSettings: AppSettings
     let onTap: () -> Void
+    
+    private var isWeekend: Bool { appSettings.isWeekend(weekday: day.weekday) }
 
     var body: some View {
         Button(action: onTap) {
@@ -90,23 +99,23 @@ struct DayRowView: View {
                     Text(weekdayAbbreviation)
                         .font(.caption2)
                         .fontWeight(.medium)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(isWeekend ? appSettings.columnHeadingColor.opacity(0.7) : appSettings.columnHeadingColor)
 
                     ZStack {
                         if day.isToday {
                             Circle()
-                                .fill(Color.accentColor)
+                                .fill(appSettings.todayColor)
                                 .frame(width: 32, height: 32)
                         } else if isSelected {
                             Circle()
-                                .stroke(Color.accentColor, lineWidth: 2)
+                                .stroke(appSettings.todayColor, lineWidth: 2)
                                 .frame(width: 32, height: 32)
                         }
 
                         Text("\(day.dayNumber)")
                             .font(.system(.body, design: .rounded))
                             .fontWeight(day.isToday ? .bold : .regular)
-                            .foregroundStyle(day.isToday ? .white : .primary)
+                            .foregroundStyle(day.isToday ? .white : appSettings.dateLabelColor)
                     }
                     .frame(width: 32, height: 32)
                 }
@@ -133,9 +142,13 @@ struct DayRowView: View {
             .padding(.vertical, 8)
             .padding(.horizontal, 12)
             .background {
-                if day.isWeekend {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(appSettings.backgroundColor(isWeekend: isWeekend))
+            }
+            .overlay {
+                if appSettings.showGridlinesRow {
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(.quaternary.opacity(0.3))
+                        .stroke(appSettings.gridlineColor, lineWidth: 1)
                 }
             }
         }
@@ -169,4 +182,5 @@ struct DayRowView: View {
         .navigationTitle("2026")
     }
     .environment(CalendarViewModel())
+    .environment(AppSettings())
 }

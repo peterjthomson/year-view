@@ -4,25 +4,35 @@ struct DayCell: View {
     let day: DayData
     let isSelected: Bool
     let eventColors: [Color]
+    let appSettings: AppSettings
     let onTap: () -> Void
 
     @Environment(\.colorScheme) private var colorScheme
+    
+    private var isWeekend: Bool { appSettings.isWeekend(weekday: day.weekday) }
 
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: 2) {
                 ZStack {
+                    // Weekend/weekday background
+                    if !day.isToday && !isSelected {
+                        Circle()
+                            .fill(appSettings.backgroundColor(isWeekend: isWeekend))
+                            .frame(width: 28, height: 28)
+                    }
+                    
                     // Today highlight
                     if day.isToday {
                         Circle()
-                            .fill(Color.accentColor)
+                            .fill(appSettings.todayColor)
                             .frame(width: 28, height: 28)
                     }
 
                     // Selection ring
                     if isSelected && !day.isToday {
                         Circle()
-                            .stroke(Color.accentColor, lineWidth: 2)
+                            .stroke(appSettings.todayColor, lineWidth: 2)
                             .frame(width: 28, height: 28)
                     }
 
@@ -53,10 +63,8 @@ struct DayCell: View {
     private var dayTextColor: Color {
         if day.isToday {
             return .white
-        } else if day.isWeekend {
-            return .secondary
         } else {
-            return .primary
+            return appSettings.dateLabelColor
         }
     }
 
@@ -130,11 +138,13 @@ struct CompactDayCell: View {
 }
 
 #Preview("Day Cell") {
-    HStack(spacing: 20) {
+    let settings = AppSettings()
+    return HStack(spacing: 20) {
         DayCell(
             day: DayData(date: Date(), calendar: Calendar.current),
             isSelected: false,
             eventColors: [.blue, .green],
+            appSettings: settings,
             onTap: {}
         )
 
@@ -142,6 +152,7 @@ struct CompactDayCell: View {
             day: DayData(date: Date(), calendar: Calendar.current),
             isSelected: true,
             eventColors: [.blue],
+            appSettings: settings,
             onTap: {}
         )
 
@@ -149,6 +160,7 @@ struct CompactDayCell: View {
             day: DayData(date: Date().addingTimeInterval(86400), calendar: Calendar.current),
             isSelected: false,
             eventColors: [],
+            appSettings: settings,
             onTap: {}
         )
     }

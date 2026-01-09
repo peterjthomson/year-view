@@ -7,8 +7,9 @@ struct BigYearLayout: View {
     let onDateTap: (Date) -> Void
 
     @Environment(CalendarViewModel.self) private var calendarViewModel
+    @Environment(AppSettings.self) private var appSettings
 
-    private let calendar = Calendar.current
+    private var calendar: Calendar { appSettings.calendar }
     private let dayColumnWidth: CGFloat = 140
     private let rowHeight: CGFloat = 80
 
@@ -23,11 +24,10 @@ struct BigYearLayout: View {
                             selectedDate: selectedDate,
                             onDateTap: onDateTap,
                             dayColumnWidth: dayColumnWidth,
-                            rowHeight: rowHeight
+                            rowHeight: rowHeight,
+                            appSettings: appSettings
                         )
                         .id(weekStart)
-
-                        Divider()
                     }
                 }
             }
@@ -38,7 +38,7 @@ struct BigYearLayout: View {
                 }
             }
         }
-        .background(Color.systemGroupedBackground)
+        .background(appSettings.pageBackgroundColor)
     }
 
     /// All weeks that have at least one day in the target year
@@ -51,7 +51,7 @@ struct BigYearLayout: View {
             return weeks
         }
 
-        // Find the Monday of the week containing Jan 1
+        // Find the start of the week containing Jan 1
         var currentWeekStart = startOfWeek(for: startOfYear)
 
         // Include the previous week if it contains days from last year that show in our view
@@ -90,28 +90,35 @@ struct WeekRowView: View {
     let onDateTap: (Date) -> Void
     let dayColumnWidth: CGFloat
     let rowHeight: CGFloat
+    let appSettings: AppSettings
 
     @Environment(CalendarViewModel.self) private var calendarViewModel
 
-    private let calendar = Calendar.current
+    private var calendar: Calendar { appSettings.calendar }
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             // Day cells row
             HStack(spacing: 0) {
-                ForEach(daysInWeek, id: \.self) { date in
+                ForEach(Array(daysInWeek.enumerated()), id: \.element) { index, date in
+                    let isWeekend = appSettings.isWeekend(date: date)
                     DayCellBigYear(
                         date: date,
                         isInYear: calendar.component(.year, from: date) == year,
                         isToday: calendar.isDateInToday(date),
                         isSelected: selectedDate.map { calendar.isDate($0, inSameDayAs: date) } ?? false,
                         showMonthLabel: shouldShowMonthLabel(for: date),
+                        isWeekend: isWeekend,
+                        appSettings: appSettings,
                         onTap: { onDateTap(date) }
                     )
                     .frame(width: dayColumnWidth, height: rowHeight)
-
-                    if date != daysInWeek.last {
-                        Divider()
+                    .overlay(alignment: .trailing) {
+                        if appSettings.showGridlinesBigYear && index < daysInWeek.count - 1 {
+                            Rectangle()
+                                .fill(appSettings.gridlineColor)
+                                .frame(width: 1)
+                        }
                     }
                 }
             }
@@ -126,6 +133,13 @@ struct WeekRowView: View {
             )
         }
         .frame(height: rowHeight)
+        .overlay(alignment: .bottom) {
+            if appSettings.showGridlinesBigYear {
+                Rectangle()
+                    .fill(appSettings.gridlineColor)
+                    .frame(height: 1)
+            }
+        }
     }
 
     private var daysInWeek: [Date] {
@@ -139,7 +153,8 @@ struct WeekRowView: View {
             return []
         }
 
-        return calendarViewModel.filteredEvents.filter { event in
+        let filtered = appSettings.filterEvents(calendarViewModel.filteredEvents)
+        return filtered.filter { event in
             // Event overlaps with this week
             let eventStart = calendar.startOfDay(for: event.startDate)
             let eventEnd = calendar.startOfDay(for: event.endDate)
@@ -162,9 +177,11 @@ struct DayCellBigYear: View {
     let isToday: Bool
     let isSelected: Bool
     let showMonthLabel: Bool
+    let isWeekend: Bool
+    let appSettings: AppSettings
     let onTap: () -> Void
 
-    private let calendar = Calendar.current
+    private var calendar: Calendar { appSettings.calendar }
 
     var body: some View {
         Button(action: onTap) {
@@ -174,18 +191,18 @@ struct DayCellBigYear: View {
                     Text(weekdayAbbrev)
                         .font(.caption2)
                         .fontWeight(.medium)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(isWeekend ? appSettings.columnHeadingColor.opacity(0.7) : appSettings.columnHeadingColor)
 
                     Text("\(calendar.component(.day, from: date))")
                         .font(.subheadline)
                         .fontWeight(isToday ? .bold : .regular)
-                        .foregroundStyle(isInYear ? .primary : .tertiary)
+                        .foregroundStyle(isToday ? appSettings.todayColor : (isInYear ? appSettings.dateLabelColor : appSettings.dateLabelColor.opacity(0.3)))
 
                     if showMonthLabel {
                         Text(monthAbbrev)
                             .font(.caption)
                             .fontWeight(.bold)
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(appSettings.rowHeadingColor)
                     }
 
                     Spacer()
@@ -204,13 +221,14 @@ struct DayCellBigYear: View {
 
     private var backgroundColor: Color {
         if isToday {
-            return Color.yellow.opacity(0.3)
+            return appSettings.todayColor.opacity(0.3)
         } else if isSelected {
-            return Color.accentColor.opacity(0.1)
+            return appSettings.todayColor.opacity(0.1)
         } else if !isInYear {
-            return Color.secondarySystemGroupedBackground
+            // Days outside the current year - weekend shading takes priority
+            return appSettings.unusedCellBackgroundColor(forWeekday: calendar.component(.weekday, from: date))
         } else {
-            return Color.clear
+            return appSettings.backgroundColor(isWeekend: isWeekend)
         }
     }
 
@@ -237,7 +255,7 @@ struct DayCellBigYear: View {
     }
 }
 
-struct EventBarsOverlay: View {
+private struct EventBarsOverlay: View {
     let weekStart: Date
     let daysInWeek: [Date]
     let events: [CalendarEvent]
@@ -393,4 +411,5 @@ struct EventBar: View {
         .navigationTitle("2026")
     }
     .environment(CalendarViewModel())
+    .environment(AppSettings())
 }

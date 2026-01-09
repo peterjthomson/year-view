@@ -3,12 +3,14 @@ import SwiftUI
 @main
 struct YearViewApp: App {
     @State private var calendarViewModel = CalendarViewModel()
+    @State private var appSettings = AppSettings()
 
     var body: some Scene {
         #if os(macOS)
         WindowGroup {
             ContentView()
                 .environment(calendarViewModel)
+                .environment(appSettings)
         }
         .commands {
             MacCommands(calendarViewModel: calendarViewModel)
@@ -17,17 +19,20 @@ struct YearViewApp: App {
         MenuBarExtra("Year View", systemImage: "calendar") {
             MenuBarView()
                 .environment(calendarViewModel)
+                .environment(appSettings)
         }
         .menuBarExtraStyle(.window)
 
         Settings {
-            CalendarSelectionView()
+            SettingsView()
                 .environment(calendarViewModel)
+                .environment(appSettings)
         }
         #else
         WindowGroup {
             ContentView()
                 .environment(calendarViewModel)
+                .environment(appSettings)
         }
         #endif
     }

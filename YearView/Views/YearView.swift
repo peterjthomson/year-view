@@ -2,9 +2,11 @@ import SwiftUI
 
 struct YearView: View {
     @Environment(CalendarViewModel.self) private var calendarViewModel
+    @Environment(AppSettings.self) private var appSettings
     @State private var yearViewModel = YearViewModel()
     @State private var selectedDate: Date?
     @State private var showingDayDetail = false
+    @State private var showingSettings = false
     @GestureState private var magnifyBy = 1.0
 
     var body: some View {
@@ -18,25 +20,25 @@ struct YearView: View {
                 )
             case .monthRows:
                 YearMonthRowLayout(
-                    months: yearViewModel.months(for: calendarViewModel.displayedYear),
+                    months: yearViewModel.months(for: calendarViewModel.displayedYear, using: appSettings),
                     selectedDate: $selectedDate,
                     onDateTap: handleDateTap
                 )
             case .standardGrid:
                 StandardGridLayout(
-                    months: yearViewModel.months(for: calendarViewModel.displayedYear),
+                    months: yearViewModel.months(for: calendarViewModel.displayedYear, using: appSettings),
                     selectedDate: $selectedDate,
                     onDateTap: handleDateTap
                 )
             case .continuousRow:
                 ContinuousRowLayout(
-                    months: yearViewModel.months(for: calendarViewModel.displayedYear),
+                    months: yearViewModel.months(for: calendarViewModel.displayedYear, using: appSettings),
                     selectedDate: $selectedDate,
                     onDateTap: handleDateTap
                 )
             case .verticalList:
                 VerticalListLayout(
-                    months: yearViewModel.months(for: calendarViewModel.displayedYear),
+                    months: yearViewModel.months(for: calendarViewModel.displayedYear, using: appSettings),
                     selectedDate: $selectedDate,
                     onDateTap: handleDateTap
                 )
@@ -102,25 +104,69 @@ struct YearView: View {
         .toolbar {
             #if os(iOS)
             ToolbarItem(placement: .bottomBar) {
-                Picker("Layout", selection: $yearViewModel.layoutStyle) {
+                HStack(spacing: 2) {
                     ForEach(YearLayoutStyle.allCases) { style in
-                        Image(systemName: style.icon)
-                            .tag(style)
+                        Button {
+                            yearViewModel.layoutStyle = style
+                        } label: {
+                            Image(systemName: style.icon)
+                                .frame(width: 32, height: 32)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(yearViewModel.layoutStyle == style ? .accentColor : .gray)
+                        .accessibilityLabel(style.description)
                     }
+                    
+                    Divider()
+                        .frame(height: 24)
+                        .padding(.horizontal, 4)
+                    
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                            .frame(width: 32, height: 32)
+                    }
+                    .buttonStyle(.bordered)
+                    .accessibilityLabel("Settings")
                 }
-                .pickerStyle(.segmented)
-                .frame(maxWidth: 200)
             }
             #else
             ToolbarItem(placement: .automatic) {
-                Picker("Layout", selection: $yearViewModel.layoutStyle) {
+                HStack(spacing: 2) {
                     ForEach(YearLayoutStyle.allCases) { style in
-                        Label(style.rawValue, systemImage: style.icon)
-                            .tag(style)
+                        Button {
+                            yearViewModel.layoutStyle = style
+                        } label: {
+                            Image(systemName: style.icon)
+                                .frame(width: 24, height: 24)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(yearViewModel.layoutStyle == style ? .accentColor : .gray)
+                        .help(style.description)
+                        .accessibilityLabel(style.description)
                     }
                 }
-                .pickerStyle(.segmented)
             }
+            #endif
+        }
+        .sheet(isPresented: $showingSettings) {
+            NavigationStack {
+                SettingsView()
+                    .navigationTitle("Settings")
+                    #if os(iOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    #endif
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") {
+                                showingSettings = false
+                            }
+                        }
+                    }
+            }
+            #if os(macOS)
+            .frame(minWidth: 350, minHeight: 450)
             #endif
         }
         .accessibilityAction(.escape) {
@@ -140,4 +186,5 @@ struct YearView: View {
         YearView()
     }
     .environment(CalendarViewModel())
+    .environment(AppSettings())
 }

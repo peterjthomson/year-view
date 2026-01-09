@@ -46,32 +46,32 @@ final class YearViewModel {
     var layoutStyle: YearLayoutStyle = .bigYear  // Default to Big Year style
     var showWeekends: Bool = true
     var showWeekNumbers: Bool = false
-    var firstDayOfWeek: Int = 1 // 1 = Sunday, 2 = Monday
     var zoomLevel: CGFloat = 1.0
 
-    private let calendar = Calendar.current
-
-    var months: [MonthData] {
-        (1...12).compactMap { month in
-            var components = DateComponents()
-            components.year = Calendar.current.component(.year, from: Date())
-            components.month = month
-            components.day = 1
-
-            guard let date = calendar.date(from: components) else { return nil }
-            return MonthData(date: date, calendar: calendar)
-        }
-    }
-
-    func months(for year: Int) -> [MonthData] {
-        (1...12).compactMap { month in
+    func months(for year: Int, using appSettings: AppSettings) -> [MonthData] {
+        let calendar = appSettings.calendar
+        return (1...12).compactMap { month in
             var components = DateComponents()
             components.year = year
             components.month = month
             components.day = 1
 
             guard let date = calendar.date(from: components) else { return nil }
-            return MonthData(date: date, calendar: calendar)
+            return MonthData(date: date, calendar: calendar, appSettings: appSettings)
+        }
+    }
+    
+    // Legacy method for compatibility
+    func months(for year: Int) -> [MonthData] {
+        let calendar = Calendar.current
+        return (1...12).compactMap { month in
+            var components = DateComponents()
+            components.year = year
+            components.month = month
+            components.day = 1
+
+            guard let date = calendar.date(from: components) else { return nil }
+            return MonthData(date: date, calendar: calendar, appSettings: nil)
         }
     }
 }
@@ -83,10 +83,12 @@ struct MonthData: Identifiable {
     let days: [DayData]
     let weeks: [[DayData?]]
     let weekdayHeaders: [String]
+    /// Weekday numbers (1-7) for each column, respecting firstWeekday
+    let weekdayNumbers: [Int]
     
     var id: Date { date }
 
-    init(date: Date, calendar: Calendar) {
+    init(date: Date, calendar: Calendar, appSettings: AppSettings? = nil) {
         self.date = date
 
         let formatter = DateFormatter()
@@ -96,9 +98,20 @@ struct MonthData: Identifiable {
         formatter.dateFormat = "MMM"
         self.shortName = formatter.string(from: date)
 
-        // Generate weekday headers
-        let symbols = calendar.veryShortWeekdaySymbols
-        self.weekdayHeaders = symbols
+        // Generate weekday headers respecting firstWeekday
+        let allSymbols = calendar.veryShortWeekdaySymbols // 0=Sun, 1=Mon, etc. (0-indexed)
+        let firstWeekday = calendar.firstWeekday // 1=Sun, 2=Mon, etc. (1-indexed)
+        
+        // Reorder symbols based on firstWeekday
+        var orderedSymbols: [String] = []
+        var orderedWeekdays: [Int] = []
+        for i in 0..<7 {
+            let index = (firstWeekday - 1 + i) % 7
+            orderedSymbols.append(allSymbols[index])
+            orderedWeekdays.append(index + 1) // Convert back to 1-indexed weekday
+        }
+        self.weekdayHeaders = orderedSymbols
+        self.weekdayNumbers = orderedWeekdays
 
         // Generate days for the month
         guard let range = calendar.range(of: .day, in: .month, for: date) else {
@@ -121,7 +134,6 @@ struct MonthData: Identifiable {
         var weeks: [[DayData?]] = []
         var currentWeek: [DayData?] = Array(repeating: nil, count: 7)
 
-        // Add leading empty days
         if let firstDay = days.first {
             let weekday = calendar.component(.weekday, from: firstDay.date)
             let offset = weekday - calendar.firstWeekday
@@ -140,6 +152,35 @@ struct MonthData: Identifiable {
 
         self.weeks = weeks
     }
+    
+    /// Returns weeks with single-day weeks collapsed (for compact display)
+    /// If a week has only one day at the start of month, it's merged with the next week
+    /// If a week has only one day at the end of month, it's merged with the previous week
+    var collapsedWeeks: [[DayData?]] {
+        guard weeks.count > 1 else { return weeks }
+        
+        var result = weeks
+        
+        // Check first week - if it has only 1 day, we don't show it separately
+        if let firstWeek = result.first {
+            let daysInFirstWeek = firstWeek.compactMap { $0 }.count
+            if daysInFirstWeek == 1 {
+                // Remove the first week (it will naturally flow into calendar view)
+                result.removeFirst()
+            }
+        }
+        
+        // Check last week - if it has only 1 day, we don't show it separately  
+        if let lastWeek = result.last {
+            let daysInLastWeek = lastWeek.compactMap { $0 }.count
+            if daysInLastWeek == 1 && result.count > 1 {
+                // Remove the last week
+                result.removeLast()
+            }
+        }
+        
+        return result
+    }
 }
 
 struct DayData: Identifiable {
@@ -156,6 +197,7 @@ struct DayData: Identifiable {
         self.dayNumber = calendar.component(.day, from: date)
         self.isToday = calendar.isDateInToday(date)
         self.weekday = calendar.component(.weekday, from: date)
-        self.isWeekend = weekday == 1 || weekday == 7 // Sunday or Saturday
+        // Weekend is always Saturday (7) and Sunday (1)
+        self.isWeekend = weekday == 1 || weekday == 7
     }
 }

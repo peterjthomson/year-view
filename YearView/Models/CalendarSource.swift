@@ -31,6 +31,8 @@ struct CalendarSource: Identifiable, Hashable {
                 self = .local
             case .subscribed:
                 self = .calDAV
+            case .mobileMe:
+                self = .iCloud
             @unknown default:
                 self = .unknown
             }

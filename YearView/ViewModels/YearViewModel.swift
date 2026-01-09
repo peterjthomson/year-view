@@ -3,6 +3,7 @@ import Observation
 
 enum YearLayoutStyle: String, CaseIterable, Identifiable {
     case bigYear = "Year"           // Continuous week rows (Big Year style) - DEFAULT
+    case monthRows = "Months"       // Calendar.app-style: each month is one row (6-week strip)
     case standardGrid = "Grid"      // Traditional 4×3 month grid
     case continuousRow = "Row"      // Horizontal month scroll
     case verticalList = "List"      // Vertical month list
@@ -13,6 +14,8 @@ enum YearLayoutStyle: String, CaseIterable, Identifiable {
         switch self {
         case .bigYear:
             return "calendar"
+        case .monthRows:
+            return "rectangle.grid.1x2"
         case .standardGrid:
             return "square.grid.3x3"
         case .continuousRow:
@@ -26,6 +29,8 @@ enum YearLayoutStyle: String, CaseIterable, Identifiable {
         switch self {
         case .bigYear:
             return "Continuous week rows"
+        case .monthRows:
+            return "Month rows"
         case .standardGrid:
             return "Month grid"
         case .continuousRow:

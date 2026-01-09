@@ -16,6 +16,12 @@ struct YearView: View {
                     selectedDate: $selectedDate,
                     onDateTap: handleDateTap
                 )
+            case .monthRows:
+                YearMonthRowLayout(
+                    months: yearViewModel.months(for: calendarViewModel.displayedYear),
+                    selectedDate: $selectedDate,
+                    onDateTap: handleDateTap
+                )
             case .standardGrid:
                 StandardGridLayout(
                     months: yearViewModel.months(for: calendarViewModel.displayedYear),

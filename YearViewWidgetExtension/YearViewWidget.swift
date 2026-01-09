@@ -73,8 +73,7 @@ struct YearViewWidgetProvider: TimelineProvider {
     }
 
     private func fetchTodayEvents() -> [WidgetEvent] {
-        let status = EKEventStore.authorizationStatus(for: .event)
-        guard status == .authorized || status == .fullAccess else {
+        guard hasCalendarAccess() else {
             return []
         }
 
@@ -113,9 +112,17 @@ struct YearViewWidgetProvider: TimelineProvider {
         }
     }
 
-    private func hasEvents(on date: Date) -> Bool {
+    private func hasCalendarAccess() -> Bool {
         let status = EKEventStore.authorizationStatus(for: .event)
-        guard status == .authorized || status == .fullAccess else {
+        if #available(iOS 17.0, macOS 14.0, watchOS 10.0, *) {
+            return status == .fullAccess
+        } else {
+            return status == .authorized
+        }
+    }
+
+    private func hasEvents(on date: Date) -> Bool {
+        guard hasCalendarAccess() else {
             return false
         }
 

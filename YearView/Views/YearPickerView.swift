@@ -36,7 +36,7 @@ struct YearPickerView: View {
 
                     if year == selectedYear {
                         Image(systemName: "checkmark")
-                            .foregroundStyle(.accentColor)
+                            .foregroundStyle(Color.accentColor)
                             .fontWeight(.semibold)
                     }
                 }
@@ -44,7 +44,7 @@ struct YearPickerView: View {
             .buttonStyle(.plain)
             .accessibilityLabel("Year \(year)")
             .accessibilityValue(year == selectedYear ? "selected" : "")
-            .accessibilityAddTraits(year == selectedYear ? [.isSelected] : [])
+            .accessibilityAddTraits(year == selectedYear ? .isSelected : [])
         }
         #if os(iOS)
         .listStyle(.insetGrouped)

@@ -37,7 +37,7 @@ struct StandardGridLayout: View {
             }
             .padding()
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color.systemGroupedBackground)
     }
 }
 

@@ -72,7 +72,7 @@ struct CalendarRow: View {
                 // Checkmark
                 if isEnabled {
                     Image(systemName: "checkmark")
-                        .foregroundStyle(.accentColor)
+                        .foregroundStyle(Color.accentColor)
                         .fontWeight(.semibold)
                 }
             }

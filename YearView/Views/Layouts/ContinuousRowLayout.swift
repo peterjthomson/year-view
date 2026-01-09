@@ -27,7 +27,7 @@ struct ContinuousRowLayout: View {
             .scrollTargetBehavior(.viewAligned)
             .scrollPosition(id: $scrollPosition)
         }
-        .background(Color(.systemGroupedBackground))
+        .background(Color.systemGroupedBackground)
         .onAppear {
             // Scroll to current month
             let currentMonth = Calendar.current.component(.month, from: Date()) - 1

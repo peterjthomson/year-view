@@ -7,116 +7,86 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		/* Main App Files */
-		E1000001001 /* YearViewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002001; };
-		E1000001002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002002; };
-		E1000001003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1000002003; };
-
-		/* Models */
-		E1000001010 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002010; };
-		E1000001011 /* CalendarSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002011; };
-		E1000001012 /* CalendarSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002012; };
-
-		/* ViewModels */
-		E1000001020 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002020; };
-		E1000001021 /* YearViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002021; };
-		E1000001022 /* DayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002022; };
-
-		/* Views - Core */
-		E1000001030 /* YearView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002030; };
-		E1000001031 /* MonthGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002031; };
-		E1000001032 /* DayCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002032; };
-		E1000001033 /* DayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002033; };
-		E1000001034 /* EventRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002034; };
-		E1000001035 /* CalendarSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002035; };
-		E1000001036 /* YearPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002036; };
-		E1000001037 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002037; };
-
-		/* Views - Layout Options */
-		E1000001040 /* StandardGridLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002040; };
-		E1000001041 /* ContinuousRowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002041; };
-		E1000001042 /* VerticalListLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002042; };
-
-		/* Services */
-		E1000001050 /* EventKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002050; };
-		E1000001051 /* GoogleCalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002051; };
-		E1000001052 /* CalendarDeepLinkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002052; };
-		E1000001053 /* CalendarCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002053; };
-
-		/* Utilities */
-		E1000001060 /* DateUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002060; };
-		E1000001061 /* ColorUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002061; };
-		E1000001062 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002062; };
-
-		/* Platform Specific - macOS */
-		E1000001070 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002070; };
-		E1000001071 /* MacCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002071; };
-
-		/* watchOS App */
-		E1000001100 /* WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002100; };
-		E1000001101 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002101; };
-		E1000001102 /* WatchMonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002102; };
-		E1000001103 /* WatchDayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002103; };
-		E1000001104 /* WatchAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1000002104; };
-
-		/* Shared Models for Watch */
-		E1000001110 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002010; };
-		E1000001111 /* CalendarSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002011; };
-		E1000001112 /* EventKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002050; };
-		E1000001113 /* DateUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002060; };
-		E1000001114 /* ColorUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002061; };
-
-		/* Widget Extension */
-		E1000001200 /* YearViewWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002200; };
-		E1000001201 /* WidgetAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1000002201; };
-		E1000001202 /* SmallWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002202; };
-		E1000001203 /* MediumWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002203; };
-		E1000001204 /* LargeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002204; };
-		E1000001205 /* LockScreenWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002205; };
-
-		/* Shared for Widget */
-		E1000001210 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002010; };
-		E1000001211 /* DateUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002060; };
-		E1000001212 /* ColorUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002061; };
+		E1000001001 /* YearViewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002001 /* YearViewApp.swift */; };
+		E1000001002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002002 /* ContentView.swift */; };
+		E1000001003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1000002003 /* Assets.xcassets */; };
+		E1000001010 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002010 /* CalendarEvent.swift */; };
+		E1000001011 /* CalendarSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002011 /* CalendarSource.swift */; };
+		E1000001012 /* CalendarSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002012 /* CalendarSet.swift */; };
+		E1000001020 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002020 /* CalendarViewModel.swift */; };
+		E1000001021 /* YearViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002021 /* YearViewModel.swift */; };
+		E1000001022 /* DayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002022 /* DayViewModel.swift */; };
+		E1000001030 /* YearView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002030 /* YearView.swift */; };
+		E1000001031 /* MonthGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002031 /* MonthGridView.swift */; };
+		E1000001032 /* DayCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002032 /* DayCell.swift */; };
+		E1000001033 /* DayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002033 /* DayDetailView.swift */; };
+		E1000001034 /* EventRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002034 /* EventRow.swift */; };
+		E1000001035 /* CalendarSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002035 /* CalendarSelectionView.swift */; };
+		E1000001036 /* YearPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002036 /* YearPickerView.swift */; };
+		E1000001037 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002037 /* SearchView.swift */; };
+		E1000001040 /* StandardGridLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002040 /* StandardGridLayout.swift */; };
+		E1000001041 /* ContinuousRowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002041 /* ContinuousRowLayout.swift */; };
+		E1000001042 /* VerticalListLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002042 /* VerticalListLayout.swift */; };
+		E1000001043 /* BigYearLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002043 /* BigYearLayout.swift */; };
+		E1000001050 /* EventKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002050 /* EventKitService.swift */; };
+		E1000001051 /* GoogleCalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002051 /* GoogleCalendarService.swift */; };
+		E1000001052 /* CalendarDeepLinkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002052 /* CalendarDeepLinkService.swift */; };
+		E1000001053 /* CalendarCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002053 /* CalendarCacheService.swift */; };
+		E1000001060 /* DateUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002060 /* DateUtilities.swift */; };
+		E1000001061 /* ColorUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002061 /* ColorUtilities.swift */; };
+		E1000001062 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002062 /* HapticFeedback.swift */; };
+		E1000001070 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002070 /* MenuBarView.swift */; };
+		E1000001071 /* MacCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002071 /* MacCommands.swift */; };
+		E1000001100 /* WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002100 /* WatchApp.swift */; };
+		E1000001101 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002101 /* WatchContentView.swift */; };
+		E1000001102 /* WatchMonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002102 /* WatchMonthView.swift */; };
+		E1000001103 /* WatchDayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002103 /* WatchDayDetailView.swift */; };
+		E1000001104 /* WatchAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1000002104 /* WatchAssets.xcassets */; };
+		E1000001110 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002010 /* CalendarEvent.swift */; };
+		E1000001111 /* CalendarSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002011 /* CalendarSource.swift */; };
+		E1000001112 /* EventKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002050 /* EventKitService.swift */; };
+		E1000001113 /* DateUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002060 /* DateUtilities.swift */; };
+		E1000001114 /* ColorUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002061 /* ColorUtilities.swift */; };
+		E1000001200 /* YearViewWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002200 /* YearViewWidget.swift */; };
+		E1000001201 /* WidgetAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E1000002201 /* WidgetAssets.xcassets */; };
+		E1000001202 /* SmallWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002202 /* SmallWidget.swift */; };
+		E1000001203 /* MediumWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002203 /* MediumWidget.swift */; };
+		E1000001204 /* LargeWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002204 /* LargeWidget.swift */; };
+		E1000001205 /* LockScreenWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002205 /* LockScreenWidget.swift */; };
+		E1000001210 /* CalendarEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002010 /* CalendarEvent.swift */; };
+		E1000001211 /* DateUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002060 /* DateUtilities.swift */; };
+		E1000001212 /* ColorUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002061 /* ColorUtilities.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		E1000003001 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E1000004001;
-			proxyType = 1;
-			remoteGlobalIDString = E1000005002;
-			remoteInfo = "YearView Watch App";
-		};
-		E1000003002 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E1000004001;
-			proxyType = 1;
-			remoteGlobalIDString = E1000005003;
-			remoteInfo = YearViewWidgetExtension;
-		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		E100000B001 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		/* Main App Files */
 		E1000002001 /* YearViewApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearViewApp.swift; sourceTree = "<group>"; };
 		E1000002002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		E1000002003 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E1000002004 /* YearView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YearView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1000002005 /* YearView.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = YearView.entitlements; sourceTree = "<group>"; };
 		E1000002006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-
-		/* Models */
 		E1000002010 /* CalendarEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEvent.swift; sourceTree = "<group>"; };
 		E1000002011 /* CalendarSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSource.swift; sourceTree = "<group>"; };
 		E1000002012 /* CalendarSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSet.swift; sourceTree = "<group>"; };
-
-		/* ViewModels */
 		E1000002020 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
 		E1000002021 /* YearViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearViewModel.swift; sourceTree = "<group>"; };
 		E1000002022 /* DayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayViewModel.swift; sourceTree = "<group>"; };
-
-		/* Views - Core */
 		E1000002030 /* YearView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearView.swift; sourceTree = "<group>"; };
 		E1000002031 /* MonthGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthGridView.swift; sourceTree = "<group>"; };
 		E1000002032 /* DayCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayCell.swift; sourceTree = "<group>"; };
@@ -125,28 +95,19 @@
 		E1000002035 /* CalendarSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSelectionView.swift; sourceTree = "<group>"; };
 		E1000002036 /* YearPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearPickerView.swift; sourceTree = "<group>"; };
 		E1000002037 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
-
-		/* Views - Layout Options */
 		E1000002040 /* StandardGridLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandardGridLayout.swift; sourceTree = "<group>"; };
 		E1000002041 /* ContinuousRowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinuousRowLayout.swift; sourceTree = "<group>"; };
 		E1000002042 /* VerticalListLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalListLayout.swift; sourceTree = "<group>"; };
-
-		/* Services */
+		E1000002043 /* BigYearLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigYearLayout.swift; sourceTree = "<group>"; };
 		E1000002050 /* EventKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitService.swift; sourceTree = "<group>"; };
 		E1000002051 /* GoogleCalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarService.swift; sourceTree = "<group>"; };
 		E1000002052 /* CalendarDeepLinkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDeepLinkService.swift; sourceTree = "<group>"; };
 		E1000002053 /* CalendarCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCacheService.swift; sourceTree = "<group>"; };
-
-		/* Utilities */
 		E1000002060 /* DateUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtilities.swift; sourceTree = "<group>"; };
 		E1000002061 /* ColorUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorUtilities.swift; sourceTree = "<group>"; };
 		E1000002062 /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
-
-		/* Platform Specific - macOS */
 		E1000002070 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		E1000002071 /* MacCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCommands.swift; sourceTree = "<group>"; };
-
-		/* watchOS App */
 		E1000002100 /* WatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchApp.swift; sourceTree = "<group>"; };
 		E1000002101 /* WatchContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
 		E1000002102 /* WatchMonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchMonthView.swift; sourceTree = "<group>"; };
@@ -154,8 +115,6 @@
 		E1000002104 /* WatchAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = WatchAssets.xcassets; sourceTree = "<group>"; };
 		E1000002105 /* YearView Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "YearView Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1000002106 /* WatchInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = WatchInfo.plist; sourceTree = "<group>"; };
-
-		/* Widget Extension */
 		E1000002200 /* YearViewWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearViewWidget.swift; sourceTree = "<group>"; };
 		E1000002201 /* WidgetAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = WidgetAssets.xcassets; sourceTree = "<group>"; };
 		E1000002202 /* SmallWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallWidget.swift; sourceTree = "<group>"; };
@@ -328,6 +287,7 @@
 				E1000002040 /* StandardGridLayout.swift */,
 				E1000002041 /* ContinuousRowLayout.swift */,
 				E1000002042 /* VerticalListLayout.swift */,
+				E1000002043 /* BigYearLayout.swift */,
 			);
 			path = Layouts;
 			sourceTree = "<group>";
@@ -337,27 +297,25 @@
 /* Begin PBXNativeTarget section */
 		E1000005001 /* YearView */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E1000008001;
+			buildConfigurationList = E1000008001 /* Build configuration list for PBXNativeTarget "YearView" */;
 			buildPhases = (
 				E1000009001 /* Sources */,
 				E1000006001 /* Frameworks */,
 				E100000A001 /* Resources */,
-				E100000B001 /* Embed App Extensions */,
+				E100000B001 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				E100000C001 /* PBXTargetDependency */,
-				E100000C002 /* PBXTargetDependency */,
 			);
 			name = YearView;
 			productName = YearView;
-			productReference = E1000002004;
+			productReference = E1000002004 /* YearView.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E1000005002 /* YearView Watch App */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E1000008002;
+			buildConfigurationList = E1000008002 /* Build configuration list for PBXNativeTarget "YearView Watch App" */;
 			buildPhases = (
 				E1000009002 /* Sources */,
 				E1000006002 /* Frameworks */,
@@ -369,12 +327,12 @@
 			);
 			name = "YearView Watch App";
 			productName = "YearView Watch App";
-			productReference = E1000002105;
+			productReference = E1000002105 /* YearView Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E1000005003 /* YearViewWidgetExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E1000008003;
+			buildConfigurationList = E1000008003 /* Build configuration list for PBXNativeTarget "YearViewWidgetExtension" */;
 			buildPhases = (
 				E1000009003 /* Sources */,
 				E1000006003 /* Frameworks */,
@@ -386,7 +344,7 @@
 			);
 			name = YearViewWidgetExtension;
 			productName = YearViewWidgetExtension;
-			productReference = E1000002206;
+			productReference = E1000002206 /* YearViewWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -397,7 +355,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2620;
 				TargetAttributes = {
 					E1000005001 = {
 						CreatedOnToolsVersion = 15.0;
@@ -410,7 +368,7 @@
 					};
 				};
 			};
-			buildConfigurationList = E1000008000;
+			buildConfigurationList = E1000008000 /* Build configuration list for PBXProject "YearView" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -419,7 +377,7 @@
 				Base,
 			);
 			mainGroup = E1000007001;
-			productRefGroup = E1000007005;
+			productRefGroup = E1000007005 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -481,6 +439,7 @@
 				E1000001040 /* StandardGridLayout.swift in Sources */,
 				E1000001041 /* ContinuousRowLayout.swift in Sources */,
 				E1000001042 /* VerticalListLayout.swift in Sources */,
+				E1000001043 /* BigYearLayout.swift in Sources */,
 				E1000001050 /* EventKitService.swift in Sources */,
 				E1000001051 /* GoogleCalendarService.swift in Sources */,
 				E1000001052 /* CalendarDeepLinkService.swift in Sources */,
@@ -527,33 +486,9 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		E100000C001 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E1000005002;
-			targetProxy = E1000003001;
-		};
-		E100000C002 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = E1000005003;
-			targetProxy = E1000003002;
-		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		E100000B001 /* Embed App Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-			);
-			name = "Embed App Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin XCBuildConfiguration section */
-		/* Project-level Debug */
 		E100000D001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -588,6 +523,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -610,12 +546,12 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
-		/* Project-level Release */
 		E100000D002 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -650,6 +586,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -665,25 +602,31 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
 		};
-		/* YearView Debug */
 		E100000D003 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = YearView/YearView.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = R4RRG93J68;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YearView/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Year View";
+				INFOPLIST_KEY_CFBundleDisplayName = "Year View Cal";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Year View needs access to your calendars to display your events.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -698,6 +641,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.yearview.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
@@ -707,21 +651,26 @@
 			};
 			name = Debug;
 		};
-		/* YearView Release */
 		E100000D004 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = YearView/YearView.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = R4RRG93J68;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YearView/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Year View";
+				INFOPLIST_KEY_CFBundleDisplayName = "Year View Cal";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Year View needs access to your calendars to display your events.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -736,6 +685,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.yearview.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
@@ -745,7 +695,6 @@
 			};
 			name = Release;
 		};
-		/* Watch Debug */
 		E100000D005 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -754,10 +703,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = R4RRG93J68;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "YearView Watch App/WatchInfo.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Year View";
+				INFOPLIST_KEY_CFBundleDisplayName = "Year View Cal";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Year View needs access to your calendars to display your events.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.yearview.app;
@@ -777,7 +727,6 @@
 			};
 			name = Debug;
 		};
-		/* Watch Release */
 		E100000D006 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -786,10 +735,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "";
+				DEVELOPMENT_TEAM = R4RRG93J68;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "YearView Watch App/WatchInfo.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Year View";
+				INFOPLIST_KEY_CFBundleDisplayName = "Year View Cal";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Year View needs access to your calendars to display your events.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.yearview.app;
@@ -809,7 +759,6 @@
 			};
 			name = Release;
 		};
-		/* Widget Debug */
 		E100000D007 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -817,6 +766,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YearViewWidgetExtension/WidgetInfo.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = YearViewWidget;
@@ -846,7 +796,6 @@
 			};
 			name = Debug;
 		};
-		/* Widget Release */
 		E100000D008 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -854,6 +803,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = YearViewWidgetExtension/WidgetInfo.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = YearViewWidget;
@@ -924,5 +874,5 @@
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = E1000004001;
+	rootObject = E1000004001 /* Project object */;
 }

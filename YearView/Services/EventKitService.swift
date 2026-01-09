@@ -1,5 +1,7 @@
-import EventKit
 import SwiftUI
+
+#if canImport(EventKit)
+import EventKit
 
 final class EventKitService {
     private let eventStore = EKEventStore()
@@ -73,3 +75,18 @@ final class EventKitService {
         NotificationCenter.default.removeObserver(observer)
     }
 }
+#else
+/// watchOS-safe stub to keep the shared code compiling even when EventKit isn't available.
+final class EventKitService {
+    func requestAccess() async throws -> Bool { false }
+    func fetchCalendars() -> [Any] { [] }
+    func fetchEvents(from startDate: Date, to endDate: Date, calendars: [Any]? = nil) -> [Any] { [] }
+    func fetchEvent(withIdentifier identifier: String) -> Any? { nil }
+    func startObservingChanges(handler: @escaping () -> Void) -> NSObjectProtocol {
+        NotificationCenter.default.addObserver(forName: Notification.Name("EventKitUnavailable"), object: nil, queue: .main) { _ in }
+    }
+    func stopObservingChanges(observer: NSObjectProtocol) {
+        NotificationCenter.default.removeObserver(observer)
+    }
+}
+#endif

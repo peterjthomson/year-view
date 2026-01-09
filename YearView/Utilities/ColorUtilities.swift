@@ -3,18 +3,14 @@ import SwiftUI
 extension Color {
     var luminance: Double {
         #if os(macOS)
-        guard let cgColor = NSColor(self).cgColor,
-              let components = cgColor.components,
-              components.count >= 3 else {
-            return 0.5
-        }
+        let cgColor = NSColor(self).cgColor
         #else
-        guard let cgColor = UIColor(self).cgColor,
-              let components = cgColor.components,
-              components.count >= 3 else {
+        let cgColor = UIColor(self).cgColor
+        #endif
+
+        guard let components = cgColor.components, components.count >= 3 else {
             return 0.5
         }
-        #endif
 
         let red = components[0]
         let green = components[1]

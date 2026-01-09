@@ -7,6 +7,8 @@ struct ContentView: View {
     @State private var showingSearch = false
 
     var body: some View {
+        @Bindable var calendarViewModel = calendarViewModel
+
         NavigationStack {
             YearView()
                 .navigationTitle(String(calendarViewModel.displayedYear))

@@ -38,7 +38,7 @@ struct BigYearLayout: View {
                 }
             }
         }
-        .background(Color(.systemBackground))
+        .background(Color.systemGroupedBackground)
     }
 
     /// All weeks that have at least one day in the target year
@@ -208,7 +208,7 @@ struct DayCellBigYear: View {
         } else if isSelected {
             return Color.accentColor.opacity(0.1)
         } else if !isInYear {
-            return Color(.systemGray6)
+            return Color.secondarySystemGroupedBackground
         } else {
             return Color.clear
         }

@@ -5,11 +5,11 @@ struct YearViewApp: App {
     @State private var calendarViewModel = CalendarViewModel()
 
     var body: some Scene {
+        #if os(macOS)
         WindowGroup {
             ContentView()
                 .environment(calendarViewModel)
         }
-        #if os(macOS)
         .commands {
             MacCommands(calendarViewModel: calendarViewModel)
         }
@@ -22,6 +22,11 @@ struct YearViewApp: App {
 
         Settings {
             CalendarSelectionView()
+                .environment(calendarViewModel)
+        }
+        #else
+        WindowGroup {
+            ContentView()
                 .environment(calendarViewModel)
         }
         #endif

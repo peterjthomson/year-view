@@ -23,14 +23,6 @@ jobs:
             target: YearView
             sdk: macosx
             destination: generic/platform=macOS
-          - name: iOS (Simulator) - Widget
-            target: YearViewWidgetExtension
-            sdk: iphonesimulator
-            destination: generic/platform=iOS Simulator
-          - name: watchOS (Simulator) - Watch App
-            target: YearView Watch App
-            sdk: watchsimulator
-            destination: generic/platform=watchOS Simulator
 
     steps:
       - name: Checkout

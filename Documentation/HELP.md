@@ -1,6 +1,6 @@
 # Year View User Guide
 
-Welcome to **Year View**, your year-at-a-glance calendar companion for iPhone, iPad, Mac, and Apple Watch.
+Welcome to **Year View**, your year-at-a-glance calendar companion for iPhone, iPad, and Mac.
 
 Year View helps you see your entire year in one view, making it easy to spot patterns, plan ahead, and get a big-picture view of your schedule.
 

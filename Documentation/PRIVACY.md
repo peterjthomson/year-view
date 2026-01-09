@@ -5,7 +5,7 @@
 
 ## Overview
 
-Year View ("the App") is a read-only calendar visualization app for macOS, iOS, iPadOS, and watchOS. We are committed to protecting your privacy. This Privacy Policy explains how the App handles your information.
+Year View ("the App") is a read-only calendar visualization app for macOS, iOS, and iPadOS. We are committed to protecting your privacy. This Privacy Policy explains how the App handles your information.
 
 **The most important thing to know:** Year View does not collect, store, or transmit any of your personal data to our servers. All your data stays on your device.
 
@@ -149,4 +149,4 @@ If you have any questions about this Privacy Policy or Year View's privacy pract
 
 ---
 
-*This privacy policy applies to Year View for iOS, iPadOS, macOS, and watchOS.*
+*This privacy policy applies to Year View for iOS, iPadOS, and macOS.*

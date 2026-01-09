@@ -75,6 +75,33 @@ extension Color {
         Color(UIColor.secondarySystemGroupedBackground)
         #endif
     }
+    
+    /// Main system background - adapts to light/dark mode
+    static var systemBackground: Color {
+        #if os(macOS)
+        Color(NSColor.windowBackgroundColor)
+        #else
+        Color(UIColor.systemBackground)
+        #endif
+    }
+    
+    /// Secondary system background - adapts to light/dark mode
+    static var secondarySystemBackground: Color {
+        #if os(macOS)
+        Color(NSColor.underPageBackgroundColor)
+        #else
+        Color(UIColor.secondarySystemBackground)
+        #endif
+    }
+    
+    /// System separator color - adapts to light/dark mode
+    static var separator: Color {
+        #if os(macOS)
+        Color(NSColor.separatorColor)
+        #else
+        Color(UIColor.separator)
+        #endif
+    }
 }
 
 extension Color {

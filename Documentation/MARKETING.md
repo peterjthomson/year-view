@@ -35,9 +35,7 @@ Year View sees every calendar you've connected to Apple Calendar—iCloud, Googl
 
 • iPhone — Your year in your pocket
 • iPad — The full year visible without scrolling
-• Mac — Menu bar widget for quick access
-• Apple Watch — Glanceable month view on your wrist
-• Widgets — Home screen and Lock Screen at a glance
+• Mac — Menu bar access for quick glances
 
 **Privacy first:**
 
@@ -79,7 +77,7 @@ When you zoom out, everything changes. Spot the busy weeks before they arrive. F
 The classic layout. Four rows, three columns, twelve months. Your entire year in the most intuitive arrangement.
 
 **Continuous**
-Inspired by HEY Calendar. Scroll horizontally through your year like flipping through pages of time.
+Inspired by traditional wall planners, year views and HEY Calendar. Scroll horizontally through your year like flipping through pages of time.
 
 **List**
 Months stacked vertically. Perfect for scanning through the year on your phone.
@@ -113,13 +111,7 @@ Your year in your pocket. Swipe between years. Tap any day to see what's happeni
 See all 12 months without scrolling. Stage Manager and Split View ready.
 
 **Mac**
-Full app plus a menu bar widget for quick glances. Keyboard shortcuts for power users.
-
-**Apple Watch**
-Scroll through months with the Digital Crown. Tap to see today's events.
-
-**Widgets**
-Home Screen. Lock Screen. The date and your events, always visible.
+Full app plus menu bar access for quick glances. Keyboard shortcuts for power users.
 
 ---
 
@@ -151,7 +143,7 @@ We might add optional features in the future, but the core experience will alway
 
 [Download on the App Store]
 
-Available for iPhone, iPad, Mac, and Apple Watch.
+Available for iPhone, iPad, and Mac.
 
 ---
 
@@ -161,25 +153,23 @@ Available for iPhone, iPad, Mac, and Apple Watch.
 Year View is a native Apple app that shows your entire calendar year on a single screen.
 
 ### Boilerplate
-Year View is a free calendar companion app for iPhone, iPad, Mac, and Apple Watch. It connects to Apple Calendar and Google Calendar to display a full year of events in one beautiful, scannable view. Unlike traditional calendar apps focused on daily scheduling, Year View emphasizes the big picture—helping users spot patterns, find free time, and plan ahead. All event creation and editing is handled by native calendar apps via deep links, keeping Year View focused on its core purpose: clarity.
+Year View is a free calendar companion app for iPhone, iPad, and Mac. It connects to Apple Calendar and Google Calendar to display a full year of events in one beautiful, scannable view. Unlike traditional calendar apps focused on daily scheduling, Year View emphasizes the big picture—helping users spot patterns, find free time, and plan ahead. All event creation and editing is handled by native calendar apps via deep links, keeping Year View focused on its core purpose: clarity.
 
 ### Key Facts
 - **Price:** Free (no IAP, no subscriptions)
-- **Platforms:** iOS 17+, iPadOS 17+, macOS 14+, watchOS 10+
+- **Platforms:** iOS 17+, iPadOS 17+, macOS 14+
 - **Calendar Support:** Apple Calendar, Google Calendar (includes iCloud, Exchange, Outlook, CalDAV, subscribed, shared)
 - **Privacy:** No account required, no tracking, data stays on device
 - **Developer:** [Your Company Name]
 
 ### Feature Highlights
 - Full year displayed on one screen
-- Three layout options (Grid, Continuous Row, List)
+- Five layout options (Year View, Month Rows, Grid, Row, List)
 - Event dots with calendar colors
 - Day detail popover with event list
 - Video call detection (Zoom, Meet, Teams)
 - Deep links to native calendar apps
-- Menu bar widget (macOS)
-- Home Screen and Lock Screen widgets
-- Apple Watch app with Digital Crown navigation
+- Menu bar access (macOS)
 - Full accessibility support
 
 ---
@@ -191,7 +181,7 @@ Year View is a free calendar companion app for iPhone, iPad, Mac, and Apple Watc
 **Launch Tweet**
 Your entire year. One screen. 📅
 
-Introducing Year View—a free calendar companion for iPhone, iPad, Mac, and Apple Watch.
+Introducing Year View—a free calendar companion for iPhone, iPad, and Mac.
 
 See all 12 months at once. Spot the busy weeks. Find the free time. Plan with clarity.
 
@@ -245,7 +235,7 @@ Your year deserves more than tiny month squares.
 
 Year View shows all 12 months on one screen—so you can finally see the shape of your life.
 
-Free for iPhone, iPad, Mac, and Apple Watch.
+Free for iPhone, iPad, and Mac.
 
 Link in bio 📅
 
@@ -297,7 +287,7 @@ It's a free companion app that connects to your existing calendars—Apple Calen
 - Tap any event to open it in your native calendar app
 - No account required, no tracking, your data stays on your device
 
-Available now for iPhone, iPad, Mac, and Apple Watch.
+Available now for iPhone, iPad, and Mac.
 
 [Download Year View →]
 
@@ -323,14 +313,6 @@ The Year View Team
 ### Screenshot 4: Multiple Calendars
 **All your calendars**
 **One unified view**
-
-### Screenshot 5: Widgets
-**On your Home Screen**
-**On your Lock Screen**
-
-### Screenshot 6: Apple Watch
-**Glanceable**
-**On your wrist**
 
 ---
 

@@ -91,7 +91,7 @@ struct SettingsView: View {
     
     private func resetToDefaults() {
         appSettings.weekStartsOn = .monday
-        appSettings.pageBackgroundColor = .white
+        appSettings.pageBackgroundColor = Color.systemBackground
         appSettings.weekdayBackgroundColor = .clear
         appSettings.weekendBackgroundColor = Color.secondarySystemGroupedBackground.opacity(0.5)
         appSettings.unusedCellColor = Color.secondarySystemGroupedBackground.opacity(0.3)
@@ -99,7 +99,7 @@ struct SettingsView: View {
         appSettings.columnHeadingColor = .secondary
         appSettings.rowHeadingColor = .primary
         appSettings.todayColor = .accentColor
-        appSettings.gridlineColor = Color.gray.opacity(0.2)
+        appSettings.gridlineColor = Color.separator.opacity(0.5)
         appSettings.showGridlinesBigYear = true
         appSettings.showGridlinesMonthRows = true
         appSettings.showGridlinesGrid = false

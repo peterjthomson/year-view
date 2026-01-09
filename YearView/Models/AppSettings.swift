@@ -76,9 +76,10 @@ enum MonthLabelFontSize: String, CaseIterable, Identifiable {
 @Observable
 final class AppSettings {
     // MARK: - Color Settings
+    // All defaults use system-adaptive colors that work in both light and dark mode
     
     /// Background color for the page/view
-    var pageBackgroundColor: Color = .white
+    var pageBackgroundColor: Color = Color.systemBackground
     
     /// Background color for weekday cells
     var weekdayBackgroundColor: Color = .clear
@@ -102,7 +103,7 @@ final class AppSettings {
     var todayColor: Color = .accentColor
     
     /// Color for gridlines
-    var gridlineColor: Color = Color.gray.opacity(0.2)
+    var gridlineColor: Color = Color.separator.opacity(0.5)
     
     // MARK: - Gridline Settings
     

@@ -4,7 +4,7 @@ This document describes the architecture and design patterns used in Year View.
 
 ## Overview
 
-Year View is built using SwiftUI with a modern, Observable-based architecture. The app follows Apple's recommended patterns for multiplatform development, supporting iOS, iPadOS, macOS, and watchOS from a single codebase.
+Year View is built using SwiftUI with a modern, Observable-based architecture. The app follows Apple's recommended patterns for multiplatform development, supporting iOS, iPadOS, and macOS from a single codebase.
 
 ## Technology Choices
 
@@ -23,12 +23,10 @@ Year View intentionally uses standard SwiftUI with `@Observable` instead of The 
 - iOS 17.0+
 - iPadOS 17.0+
 - macOS 14.0 (Sonoma)+
-- watchOS 10.0+
 
 These requirements enable use of:
 - `@Observable` macro (replaces `ObservableObject`)
 - Modern SwiftUI navigation APIs
-- Latest WidgetKit features
 - Improved EventKit APIs
 
 ## Project Structure
@@ -68,7 +66,7 @@ YearView/
 │   ├── ColorUtilities.swift   # Color helpers
 │   └── HapticFeedback.swift   # Haptic feedback (iOS)
 └── Platform/
-    ├── MenuBarView.swift      # macOS menu bar widget
+    ├── MenuBarView.swift      # macOS menu bar view
     └── MacCommands.swift      # macOS keyboard shortcuts
 ```
 
@@ -203,7 +201,6 @@ Views include SwiftUI previews for visual testing during development.
 
 - Calendar permission flows
 - Deep link behavior
-- Widget appearance
 - Accessibility (VoiceOver, Dynamic Type)
 
 ## Accessibility
@@ -229,4 +226,5 @@ Potential enhancements (not in v1.0):
 - CloudKit sync for preferences
 - Live Activities for upcoming events
 - Siri Shortcuts integration
-- Widget configuration intents
+- Widgets (iOS/macOS)
+- Apple Watch app

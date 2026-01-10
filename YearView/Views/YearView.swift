@@ -58,21 +58,6 @@ struct YearView: View {
                     }
                 }
         )
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 50)
-                .onEnded { value in
-                    let horizontalAmount = value.translation.width
-                    if horizontalAmount < -50 {
-                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                            calendarViewModel.goToNextYear()
-                        }
-                    } else if horizontalAmount > 50 {
-                        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-                            calendarViewModel.goToPreviousYear()
-                        }
-                    }
-                }
-        )
         .overlay {
             if calendarViewModel.isLoading {
                 ProgressView()

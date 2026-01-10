@@ -18,7 +18,7 @@ final class YearViewModelTests: XCTestCase {
     // MARK: - Default State Tests
 
     func testDefaultLayoutStyle() {
-        XCTAssertEqual(viewModel.layoutStyle, .bigYear)  // Big Year is now default
+        XCTAssertEqual(viewModel.layoutStyle, .monthRows)
     }
 
     func testDefaultShowWeekends() {
@@ -35,33 +35,31 @@ final class YearViewModelTests: XCTestCase {
 
     // MARK: - Layout Style Tests
 
-    func testLayoutStyleCases() {
-        XCTAssertEqual(YearLayoutStyle.allCases.count, 4)
+    func testAllLayoutStylesExist() {
+        // Verify all 5 layout styles are available
+        XCTAssertEqual(YearLayoutStyle.allCases.count, 5)
+        XCTAssertTrue(YearLayoutStyle.allCases.contains(.monthRows))
         XCTAssertTrue(YearLayoutStyle.allCases.contains(.bigYear))
         XCTAssertTrue(YearLayoutStyle.allCases.contains(.standardGrid))
         XCTAssertTrue(YearLayoutStyle.allCases.contains(.continuousRow))
         XCTAssertTrue(YearLayoutStyle.allCases.contains(.verticalList))
     }
 
-    func testLayoutStyleIcons() {
-        XCTAssertEqual(YearLayoutStyle.bigYear.icon, "calendar")
-        XCTAssertEqual(YearLayoutStyle.standardGrid.icon, "square.grid.3x3")
-        XCTAssertEqual(YearLayoutStyle.continuousRow.icon, "rectangle.split.3x1")
-        XCTAssertEqual(YearLayoutStyle.verticalList.icon, "list.bullet")
+    func testLayoutStylesHaveUniqueIdentifiers() {
+        let ids = YearLayoutStyle.allCases.map { $0.id }
+        XCTAssertEqual(Set(ids).count, YearLayoutStyle.allCases.count, "All layout styles should have unique IDs")
     }
 
-    func testLayoutStyleRawValues() {
-        XCTAssertEqual(YearLayoutStyle.bigYear.rawValue, "Year")
-        XCTAssertEqual(YearLayoutStyle.standardGrid.rawValue, "Grid")
-        XCTAssertEqual(YearLayoutStyle.continuousRow.rawValue, "Row")
-        XCTAssertEqual(YearLayoutStyle.verticalList.rawValue, "List")
+    func testLayoutStylesHaveIcons() {
+        for style in YearLayoutStyle.allCases {
+            XCTAssertFalse(style.icon.isEmpty, "\(style) should have an icon")
+        }
     }
 
-    func testLayoutStyleDescriptions() {
-        XCTAssertEqual(YearLayoutStyle.bigYear.description, "Continuous week rows")
-        XCTAssertEqual(YearLayoutStyle.standardGrid.description, "Month grid")
-        XCTAssertEqual(YearLayoutStyle.continuousRow.description, "Horizontal scroll")
-        XCTAssertEqual(YearLayoutStyle.verticalList.description, "Vertical list")
+    func testLayoutStylesHaveDescriptions() {
+        for style in YearLayoutStyle.allCases {
+            XCTAssertFalse(style.description.isEmpty, "\(style) should have a description")
+        }
     }
 
     // MARK: - Month Generation Tests

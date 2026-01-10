@@ -27,7 +27,7 @@ final class CalendarCacheService {
     }
 
     func loadSelectedLayout() -> String {
-        userDefaults.string(forKey: selectedLayoutKey) ?? "standardGrid"
+        userDefaults.string(forKey: selectedLayoutKey) ?? "Months"
     }
 
     // MARK: - Display Preferences

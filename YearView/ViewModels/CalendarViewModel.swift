@@ -34,7 +34,8 @@ final class CalendarViewModel {
     }
 
     init() {
-        self.displayedYear = cacheService.loadLastViewedYear()
+        // Default to the current year on launch (do not restore last viewed year)
+        self.displayedYear = Calendar.current.component(.year, from: Date())
     }
 
     @MainActor
@@ -103,22 +104,41 @@ final class CalendarViewModel {
     }
 
     func toggleCalendar(_ calendar: CalendarSource) {
-        if let index = calendars.firstIndex(where: { $0.id == calendar.id }) {
-            calendars[index].isEnabled.toggle()
-            saveCalendarPreferences()
+        let updated = calendars.map { source in
+            var copy = source
+            if copy.id == calendar.id {
+                copy.isEnabled.toggle()
+            }
+            return copy
         }
+        calendars = updated
+        saveCalendarPreferences()
     }
 
     func enableAllCalendars() {
-        for index in calendars.indices {
-            calendars[index].isEnabled = true
+        calendars = calendars.map { source in
+            var copy = source
+            copy.isEnabled = true
+            return copy
         }
         saveCalendarPreferences()
     }
 
     func disableAllCalendars() {
-        for index in calendars.indices {
-            calendars[index].isEnabled = false
+        calendars = calendars.map { source in
+            var copy = source
+            copy.isEnabled = false
+            return copy
+        }
+        saveCalendarPreferences()
+    }
+
+    /// Update enabled calendars in a single batch (avoids per-row UI churn).
+    func setEnabledCalendarIDs(_ ids: Set<String>) {
+        calendars = calendars.map { source in
+            var copy = source
+            copy.isEnabled = ids.contains(copy.id)
+            return copy
         }
         saveCalendarPreferences()
     }

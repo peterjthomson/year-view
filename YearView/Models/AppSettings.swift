@@ -82,10 +82,10 @@ final class AppSettings {
     var pageBackgroundColor: Color = Color.systemBackground
     
     /// Background color for weekday cells
-    var weekdayBackgroundColor: Color = .clear
+    var weekdayBackgroundColor: Color = .white
     
     /// Background color for weekend cells
-    var weekendBackgroundColor: Color = Color.secondarySystemGroupedBackground.opacity(0.5)
+    var weekendBackgroundColor: Color = Color.gray.opacity(0.1)
     
     /// Background color for unused/placeholder cells (cells that maintain grid but have no day)
     var unusedCellColor: Color = Color.secondarySystemGroupedBackground.opacity(0.3)
@@ -100,7 +100,7 @@ final class AppSettings {
     var rowHeadingColor: Color = .primary
     
     /// Color for today highlight
-    var todayColor: Color = .accentColor
+    var todayColor: Color = Color.gray.opacity(0.25)
     
     /// Color for gridlines
     var gridlineColor: Color = Color.separator.opacity(0.5)

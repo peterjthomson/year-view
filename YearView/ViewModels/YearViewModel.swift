@@ -2,8 +2,8 @@ import SwiftUI
 import Observation
 
 enum YearLayoutStyle: String, CaseIterable, Identifiable {
-    case bigYear = "Year"           // Continuous week rows (Big Year style) - DEFAULT
-    case monthRows = "Months"       // Calendar.app-style: each month is one row (6-week strip)
+    case monthRows = "Months"       // Calendar.app-style: each month is one row - DEFAULT
+    case bigYear = "Year"           // Continuous week rows (Big Year style)
     case standardGrid = "Grid"      // Traditional 4×3 month grid
     case continuousRow = "Row"      // Horizontal month scroll
     case verticalList = "List"      // Vertical month list
@@ -43,7 +43,7 @@ enum YearLayoutStyle: String, CaseIterable, Identifiable {
 
 @Observable
 final class YearViewModel {
-    var layoutStyle: YearLayoutStyle = .bigYear  // Default to Big Year style
+    var layoutStyle: YearLayoutStyle = .monthRows  // Default to month rows style
     var showWeekends: Bool = true
     var showWeekNumbers: Bool = false
     var zoomLevel: CGFloat = 1.0

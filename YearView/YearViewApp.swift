@@ -12,6 +12,7 @@ struct YearViewApp: App {
                 .environment(calendarViewModel)
                 .environment(appSettings)
         }
+        .defaultSize(width: 1200, height: 800)
         .commands {
             MacCommands(calendarViewModel: calendarViewModel)
         }

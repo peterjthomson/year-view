@@ -10,13 +10,16 @@ struct YearMonthRowLayout: View {
 
     @Environment(CalendarViewModel.self) private var calendarViewModel
     @Environment(AppSettings.self) private var appSettings
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     private let daysPerWeek = 7
     private let outerPadding: CGFloat = 12
     private let rowSpacing: CGFloat = 0 // Spacing handled by padding/dividers
     private let headerBottomPadding: CGFloat = 8
     private let minCellWidth: CGFloat = 20
-    private let minRowHeight: CGFloat = 32
+    private let floatingPanelHeight: CGFloat = 60 // Height of floating mode panel on mobile
+    private let monthRowVerticalPadding: CGFloat = 4
+    private let rowDividerHeight: CGFloat = 1
     
     /// Use appSettings calendar for consistent week start
     private var calendar: Calendar { appSettings.calendar }
@@ -52,16 +55,28 @@ struct YearMonthRowLayout: View {
             let columns = CGFloat(totalColumns)
             
             // Height sizing: fill vertical space with 12 month rows plus header
+            // On mobile, account for floating mode panel that overlays bottom of view
             let headerHeight: CGFloat = 20
-            let availableHeight = geometry.size.height - (outerPadding * 2) - headerHeight - headerBottomPadding
-            let rowHeight = max(minRowHeight, availableHeight / 12)
+            let panelInset: CGFloat = horizontalSizeClass == .compact ? floatingPanelHeight : 0
+            let chromeHeight = (outerPadding * 2) + headerHeight + headerBottomPadding + panelInset
+            let availableHeight = max(0, geometry.size.height - chromeHeight)
+            
+            let monthCount = CGFloat(max(1, months.count))
+            let dividerCount = CGFloat(max(0, months.count - 1))
+            let totalRowPaddingHeight = monthCount * (monthRowVerticalPadding * 2)
+            let totalDividerHeight = dividerCount * rowDividerHeight
+            
+            // MonthRow's total height is cellHeight + (verticalPadding*2), plus dividers between rows.
+            // Solve for cellHeight so all 12 months are visible without vertical clipping.
+            let availableCellHeight = max(0, availableHeight - totalRowPaddingHeight - totalDividerHeight)
+            let cellHeight = max(0, availableCellHeight / monthCount)
 
             // Width sizing: fill the available width when possible, otherwise fall back to a minimum and allow scroll.
             let availableGridWidth = max(0, geometry.size.width - (outerPadding * 2) - monthLabelWidth)
             let idealCellWidth = availableGridWidth / columns
             let cellWidth = max(minCellWidth, idealCellWidth)
             
-            let cellSize = CGSize(width: cellWidth, height: rowHeight)
+            let cellSize = CGSize(width: cellWidth, height: cellHeight)
 
             ScrollView(.horizontal, showsIndicators: true) {
                 VStack(alignment: .leading, spacing: 0) {
@@ -69,7 +84,7 @@ struct YearMonthRowLayout: View {
                         .padding(.bottom, headerBottomPadding)
 
                     VStack(alignment: .leading, spacing: 0) {
-                        ForEach(months) { month in
+                        ForEach(Array(months.enumerated()), id: \.element.id) { index, month in
                             MonthRow(
                                 month: month,
                                 cellSize: cellSize,
@@ -78,9 +93,13 @@ struct YearMonthRowLayout: View {
                                 selectedDate: selectedDate,
                                 calendarViewModel: calendarViewModel,
                                 appSettings: appSettings,
+                                verticalPadding: monthRowVerticalPadding,
                                 onDateTap: onDateTap
                             )
-                            Divider()
+                            
+                            if index < months.count - 1 {
+                                Divider()
+                            }
                         }
                     }
                 }
@@ -123,6 +142,7 @@ private struct MonthRow: View {
     let selectedDate: Date?
     let calendarViewModel: CalendarViewModel
     let appSettings: AppSettings
+    let verticalPadding: CGFloat
     let onDateTap: (Date) -> Void
 
     private var calendar: Calendar { appSettings.calendar }
@@ -133,8 +153,6 @@ private struct MonthRow: View {
         return (calendar.firstWeekday - 1 + columnInWeek) % 7 + 1
     }
 
-    private let verticalPadding: CGFloat = 4
-    
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             // Month Label - format based on settings
@@ -164,7 +182,7 @@ private struct MonthRow: View {
                 // Event Bars Overlay
                 EventBarsOverlay(
                     month: month,
-                    events: appSettings.filterEvents(calendarViewModel.events),
+                    events: appSettings.filterEvents(calendarViewModel.filteredEvents),
                     cellSize: cellSize,
                     totalColumns: totalColumns,
                     appSettings: appSettings
@@ -186,11 +204,17 @@ private struct MonthRow: View {
             ForEach(0..<totalColumns, id: \.self) { index in
                 let weekday = weekdayForColumn(index)
                 let isWeekend = appSettings.isWeekend(weekday: weekday)
-                let hasDay = paddedDays[index] != nil
+                let day = paddedDays[index]
+                let hasDay = day != nil
+                let isToday = day?.isToday == true
                 
                 Group {
                     if hasDay {
-                        appSettings.backgroundColor(isWeekend: isWeekend)
+                        if isToday {
+                            appSettings.todayColor
+                        } else {
+                            appSettings.backgroundColor(isWeekend: isWeekend)
+                        }
                     } else {
                         // Weekend shading takes priority over unused cell shading
                         appSettings.unusedCellBackgroundColor(forWeekday: weekday)
@@ -377,12 +401,6 @@ private struct MonthRowDayCell: View {
                     onTap(day.date)
                 } label: {
                     ZStack(alignment: .top) {
-                        // Today gets a full cell background color instead of a circle
-                        if day.isToday {
-                            Rectangle()
-                                .fill(appSettings.todayColor.opacity(0.3))
-                        }
-                        
                         if isSelected && !day.isToday {
                             Rectangle()
                                 .stroke(appSettings.todayColor, lineWidth: 2)
@@ -391,7 +409,7 @@ private struct MonthRowDayCell: View {
                         Text("\(day.dayNumber)")
                             .font(.system(size: 11))
                             .fontWeight(day.isToday ? .bold : .medium)
-                            .foregroundStyle(day.isToday ? appSettings.todayColor : appSettings.dateLabelColor)
+                            .foregroundStyle(appSettings.dateLabelColor)
                             .frame(width: cellSize.width, alignment: .center)
                             .padding(.top, 6)
                     }

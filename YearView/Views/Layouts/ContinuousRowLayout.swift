@@ -118,7 +118,7 @@ struct DayRowView: View {
                         Text("\(day.dayNumber)")
                             .font(.system(.body, design: .rounded))
                             .fontWeight(day.isToday ? .bold : .regular)
-                            .foregroundStyle(day.isToday ? .white : appSettings.dateLabelColor)
+                            .foregroundStyle(appSettings.dateLabelColor)
                     }
                     .frame(width: 32, height: 32)
                 }

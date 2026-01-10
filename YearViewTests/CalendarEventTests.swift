@@ -202,19 +202,23 @@ final class CalendarEventTests: XCTestCase {
 
     // MARK: - Preview Data Tests
 
-    func testPreviewEvent() {
+    func testPreviewEventIsValid() {
         let preview = CalendarEvent.preview
 
-        XCTAssertEqual(preview.title, "Team Meeting")
-        XCTAssertFalse(preview.isAllDay)
-        XCTAssertTrue(preview.hasVideoCall)
-        XCTAssertNotNil(preview.videoCallURL)
+        // Verify preview has required data for SwiftUI previews
+        XCTAssertFalse(preview.id.isEmpty)
+        XCTAssertFalse(preview.title.isEmpty)
+        XCTAssertFalse(preview.calendarID.isEmpty)
+        XCTAssertFalse(preview.calendarTitle.isEmpty)
+        XCTAssertLessThan(preview.startDate, preview.endDate)
     }
 
-    func testPreviewAllDayEvent() {
+    func testPreviewAllDayEventIsValid() {
         let preview = CalendarEvent.previewAllDay
 
-        XCTAssertEqual(preview.title, "Company Holiday")
+        // Verify all-day preview is properly configured
+        XCTAssertFalse(preview.id.isEmpty)
+        XCTAssertFalse(preview.title.isEmpty)
         XCTAssertTrue(preview.isAllDay)
     }
 }

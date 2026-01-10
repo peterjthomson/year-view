@@ -62,21 +62,21 @@ The main screen shows your entire year with events displayed as colored dots or 
 
 Year View offers **five different layouts** to suit your preferences. Switch between them using the layout buttons at the bottom of the screen (iOS) or in the toolbar (Mac).
 
-### 1. Year View (Continuous Weeks)
-
-**Icon:** Calendar
-
-The default view shows the entire year as continuous week rows, similar to a traditional year planner. Events appear as horizontal bars spanning their duration.
-
-**Best for:** Seeing how events span across weeks, identifying busy periods, and planning around multi-day events.
-
-### 2. Month Rows
+### 1. Month Rows (Default)
 
 **Icon:** Stacked rectangles
 
-Each month is displayed as a single horizontal row, with all days laid out in sequence. The weekday columns align across all months.
+Each month is displayed as a single horizontal row, with all days laid out in sequence. The weekday columns align across all months. Events appear as colored bars below the dates.
 
 **Best for:** Comparing the same weekdays across different months, seeing month-to-month patterns.
+
+### 2. Year View (Continuous Weeks)
+
+**Icon:** Calendar
+
+Shows the entire year as continuous week rows, similar to a traditional year planner. Events appear as horizontal bars spanning their duration.
+
+**Best for:** Seeing how events span across weeks, identifying busy periods, and planning around multi-day events.
 
 ### 3. Grid View
 

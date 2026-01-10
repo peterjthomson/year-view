@@ -80,7 +80,7 @@ struct DayCell: View {
 
     private var dayTextColor: Color {
         if day.isToday {
-            return .white
+            return appSettings.dateLabelColor
         } else {
             return appSettings.dateLabelColor
         }
@@ -116,7 +116,7 @@ struct CompactDayCell: View {
                 // Background for today
                 if day.isToday {
                     Circle()
-                        .fill(Color.accentColor)
+                        .fill(Color.gray.opacity(0.25))
                         .frame(width: 16, height: 16)
                 }
 
@@ -130,7 +130,7 @@ struct CompactDayCell: View {
 
                 Text("\(day.dayNumber)")
                     .font(.system(size: 9, weight: day.isToday ? .bold : .regular, design: .rounded))
-                    .foregroundStyle(day.isToday ? .white : (day.isWeekend ? .secondary : .primary))
+                    .foregroundStyle(day.isToday ? .primary : (day.isWeekend ? .secondary : .primary))
             }
             .frame(width: 16, height: 16)
         }

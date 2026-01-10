@@ -6,74 +6,57 @@ This document provides API reference for Year View's public types and services.
 
 ### CalendarEvent
 
-Represents a calendar event from any source.
-
-```swift
-struct CalendarEvent: Identifiable, Hashable {
-    let id: String
-    let title: String
-    let startDate: Date
-    let endDate: Date
-    let isAllDay: Bool
-    let calendarID: String
-    let calendarColor: Color
-    let calendarTitle: String
-    let location: String?
-    let notes: String?
-    let url: URL?
-    let hasVideoCall: Bool
-    let videoCallURL: URL?
-}
-```
-
-#### Computed Properties
+Represents a calendar event from any source. Conforms to `Identifiable` and `Hashable`.
 
 | Property | Type | Description |
 |----------|------|-------------|
+| `id` | `String` | Unique identifier |
+| `title` | `String` | Event title |
+| `startDate` | `Date` | Start date/time |
+| `endDate` | `Date` | End date/time |
+| `isAllDay` | `Bool` | Whether event is all-day |
+| `calendarID` | `String` | Parent calendar ID |
+| `calendarColor` | `Color` | Calendar color |
+| `calendarTitle` | `String` | Calendar name |
+| `location` | `String?` | Event location |
+| `notes` | `String?` | Event notes |
+| `url` | `URL?` | Associated URL |
+| `hasVideoCall` | `Bool` | Video call detected |
+| `videoCallURL` | `URL?` | Video call link |
+
+| Computed Property | Type | Description |
+|-------------------|------|-------------|
 | `isMultiDay` | `Bool` | True if event spans multiple days |
 | `duration` | `TimeInterval` | Event duration in seconds |
 
-#### Initializers
-
-```swift
-// Standard initializer
-init(id:title:startDate:endDate:isAllDay:calendarID:calendarColor:calendarTitle:location:notes:url:hasVideoCall:videoCallURL:)
-
-// From EventKit
-init(from ekEvent: EKEvent)
-```
+Can be initialized directly or from an `EKEvent` (EventKit).
 
 ---
 
 ### CalendarSource
 
-Represents a calendar from Apple Calendar or Google Calendar.
+Represents a calendar from Apple Calendar or Google Calendar. Conforms to `Identifiable` and `Hashable`.
 
-```swift
-struct CalendarSource: Identifiable, Hashable {
-    let id: String
-    let title: String
-    let color: Color
-    let sourceType: SourceType
-    var isEnabled: Bool
-}
-```
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `String` | Calendar identifier |
+| `title` | `String` | Calendar name |
+| `color` | `Color` | Calendar color |
+| `sourceType` | `SourceType` | Source type (see below) |
+| `isEnabled` | `Bool` | Whether calendar is visible |
 
 #### SourceType
 
-```swift
-enum SourceType: String, Codable {
-    case local      // "On My Device"
-    case iCloud     // "iCloud"
-    case exchange   // "Exchange"
-    case google     // "Google"
-    case calDAV     // "CalDAV"
-    case unknown    // "Other"
+| Case | Display Name |
+|------|--------------|
+| `local` | On My Device |
+| `iCloud` | iCloud |
+| `exchange` | Exchange |
+| `google` | Google |
+| `calDAV` | CalDAV |
+| `unknown` | Other |
 
-    var displayName: String { ... }
-    var icon: String { ... }  // SF Symbol name
-}
-```
+Each case provides `displayName` and `icon` (SF Symbol) properties.
 
 ---
 
@@ -81,19 +64,15 @@ enum SourceType: String, Codable {
 
 User-defined group of calendars (persisted with SwiftData).
 
-```swift
-@Model
-final class CalendarSet {
-    var id: UUID
-    var name: String
-    var calendarIDs: [String]
-    var iconName: String
-    var colorHex: String
-    var isDefault: Bool
-
-    var color: Color { ... }
-}
-```
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `UUID` | Unique identifier |
+| `name` | `String` | Set name |
+| `calendarIDs` | `[String]` | Included calendar IDs |
+| `iconName` | `String` | SF Symbol name |
+| `colorHex` | `String` | Hex color string |
+| `isDefault` | `Bool` | Whether this is the default set |
+| `color` | `Color` | Computed color from hex |
 
 ---
 
@@ -103,48 +82,36 @@ final class CalendarSet {
 
 Main application state. Use with `@Environment`.
 
-```swift
-@Observable
-final class CalendarViewModel {
-    // State
-    var calendars: [CalendarSource]
-    var events: [CalendarEvent]
-    var displayedYear: Int
-    var selectedDate: Date?
-    var isLoading: Bool
-    var errorMessage: String?
-    var hasCalendarAccess: Bool
-
-    // Computed
-    var enabledCalendarIDs: Set<String>
-    var filteredEvents: [CalendarEvent]
-}
-```
+| Property | Type | Description |
+|----------|------|-------------|
+| `calendars` | `[CalendarSource]` | All available calendars |
+| `events` | `[CalendarEvent]` | Events for displayed year |
+| `displayedYear` | `Int` | Currently displayed year |
+| `selectedDate` | `Date?` | Selected date (if any) |
+| `isLoading` | `Bool` | Loading state |
+| `errorMessage` | `String?` | Error message (if any) |
+| `hasCalendarAccess` | `Bool` | Calendar permission granted |
+| `enabledCalendarIDs` | `Set<String>` | IDs of enabled calendars |
+| `filteredEvents` | `[CalendarEvent]` | Events from enabled calendars |
 
 #### Methods
 
-```swift
-// Lifecycle
-func requestAccess() async
-func loadCalendars() async
-func loadEvents() async
-
-// Navigation
-func goToToday()
-func goToPreviousYear()
-func goToNextYear()
-
-// Calendar management
-func toggleCalendar(_ calendar: CalendarSource)
-func enableAllCalendars()
-func disableAllCalendars()
-
-// Queries
-func events(for date: Date) -> [CalendarEvent]
-func eventColors(for date: Date) -> [Color]
-func hasEvents(on date: Date) -> Bool
-func search(query: String) -> [CalendarEvent]
-```
+| Category | Method | Description |
+|----------|--------|-------------|
+| Lifecycle | `requestAccess()` | Request calendar permission |
+| Lifecycle | `loadCalendars()` | Fetch available calendars |
+| Lifecycle | `loadEvents()` | Fetch events for displayed year |
+| Navigation | `goToToday()` | Navigate to current date |
+| Navigation | `goToPreviousYear()` | Go to previous year |
+| Navigation | `goToNextYear()` | Go to next year |
+| Calendar | `toggleCalendar(_:)` | Toggle calendar visibility |
+| Calendar | `enableAllCalendars()` | Show all calendars |
+| Calendar | `disableAllCalendars()` | Hide all calendars |
+| Calendar | `setEnabledCalendarIDs(_:)` | Batch update enabled calendars |
+| Query | `events(for:)` | Get events for a date |
+| Query | `eventColors(for:)` | Get event colors for a date |
+| Query | `hasEvents(on:)` | Check if date has events |
+| Query | `search(query:)` | Search events by text |
 
 ---
 
@@ -152,30 +119,28 @@ func search(query: String) -> [CalendarEvent]
 
 Year view display configuration.
 
-```swift
-@Observable
-final class YearViewModel {
-    var layoutStyle: YearLayoutStyle
-    var showWeekends: Bool
-    var showWeekNumbers: Bool
-    var firstDayOfWeek: Int
-    var zoomLevel: CGFloat
+| Property | Type | Description |
+|----------|------|-------------|
+| `layoutStyle` | `YearLayoutStyle` | Current layout (default: `.monthRows`) |
+| `showWeekends` | `Bool` | Show weekend days (default: `true`) |
+| `showWeekNumbers` | `Bool` | Show week numbers (default: `false`) |
+| `zoomLevel` | `CGFloat` | Zoom level (default: `1.0`) |
 
-    func months(for year: Int) -> [MonthData]
-}
-```
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `months(for:)` | `[MonthData]` | Generate month data for a year |
 
 #### YearLayoutStyle
 
-```swift
-enum YearLayoutStyle: String, CaseIterable {
-    case standardGrid   // 4×3 month grid
-    case continuousRow  // Horizontal scrolling
-    case verticalList   // Vertical month list
+| Case | Description |
+|------|-------------|
+| `monthRows` | Calendar.app-style month rows (default) |
+| `bigYear` | Continuous week rows |
+| `standardGrid` | Traditional 4×3 month grid |
+| `continuousRow` | Horizontal month scroll |
+| `verticalList` | Vertical month list |
 
-    var icon: String { ... }  // SF Symbol
-}
-```
+Each case provides `icon` (SF Symbol name) and `description` properties.
 
 ---
 
@@ -183,31 +148,24 @@ enum YearLayoutStyle: String, CaseIterable {
 
 State for day detail view.
 
-```swift
-@Observable
-final class DayViewModel {
-    var selectedDate: Date
-    var events: [CalendarEvent]
-    var isLoading: Bool
+| Property | Type | Description |
+|----------|------|-------------|
+| `selectedDate` | `Date` | The displayed date |
+| `events` | `[CalendarEvent]` | Events for the date |
+| `isLoading` | `Bool` | Loading state |
+| `formattedDate` | `String` | Full date string (e.g., "Monday, June 15, 2026") |
+| `shortFormattedDate` | `String` | Short date string (e.g., "Monday, Jun 15") |
+| `sortedEvents` | `[CalendarEvent]` | Events sorted by time (all-day first) |
+| `allDayEvents` | `[CalendarEvent]` | All-day events only |
+| `timedEvents` | `[CalendarEvent]` | Timed events only |
 
-    // Computed
-    var formattedDate: String
-    var shortFormattedDate: String
-    var sortedEvents: [CalendarEvent]
-    var allDayEvents: [CalendarEvent]
-    var timedEvents: [CalendarEvent]
-}
-```
-
-#### Methods
-
-```swift
-func openInCalendar(event: CalendarEvent?)
-func addEvent()
-func joinVideoCall(event: CalendarEvent)
-func formattedTime(for event: CalendarEvent) -> String
-func formattedDuration(for event: CalendarEvent) -> String
-```
+| Method | Description |
+|--------|-------------|
+| `openInCalendar(event:)` | Open event or date in Calendar app |
+| `addEvent()` | Create new event on selected date |
+| `joinVideoCall(event:)` | Open video call URL |
+| `formattedTime(for:)` | Format event time range |
+| `formattedDuration(for:)` | Format event duration |
 
 ---
 
@@ -215,68 +173,41 @@ func formattedDuration(for event: CalendarEvent) -> String
 
 ### EventKitService
 
-Apple Calendar integration via EventKit.
+Apple Calendar integration via EventKit. Handles authorization, calendar fetching, and event queries.
 
-```swift
-final class EventKitService {
-    var authorizationStatus: EKAuthorizationStatus
-
-    func requestAccess() async throws -> Bool
-    func fetchCalendars() -> [EKCalendar]
-    func fetchEvents(from: Date, to: Date, calendars: [EKCalendar]?) -> [EKEvent]
-    func fetchEvent(withIdentifier: String) -> EKEvent?
-    func startObservingChanges(handler: @escaping () -> Void) -> NSObjectProtocol
-    func stopObservingChanges(observer: NSObjectProtocol)
-}
-```
+| Method | Description |
+|--------|-------------|
+| `requestAccess()` | Request calendar permission |
+| `fetchCalendars()` | Get all available calendars |
+| `fetchEvents(from:to:)` | Get events in date range |
+| `startObservingChanges(handler:)` | Subscribe to calendar changes |
 
 ---
 
 ### GoogleCalendarService
 
-Direct Google Calendar API integration.
+Direct Google Calendar API integration (experimental). Handles OAuth and read-only calendar/event access.
 
-```swift
-final class GoogleCalendarService {
-    var isAuthenticated: Bool
-
-    func signIn() async throws
-    func signOut()
-    func fetchCalendars() async throws -> [GoogleCalendar]
-    func fetchEvents(calendarID: String, from: Date, to: Date) async throws -> [GoogleEvent]
-}
-```
-
-#### GoogleCalendar
-
-```swift
-struct GoogleCalendar: Codable, Identifiable {
-    let id: String
-    let summary: String
-    let backgroundColor: String?
-    let foregroundColor: String?
-    let primary: Bool?
-    let accessRole: String
-}
-```
+| Method | Description |
+|--------|-------------|
+| `signIn()` | Authenticate with Google |
+| `signOut()` | Clear authentication |
+| `fetchCalendars()` | Get Google calendars |
+| `fetchEvents(calendarID:from:to:)` | Get events from a calendar |
 
 ---
 
 ### CalendarDeepLinkService
 
-Opens native calendar apps.
+Opens native calendar apps for viewing/editing events.
 
-```swift
-final class CalendarDeepLinkService {
-    func openCalendar(at date: Date)
-    func openEvent(_ event: CalendarEvent)
-    func createEvent(on date: Date)
-    func openGoogleCalendar(at date: Date)
-    func openGoogleCalendarEvent(eventID: String, calendarID: String)
-    func createGoogleCalendarEvent(on date: Date, title: String?)
-    func openURL(_ url: URL)
-}
-```
+| Method | Description |
+|--------|-------------|
+| `openCalendar(at:)` | Open Apple Calendar to a date |
+| `openEvent(_:)` | Open event in Calendar app |
+| `createEvent(on:)` | Create new event |
+| `openGoogleCalendar(at:)` | Open Google Calendar web |
+| `openURL(_:)` | Open arbitrary URL |
 
 ---
 
@@ -284,31 +215,15 @@ final class CalendarDeepLinkService {
 
 UserDefaults persistence for preferences.
 
-```swift
-final class CalendarCacheService {
-    // Calendar preferences
-    func saveEnabledCalendarIDs(_ ids: [String])
-    func loadEnabledCalendarIDs() -> [String]
-
-    // Layout preferences
-    func saveSelectedLayout(_ layout: String)
-    func loadSelectedLayout() -> String
-
-    // Display preferences
-    func saveShowWeekends(_ show: Bool)
-    func loadShowWeekends() -> Bool
-    func saveShowWeekNumbers(_ show: Bool)
-    func loadShowWeekNumbers() -> Bool
-    func saveFirstDayOfWeek(_ day: Int)
-    func loadFirstDayOfWeek() -> Int
-
-    // State persistence
-    func saveLastViewedYear(_ year: Int)
-    func loadLastViewedYear() -> Int
-
-    func clearAllPreferences()
-}
-```
+| Data | Methods |
+|------|---------|
+| Enabled calendars | `saveEnabledCalendarIDs(_:)` / `loadEnabledCalendarIDs()` |
+| Layout | `saveSelectedLayout(_:)` / `loadSelectedLayout()` |
+| Show weekends | `saveShowWeekends(_:)` / `loadShowWeekends()` |
+| Show week numbers | `saveShowWeekNumbers(_:)` / `loadShowWeekNumbers()` |
+| First day of week | `saveFirstDayOfWeek(_:)` / `loadFirstDayOfWeek()` |
+| Last viewed year | `saveLastViewedYear(_:)` / `loadLastViewedYear()` |
+| Reset | `clearAllPreferences()` |
 
 ---
 
@@ -316,90 +231,49 @@ final class CalendarCacheService {
 
 ### Date Extensions
 
-```swift
-extension Date {
-    var startOfDay: Date
-    var endOfDay: Date
-    var startOfMonth: Date
-    var endOfMonth: Date
-    var startOfYear: Date
-    var endOfYear: Date
-    var isToday: Bool
-    var isWeekend: Bool
+Extensions on `Date` for common calendar operations.
 
-    func isSameDay(as other: Date) -> Bool
-    func isSameMonth(as other: Date) -> Bool
-    func isSameYear(as other: Date) -> Bool
-
-    func adding(days: Int) -> Date
-    func adding(months: Int) -> Date
-    func adding(years: Int) -> Date
-
-    var dayOfMonth: Int
-    var month: Int
-    var year: Int
-    var weekday: Int
-    var weekOfYear: Int
-
-    static func from(year: Int, month: Int, day: Int) -> Date?
-}
-```
+| Category | Methods/Properties |
+|----------|-------------------|
+| Boundaries | `startOfDay`, `endOfDay`, `startOfMonth`, `endOfMonth`, `startOfYear`, `endOfYear` |
+| Queries | `isToday`, `isWeekend` |
+| Comparison | `isSameDay(as:)`, `isSameMonth(as:)`, `isSameYear(as:)` |
+| Arithmetic | `adding(days:)`, `adding(months:)`, `adding(years:)` |
+| Components | `dayOfMonth`, `month`, `year`, `weekday`, `weekOfYear` |
+| Factory | `Date.from(year:month:day:)` |
 
 ### Calendar Extensions
 
-```swift
-extension Calendar {
-    func daysInMonth(for date: Date) -> Int
-    func firstDayOfMonth(for date: Date) -> Date
-    func allDays(in month: Date) -> [Date]
-    func allMonths(in year: Int) -> [Date]
-}
-```
+Extensions on `Calendar` for date enumeration.
+
+| Method | Description |
+|--------|-------------|
+| `daysInMonth(for:)` | Number of days in month |
+| `firstDayOfMonth(for:)` | First day of month |
+| `allDays(in:)` | All days in a month |
+| `allMonths(in:)` | All months in a year |
 
 ### DateRange
 
-```swift
-struct DateRange {
-    let start: Date
-    let end: Date
-
-    var days: [Date]
-    func contains(_ date: Date) -> Bool
-
-    static func month(containing date: Date) -> DateRange
-    static func year(containing date: Date) -> DateRange
-    static func year(_ year: Int) -> DateRange
-}
-```
+Represents a range of dates with utilities for enumeration and containment checks.
 
 ### Color Extensions
 
-```swift
-extension Color {
-    init(hex: String)
-    init(cgColor: CGColor)
+Extensions on `Color` for hex parsing, luminance calculation, and system colors.
 
-    var luminance: Double
-    var isDark: Bool
-    var contrastingTextColor: Color
-
-    func adjustedBrightness(_ amount: Double) -> Color
-
-    static var systemGroupedBackground: Color
-    static var secondarySystemGroupedBackground: Color
-}
-```
+| Category | Methods/Properties |
+|----------|-------------------|
+| Init | `init(hex:)`, `init(cgColor:)` |
+| Analysis | `luminance`, `isDark`, `contrastingTextColor` |
+| Transform | `adjustedBrightness(_:)` |
+| System | `systemBackground`, `systemGroupedBackground`, `separator` |
 
 ### HapticFeedback
 
-```swift
-struct HapticFeedback {
-    static func light()
-    static func medium()
-    static func heavy()
-    static func selection()
-    static func success()
-    static func warning()
-    static func error()
-}
-```
+Cross-platform haptic feedback (iOS only, no-op on macOS).
+
+| Method | Description |
+|--------|-------------|
+| `light()`, `medium()`, `heavy()` | Impact feedback |
+| `selection()` | Selection feedback |
+| `success()`, `warning()`, `error()` | Notification feedback |

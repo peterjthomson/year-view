@@ -193,7 +193,7 @@ struct DayStripCell: View {
                     Text("\(day.dayNumber)")
                         .font(.system(.callout, design: .rounded))
                         .fontWeight(day.isToday ? .bold : .regular)
-                        .foregroundStyle(day.isToday ? .white : appSettings.dateLabelColor)
+                        .foregroundStyle(appSettings.dateLabelColor)
                 }
                 .frame(width: 36, height: 36)
 

@@ -53,6 +53,8 @@ YearView/
 │   ├── YearPickerView.swift
 │   ├── SearchView.swift
 │   └── Layouts/
+│       ├── YearMonthRowLayout.swift    # Month rows (default)
+│       ├── BigYearLayout.swift         # Continuous weeks
 │       ├── StandardGridLayout.swift    # 4×3 grid
 │       ├── ContinuousRowLayout.swift   # Horizontal scroll
 │       └── VerticalListLayout.swift    # Vertical months

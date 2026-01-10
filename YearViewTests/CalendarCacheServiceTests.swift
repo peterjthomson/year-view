@@ -56,7 +56,7 @@ final class CalendarCacheServiceTests: XCTestCase {
     func testDefaultLayout() {
         let loaded = cacheService.loadSelectedLayout()
 
-        XCTAssertEqual(loaded, "standardGrid")
+        XCTAssertEqual(loaded, "Months")
     }
 
     // MARK: - Display Preferences Tests
@@ -133,7 +133,7 @@ final class CalendarCacheServiceTests: XCTestCase {
 
         // Verify defaults are restored
         XCTAssertTrue(cacheService.loadEnabledCalendarIDs().isEmpty)
-        XCTAssertEqual(cacheService.loadSelectedLayout(), "standardGrid")
+        XCTAssertEqual(cacheService.loadSelectedLayout(), "Months")
         XCTAssertTrue(cacheService.loadShowWeekends())
 
         let currentYear = Calendar.current.component(.year, from: Date())

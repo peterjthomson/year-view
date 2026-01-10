@@ -2,19 +2,20 @@ import SwiftUI
 
 struct CalendarSelectionView: View {
     @Environment(CalendarViewModel.self) private var calendarViewModel
+    @State private var enabledCalendarIDs: Set<String> = []
 
     var body: some View {
         List {
             // Quick actions
             Section {
                 Button {
-                    calendarViewModel.enableAllCalendars()
+                    enabledCalendarIDs = Set(calendarViewModel.calendars.map(\.id))
                 } label: {
                     Label("Show All", systemImage: "checkmark.circle.fill")
                 }
 
                 Button {
-                    calendarViewModel.disableAllCalendars()
+                    enabledCalendarIDs = []
                 } label: {
                     Label("Hide All", systemImage: "circle")
                 }
@@ -26,9 +27,9 @@ struct CalendarSelectionView: View {
                     ForEach(calendars) { calendar in
                         CalendarRow(
                             calendar: calendar,
-                            isEnabled: calendar.isEnabled,
+                            isEnabled: enabledCalendarIDs.contains(calendar.id),
                             onToggle: {
-                                calendarViewModel.toggleCalendar(calendar)
+                                toggle(calendarID: calendar.id)
                             }
                         )
                     }
@@ -40,6 +41,17 @@ struct CalendarSelectionView: View {
         #else
         .listStyle(.inset)
         #endif
+        .onAppear {
+            enabledCalendarIDs = Set(calendarViewModel.calendars.filter(\.isEnabled).map(\.id))
+        }
+        .onChange(of: calendarViewModel.calendars) { _, newValue in
+            // Keep local state in sync if calendars load/change while sheet is open.
+            enabledCalendarIDs = Set(newValue.filter(\.isEnabled).map(\.id))
+        }
+        .onDisappear {
+            // Apply once when closing to avoid laggy per-toggle redraws.
+            calendarViewModel.setEnabledCalendarIDs(enabledCalendarIDs)
+        }
     }
 
     private var groupedCalendars: [(key: CalendarSource.SourceType, value: [CalendarSource])] {
@@ -47,6 +59,14 @@ struct CalendarSelectionView: View {
         return grouped
             .sorted { $0.key.rawValue < $1.key.rawValue }
             .map { (key: $0.key, value: $0.value.sorted { $0.title < $1.title }) }
+    }
+
+    private func toggle(calendarID: String) {
+        if enabledCalendarIDs.contains(calendarID) {
+            enabledCalendarIDs.remove(calendarID)
+        } else {
+            enabledCalendarIDs.insert(calendarID)
+        }
     }
 }
 

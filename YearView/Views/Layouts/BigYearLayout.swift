@@ -189,7 +189,7 @@ struct DayCellBigYear: View {
                     Text("\(calendar.component(.day, from: date))")
                         .font(.subheadline)
                         .fontWeight(isToday ? .bold : .regular)
-                        .foregroundStyle(isToday ? appSettings.todayColor : (isInYear ? appSettings.dateLabelColor : appSettings.dateLabelColor.opacity(0.3)))
+                        .foregroundStyle(isToday ? appSettings.dateLabelColor : (isInYear ? appSettings.dateLabelColor : appSettings.dateLabelColor.opacity(0.3)))
 
                     if showMonthLabel {
                         Text(monthAbbrev)
@@ -214,7 +214,7 @@ struct DayCellBigYear: View {
 
     private var backgroundColor: Color {
         if isToday {
-            return appSettings.todayColor.opacity(0.3)
+            return appSettings.todayColor
         } else if isSelected {
             return appSettings.todayColor.opacity(0.1)
         } else if !isInYear {

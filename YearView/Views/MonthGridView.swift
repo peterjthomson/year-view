@@ -7,6 +7,7 @@ struct MonthGridView: View {
     let onDateTap: (Date) -> Void
 
     @Environment(CalendarViewModel.self) private var calendarViewModel
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 2), count: 7)
     
@@ -17,8 +18,8 @@ struct MonthGridView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Month header
-            Text(month.name)
+            // Month header - use short name on compact displays to avoid line breaks
+            Text(horizontalSizeClass == .compact ? month.shortName : month.name)
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(appSettings.rowHeadingColor)

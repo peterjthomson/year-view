@@ -8,8 +8,26 @@ struct DayCell: View {
     let onTap: () -> Void
 
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private var isWeekend: Bool { appSettings.isWeekend(weekday: day.weekday) }
+    
+    // Much smaller sizes for compact (narrow iPhone) displays to prevent collisions
+    private var circleSize: CGFloat {
+        #if os(iOS)
+        return horizontalSizeClass == .compact ? 14 : 28
+        #else
+        return 28
+        #endif
+    }
+    
+    private var fontSize: Font {
+        #if os(iOS)
+        return horizontalSizeClass == .compact ? .system(size: 9, design: .rounded) : .system(.callout, design: .rounded)
+        #else
+        return .system(.callout, design: .rounded)
+        #endif
+    }
 
     var body: some View {
         Button(action: onTap) {
@@ -19,39 +37,39 @@ struct DayCell: View {
                     if !day.isToday && !isSelected {
                         Circle()
                             .fill(appSettings.backgroundColor(isWeekend: isWeekend))
-                            .frame(width: 28, height: 28)
+                            .frame(width: circleSize, height: circleSize)
                     }
                     
                     // Today highlight
                     if day.isToday {
                         Circle()
                             .fill(appSettings.todayColor)
-                            .frame(width: 28, height: 28)
+                            .frame(width: circleSize, height: circleSize)
                     }
 
                     // Selection ring
                     if isSelected && !day.isToday {
                         Circle()
                             .stroke(appSettings.todayColor, lineWidth: 2)
-                            .frame(width: 28, height: 28)
+                            .frame(width: circleSize, height: circleSize)
                     }
 
                     Text("\(day.dayNumber)")
-                        .font(.system(.callout, design: .rounded))
+                        .font(fontSize)
                         .fontWeight(day.isToday ? .bold : .regular)
                         .foregroundStyle(dayTextColor)
                 }
-                .frame(width: 30, height: 30)
+                .frame(width: circleSize + 2, height: circleSize + 2)
 
-                // Event dots
-                HStack(spacing: 2) {
+                // Event dots - smaller on compact displays
+                HStack(spacing: horizontalSizeClass == .compact ? 1 : 2) {
                     ForEach(eventColors.prefix(3), id: \.self) { color in
                         Circle()
                             .fill(color)
-                            .frame(width: 4, height: 4)
+                            .frame(width: horizontalSizeClass == .compact ? 2 : 4, height: horizontalSizeClass == .compact ? 2 : 4)
                     }
                 }
-                .frame(height: 6)
+                .frame(height: horizontalSizeClass == .compact ? 3 : 6)
             }
         }
         .buttonStyle(.plain)

@@ -14,30 +14,23 @@ struct BigYearLayout: View {
     private let rowHeight: CGFloat = 80
 
     var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView(.vertical, showsIndicators: true) {
-                LazyVStack(spacing: 0) {
-                    ForEach(weeksInYear, id: \.self) { weekStart in
-                        WeekRowView(
-                            weekStart: weekStart,
-                            year: year,
-                            selectedDate: selectedDate,
-                            onDateTap: onDateTap,
-                            dayColumnWidth: dayColumnWidth,
-                            rowHeight: rowHeight,
-                            appSettings: appSettings
-                        )
-                        .id(weekStart)
-                    }
-                }
-            }
-            .onAppear {
-                // Scroll to current week on appear
-                if let currentWeekStart = currentWeekStart {
-                    proxy.scrollTo(currentWeekStart, anchor: .center)
+        ScrollView([.vertical, .horizontal], showsIndicators: true) {
+            LazyVStack(spacing: 0) {
+                ForEach(weeksInYear, id: \.self) { weekStart in
+                    WeekRowView(
+                        weekStart: weekStart,
+                        year: year,
+                        selectedDate: selectedDate,
+                        onDateTap: onDateTap,
+                        dayColumnWidth: dayColumnWidth,
+                        rowHeight: rowHeight,
+                        appSettings: appSettings
+                    )
+                    .id(weekStart)
                 }
             }
         }
+        .defaultScrollAnchor(.topLeading)
         .background(appSettings.pageBackgroundColor)
     }
 

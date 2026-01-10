@@ -105,7 +105,7 @@ struct SettingsView: View {
         appSettings.showGridlinesGrid = false
         appSettings.showGridlinesRow = false
         appSettings.showGridlinesList = false
-        appSettings.monthLabelFormat = .dual
+        appSettings.monthLabelFormat = .letter
         appSettings.monthLabelFontSize = .medium
         appSettings.showAllDayEvents = true
         appSettings.showTimeBasedEvents = false

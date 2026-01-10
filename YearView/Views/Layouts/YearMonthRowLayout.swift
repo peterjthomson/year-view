@@ -50,24 +50,25 @@ struct YearMonthRowLayout: View {
     var body: some View {
         GeometryReader { geometry in
             let columns = CGFloat(totalColumns)
+            
+            // Height sizing: fill vertical space with 12 month rows plus header
+            let headerHeight: CGFloat = 20
+            let availableHeight = geometry.size.height - (outerPadding * 2) - headerHeight - headerBottomPadding
+            let rowHeight = max(minRowHeight, availableHeight / 12)
 
             // Width sizing: fill the available width when possible, otherwise fall back to a minimum and allow scroll.
             let availableGridWidth = max(0, geometry.size.width - (outerPadding * 2) - monthLabelWidth)
             let idealCellWidth = availableGridWidth / columns
             let cellWidth = max(minCellWidth, idealCellWidth)
             
-            // Height sizing
-            let headerHeight: CGFloat = 20
-            
-            // Allow row height to grow for events
-            let cellSize = CGSize(width: cellWidth, height: max(minRowHeight, cellWidth * 1.5))
+            let cellSize = CGSize(width: cellWidth, height: rowHeight)
 
-            ScrollView([.vertical, .horizontal]) {
+            ScrollView(.horizontal, showsIndicators: true) {
                 VStack(alignment: .leading, spacing: 0) {
                     weekdayHeader(cellSize: CGSize(width: cellWidth, height: headerHeight), monthLabelWidth: monthLabelWidth)
                         .padding(.bottom, headerBottomPadding)
 
-                    LazyVStack(alignment: .leading, spacing: 0) {
+                    VStack(alignment: .leading, spacing: 0) {
                         ForEach(months) { month in
                             MonthRow(
                                 month: month,
@@ -84,7 +85,7 @@ struct YearMonthRowLayout: View {
                     }
                 }
                 .padding(outerPadding)
-                .frame(minWidth: geometry.size.width, minHeight: geometry.size.height, alignment: .topLeading)
+                .frame(minWidth: geometry.size.width, alignment: .topLeading)
             }
             .background(appSettings.pageBackgroundColor)
         }

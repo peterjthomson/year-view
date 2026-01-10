@@ -130,7 +130,7 @@ final class AppSettings {
     // MARK: - YearMonth View Settings
     
     /// Format for month labels in YearMonth view
-    var monthLabelFormat: MonthLabelFormat = .dual
+    var monthLabelFormat: MonthLabelFormat = .letter
     
     /// Font size for month labels in YearMonth view
     var monthLabelFontSize: MonthLabelFontSize = .medium

@@ -11,22 +11,22 @@ struct ContinuousRowLayout: View {
     var body: some View {
         GeometryReader { geometry in
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 24) {
+                LazyHStack(spacing: 0) {
                     ForEach(Array(months.enumerated()), id: \.element.id) { index, month in
                         MonthColumnView(
                             month: month,
                             selectedDate: selectedDate,
                             appSettings: appSettings,
                             onDateTap: onDateTap,
-                            height: geometry.size.height
+                            height: geometry.size.height,
+                            width: geometry.size.width
                         )
                         .id(index)
                     }
                 }
-                .padding(.horizontal, 24)
                 .scrollTargetLayout()
             }
-            .scrollTargetBehavior(.viewAligned)
+            .scrollTargetBehavior(.paging)
             .scrollPosition(id: $scrollPosition)
         }
         .background(appSettings.pageBackgroundColor)
@@ -44,6 +44,7 @@ struct MonthColumnView: View {
     let appSettings: AppSettings
     let onDateTap: (Date) -> Void
     let height: CGFloat
+    let width: CGFloat
 
     @Environment(CalendarViewModel.self) private var calendarViewModel
 
@@ -55,6 +56,7 @@ struct MonthColumnView: View {
                 .fontWeight(.bold)
                 .foregroundStyle(appSettings.rowHeadingColor)
                 .padding(.bottom, 4)
+                .padding(.horizontal, 16)
 
             // Days in vertical list
             ScrollView(.vertical, showsIndicators: false) {
@@ -70,9 +72,10 @@ struct MonthColumnView: View {
                         )
                     }
                 }
+                .padding(.horizontal, 16)
             }
         }
-        .frame(width: 280)
+        .frame(width: width)
         .padding(.vertical)
     }
 

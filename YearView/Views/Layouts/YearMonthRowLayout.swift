@@ -10,6 +10,7 @@ struct YearMonthRowLayout: View {
 
     @Environment(CalendarViewModel.self) private var calendarViewModel
     @Environment(AppSettings.self) private var appSettings
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     private let daysPerWeek = 7
     private let outerPadding: CGFloat = 12
@@ -17,6 +18,7 @@ struct YearMonthRowLayout: View {
     private let headerBottomPadding: CGFloat = 8
     private let minCellWidth: CGFloat = 20
     private let minRowHeight: CGFloat = 32
+    private let floatingPanelHeight: CGFloat = 60 // Height of floating mode panel on mobile
     
     /// Use appSettings calendar for consistent week start
     private var calendar: Calendar { appSettings.calendar }
@@ -52,8 +54,10 @@ struct YearMonthRowLayout: View {
             let columns = CGFloat(totalColumns)
             
             // Height sizing: fill vertical space with 12 month rows plus header
+            // On mobile, account for floating mode panel that overlays bottom of view
             let headerHeight: CGFloat = 20
-            let availableHeight = geometry.size.height - (outerPadding * 2) - headerHeight - headerBottomPadding
+            let panelInset: CGFloat = horizontalSizeClass == .compact ? floatingPanelHeight : 0
+            let availableHeight = geometry.size.height - (outerPadding * 2) - headerHeight - headerBottomPadding - panelInset
             let rowHeight = max(minRowHeight, availableHeight / 12)
 
             // Width sizing: fill the available width when possible, otherwise fall back to a minimum and allow scroll.

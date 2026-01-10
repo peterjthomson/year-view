@@ -4,6 +4,8 @@
 
 Year View is intentionally read-only: it displays events from Apple Calendar (EventKit) and deep-links to native apps for viewing/creating/editing.
 
+<img width="2752" height="2064" alt="iPad Screenshot 1" src="https://github.com/user-attachments/assets/0489c616-dc74-4531-9c66-043770549b7a" />
+
 ## Docs
 
 - `Documentation/GETTING_STARTED.md`

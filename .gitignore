@@ -1,6 +1,7 @@
 # Xcode / SwiftPM build artifacts
 .derivedData/
 DerivedData/
+Distribution/
 build/
 *.xcresult
 

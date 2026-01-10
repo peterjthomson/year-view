@@ -31,6 +31,7 @@
 		E1000001042 /* VerticalListLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002042 /* VerticalListLayout.swift */; };
 		E1000001043 /* BigYearLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002043 /* BigYearLayout.swift */; };
 		E1000001044 /* YearMonthRowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002044 /* YearMonthRowLayout.swift */; };
+		E1000001045 /* PowerLawLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002045 /* PowerLawLayout.swift */; };
 		E1000001050 /* EventKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002050 /* EventKitService.swift */; };
 		E1000001051 /* GoogleCalendarService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002051 /* GoogleCalendarService.swift */; };
 		E1000001052 /* CalendarDeepLinkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002052 /* CalendarDeepLinkService.swift */; };
@@ -83,6 +84,7 @@
 		E1000002042 /* VerticalListLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalListLayout.swift; sourceTree = "<group>"; };
 		E1000002043 /* BigYearLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigYearLayout.swift; sourceTree = "<group>"; };
 		E1000002044 /* YearMonthRowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearMonthRowLayout.swift; sourceTree = "<group>"; };
+		E1000002045 /* PowerLawLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PowerLawLayout.swift; sourceTree = "<group>"; };
 		E1000002050 /* EventKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitService.swift; sourceTree = "<group>"; };
 		E1000002051 /* GoogleCalendarService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarService.swift; sourceTree = "<group>"; };
 		E1000002052 /* CalendarDeepLinkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarDeepLinkService.swift; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 				E1000002042 /* VerticalListLayout.swift */,
 				E1000002043 /* BigYearLayout.swift */,
 				E1000002044 /* YearMonthRowLayout.swift */,
+				E1000002045 /* PowerLawLayout.swift */,
 			);
 			path = Layouts;
 			sourceTree = "<group>";
@@ -312,6 +315,7 @@
 				E1000001042 /* VerticalListLayout.swift in Sources */,
 				E1000001043 /* BigYearLayout.swift in Sources */,
 				E1000001044 /* YearMonthRowLayout.swift in Sources */,
+				E1000001045 /* PowerLawLayout.swift in Sources */,
 				E1000001050 /* EventKitService.swift in Sources */,
 				E1000001051 /* GoogleCalendarService.swift in Sources */,
 				E1000001052 /* CalendarDeepLinkService.swift in Sources */,

@@ -6,6 +6,14 @@ Year View is intentionally read-only: it displays events from Apple Calendar (Ev
 
 <img width="2752" height="2064" alt="iPad Screenshot 1" src="https://github.com/user-attachments/assets/0489c616-dc74-4531-9c66-043770549b7a" />
 
+## Download
+
+**iOS App Store:** Coming soon
+
+**macOS App Store:** Coming soon
+
+**macOS direct download:** [YearView-1.1.0-macOS.zip](https://github.com/peterjthomson/year-view/releases/download/v1.1.0/YearView-1.1.0-macOS.zip) — notarized and signed, universal binary (Apple Silicon + Intel)
+
 ## Docs
 
 - `Documentation/GETTING_STARTED.md`

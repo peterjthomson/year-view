@@ -223,4 +223,86 @@ final class CalendarViewModel {
             (event.notes?.lowercased().contains(lowercasedQuery) ?? false)
         }.sorted { $0.startDate < $1.startDate }
     }
+    
+    // MARK: - Power Law View Helpers
+    
+    /// Returns events for a specific date range (inclusive)
+    func events(from startDate: Date, to endDate: Date) -> [CalendarEvent] {
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: startDate)
+        let end = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: endDate)) ?? endDate
+        
+        return filteredEvents.filter { event in
+            // Event overlaps with the date range if:
+            // - event starts before range ends AND
+            // - event ends after range starts
+            event.startDate < end && event.endDate > start
+        }.sorted { $0.startDate < $1.startDate }
+    }
+    
+    /// Returns events for the current week (excluding today)
+    func eventsForUpcomingWeek(from date: Date = Date()) -> [CalendarEvent] {
+        let calendar = Calendar.current
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: date)) ?? date
+        let endOfWeek = calendar.date(byAdding: .day, value: 6, to: calendar.startOfDay(for: date)) ?? date
+        return events(from: tomorrow, to: endOfWeek)
+    }
+    
+    /// Returns events for the rest of the month (after the current week)
+    func eventsForRestOfMonth(from date: Date = Date()) -> [CalendarEvent] {
+        let calendar = Calendar.current
+        let weekEnd = calendar.date(byAdding: .day, value: 7, to: calendar.startOfDay(for: date)) ?? date
+        
+        // Get end of current month
+        guard let endOfMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: calendar.startOfDay(for: calendar.date(from: calendar.dateComponents([.year, .month], from: date))!)) else {
+            return []
+        }
+        
+        guard weekEnd <= endOfMonth else { return [] }
+        return events(from: weekEnd, to: endOfMonth)
+    }
+    
+    /// Returns events grouped by date for a range
+    func eventsGroupedByDate(from startDate: Date, to endDate: Date) -> [(date: Date, events: [CalendarEvent])] {
+        let calendar = Calendar.current
+        var current = calendar.startOfDay(for: startDate)
+        let end = calendar.startOfDay(for: endDate)
+        var result: [(date: Date, events: [CalendarEvent])] = []
+        
+        while current <= end {
+            let dayEvents = events(for: current)
+            if !dayEvents.isEmpty {
+                result.append((date: current, events: dayEvents))
+            }
+            current = calendar.date(byAdding: .day, value: 1, to: current) ?? current.addingTimeInterval(86400)
+        }
+        
+        return result
+    }
+    
+    /// Returns events for upcoming months (next 2-3 months)
+    func eventsForUpcomingMonths(monthCount: Int = 2) -> [(month: Date, events: [CalendarEvent])] {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        // Start from next month
+        guard let nextMonth = calendar.date(byAdding: .month, value: 1, to: now) else { return [] }
+        let startOfNextMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: nextMonth))!
+        
+        var result: [(month: Date, events: [CalendarEvent])] = []
+        
+        for i in 0..<monthCount {
+            guard let monthStart = calendar.date(byAdding: .month, value: i, to: startOfNextMonth),
+                  let monthEnd = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: monthStart) else {
+                continue
+            }
+            
+            let monthEvents = events(from: monthStart, to: monthEnd)
+            if !monthEvents.isEmpty {
+                result.append((month: monthStart, events: monthEvents))
+            }
+        }
+        
+        return result
+    }
 }

@@ -56,6 +56,11 @@ struct YearView: View {
                 selectedDate: $selectedDate,
                 onDateTap: handleDateTap
             )
+        case .powerLaw:
+            PowerLawLayout(
+                selectedDate: $selectedDate,
+                onDateTap: handleDateTap
+            )
         }
     }
     

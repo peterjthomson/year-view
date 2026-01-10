@@ -7,6 +7,7 @@ enum YearLayoutStyle: String, CaseIterable, Identifiable {
     case standardGrid = "Grid"      // Traditional 4×3 month grid
     case continuousRow = "Row"      // Horizontal month scroll
     case verticalList = "List"      // Vertical month list
+    case powerLaw = "Power Law"     // Multi-horizon view: Day/Week/Month/Year panels
 
     var id: String { rawValue }
 
@@ -22,6 +23,8 @@ enum YearLayoutStyle: String, CaseIterable, Identifiable {
             return "rectangle.split.3x1"
         case .verticalList:
             return "list.bullet"
+        case .powerLaw:
+            return "rectangle.split.2x1"
         }
     }
 
@@ -37,6 +40,8 @@ enum YearLayoutStyle: String, CaseIterable, Identifiable {
             return "Horizontal scroll"
         case .verticalList:
             return "Vertical list"
+        case .powerLaw:
+            return "Power Law planner"
         }
     }
 }

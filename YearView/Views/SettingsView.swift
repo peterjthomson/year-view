@@ -2,7 +2,9 @@ import SwiftUI
 
 struct SettingsView: View {
     @Environment(AppSettings.self) private var appSettings
+    @Environment(CalendarViewModel.self) private var calendarViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var showManageCalendars = false
     
     var body: some View {
         @Bindable var settings = appSettings
@@ -10,6 +12,18 @@ struct SettingsView: View {
         Form {
             // MARK: - Calendar Settings
             Section {
+                Button {
+                    showManageCalendars = true
+                } label: {
+                    Label("Manage Calendars", systemImage: "checklist")
+                }
+                .sheet(isPresented: $showManageCalendars) {
+                    NavigationStack {
+                        CalendarSelectionView()
+                    }
+                    .frame(minWidth: 400, minHeight: 500)
+                }
+                
                 Picker("Week Starts On", selection: $settings.weekStartsOn) {
                     ForEach(WeekStartDay.allCases) { day in
                         Text(day.name).tag(day)

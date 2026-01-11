@@ -65,7 +65,11 @@ struct CalendarEvent: Identifiable, Hashable {
 
     #if canImport(EventKit)
     init(from ekEvent: EKEvent) {
-        self.id = ekEvent.eventIdentifier ?? UUID().uuidString
+        // Use a composite ID for recurring events to ensure uniqueness across occurrences.
+        // eventIdentifier identifies the series, not the specific occurrence.
+        let baseID = ekEvent.eventIdentifier ?? UUID().uuidString
+        self.id = "\(baseID)-\(ekEvent.startDate.timeIntervalSince1970)"
+        
         self.title = ekEvent.title ?? "Untitled"
         self.startDate = ekEvent.startDate
         self.endDate = ekEvent.endDate

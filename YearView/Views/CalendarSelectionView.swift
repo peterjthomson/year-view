@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CalendarSelectionView: View {
     @Environment(CalendarViewModel.self) private var calendarViewModel
+    @Environment(\.dismiss) private var dismiss
     @State private var enabledCalendarIDs: Set<String> = []
 
     var body: some View {
@@ -51,6 +52,14 @@ struct CalendarSelectionView: View {
         .onDisappear {
             // Apply once when closing to avoid laggy per-toggle redraws.
             calendarViewModel.setEnabledCalendarIDs(enabledCalendarIDs)
+        }
+        .navigationTitle("Manage Calendars")
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Done") {
+                    dismiss()
+                }
+            }
         }
     }
 

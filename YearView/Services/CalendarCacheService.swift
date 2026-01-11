@@ -4,6 +4,7 @@ final class CalendarCacheService {
     private let userDefaults = UserDefaults.standard
 
     private let enabledCalendarsKey = "enabledCalendarIDs"
+    private let disabledCalendarsKey = "disabledCalendarIDs"
     private let selectedLayoutKey = "selectedLayout"
     private let showWeekendsKey = "showWeekends"
     private let showWeekNumbersKey = "showWeekNumbers"
@@ -18,6 +19,22 @@ final class CalendarCacheService {
 
     func loadEnabledCalendarIDs() -> [String] {
         userDefaults.stringArray(forKey: enabledCalendarsKey) ?? []
+    }
+    
+    func hasLegacyEnabledCalendars() -> Bool {
+        userDefaults.object(forKey: enabledCalendarsKey) != nil
+    }
+    
+    func removeEnabledCalendarIDs() {
+        userDefaults.removeObject(forKey: enabledCalendarsKey)
+    }
+    
+    func saveDisabledCalendarIDs(_ ids: [String]) {
+        userDefaults.set(ids, forKey: disabledCalendarsKey)
+    }
+    
+    func loadDisabledCalendarIDs() -> [String]? {
+        userDefaults.stringArray(forKey: disabledCalendarsKey)
     }
 
     // MARK: - Layout Preferences

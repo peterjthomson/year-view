@@ -21,7 +21,9 @@ struct SettingsView: View {
                     NavigationStack {
                         CalendarSelectionView()
                     }
+                    #if os(macOS)
                     .frame(minWidth: 400, minHeight: 500)
+                    #endif
                 }
                 
                 Picker("Week Starts On", selection: $settings.weekStartsOn) {
@@ -129,4 +131,5 @@ struct SettingsView: View {
 #Preview {
     SettingsView()
         .environment(AppSettings())
+        .environment(CalendarViewModel())
 }

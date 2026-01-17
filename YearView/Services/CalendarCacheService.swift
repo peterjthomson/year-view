@@ -96,6 +96,7 @@ final class CalendarCacheService {
     func clearAllPreferences() {
         let keys = [
             enabledCalendarsKey,
+            disabledCalendarsKey,
             selectedLayoutKey,
             showWeekendsKey,
             showWeekNumbersKey,

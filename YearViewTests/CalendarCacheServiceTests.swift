@@ -154,4 +154,74 @@ final class CalendarCacheServiceTests: XCTestCase {
         // Clean up
         newService.clearAllPreferences()
     }
+
+    // MARK: - Disabled Calendar Tests
+
+    func testSaveAndLoadDisabledCalendarIDs() {
+        let ids = ["disabled-1", "disabled-2"]
+
+        cacheService.saveDisabledCalendarIDs(ids)
+        let loaded = cacheService.loadDisabledCalendarIDs()
+
+        XCTAssertEqual(loaded, ids)
+    }
+
+    func testLoadDisabledCalendarIDsReturnsNilWhenNotSet() {
+        let loaded = cacheService.loadDisabledCalendarIDs()
+
+        XCTAssertNil(loaded)
+    }
+
+    func testLoadDisabledCalendarIDsReturnsEmptyArrayWhenSetToEmpty() {
+        cacheService.saveDisabledCalendarIDs([])
+        let loaded = cacheService.loadDisabledCalendarIDs()
+
+        XCTAssertNotNil(loaded)
+        XCTAssertEqual(loaded, [])
+    }
+
+    // MARK: - Legacy Migration Helper Tests
+
+    func testHasLegacyEnabledCalendarsReturnsFalseWhenNotSet() {
+        let hasLegacy = cacheService.hasLegacyEnabledCalendars()
+
+        XCTAssertFalse(hasLegacy)
+    }
+
+    func testHasLegacyEnabledCalendarsReturnsTrueWhenSet() {
+        cacheService.saveEnabledCalendarIDs(["cal-1"])
+
+        let hasLegacy = cacheService.hasLegacyEnabledCalendars()
+
+        XCTAssertTrue(hasLegacy)
+    }
+
+    func testHasLegacyEnabledCalendarsReturnsTrueEvenWhenEmpty() {
+        // An empty array is still "set" - distinguishes from "never configured"
+        cacheService.saveEnabledCalendarIDs([])
+
+        let hasLegacy = cacheService.hasLegacyEnabledCalendars()
+
+        XCTAssertTrue(hasLegacy)
+    }
+
+    func testRemoveEnabledCalendarIDs() {
+        cacheService.saveEnabledCalendarIDs(["cal-1", "cal-2"])
+        XCTAssertTrue(cacheService.hasLegacyEnabledCalendars())
+
+        cacheService.removeEnabledCalendarIDs()
+
+        XCTAssertFalse(cacheService.hasLegacyEnabledCalendars())
+        XCTAssertTrue(cacheService.loadEnabledCalendarIDs().isEmpty)
+    }
+
+    // MARK: - Clear All Includes Disabled Calendars
+
+    func testClearAllPreferencesIncludesDisabledCalendars() {
+        cacheService.saveDisabledCalendarIDs(["disabled-1"])
+
+        cacheService.clearAllPreferences()
+
+        XCTAssertNil(cacheService.loadDisabledCalendarIDs())
+    }
 }

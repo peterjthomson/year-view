@@ -65,12 +65,22 @@ final class CalendarViewModel {
         let ekCalendars = eventKitService.fetchCalendars()
         calendars = ekCalendars.map { CalendarSource(from: $0) }
 
-        // Load saved preferences
-        let savedEnabledIDs = cacheService.loadEnabledCalendarIDs()
-        if !savedEnabledIDs.isEmpty {
+        // Check for new "disabled" preference first
+        if let disabledIDs = cacheService.loadDisabledCalendarIDs() {
+            for index in calendars.indices {
+                calendars[index].isEnabled = !disabledIDs.contains(calendars[index].id)
+            }
+        } else if cacheService.hasLegacyEnabledCalendars() {
+            // Legacy fallback / Migration
+            let savedEnabledIDs = cacheService.loadEnabledCalendarIDs()
+            
             for index in calendars.indices {
                 calendars[index].isEnabled = savedEnabledIDs.contains(calendars[index].id)
             }
+            
+            // Migrate to new system immediately
+            saveCalendarPreferences()
+            cacheService.removeEnabledCalendarIDs()
         }
     }
 
@@ -144,8 +154,8 @@ final class CalendarViewModel {
     }
 
     private func saveCalendarPreferences() {
-        let enabledIDs = calendars.filter { $0.isEnabled }.map { $0.id }
-        cacheService.saveEnabledCalendarIDs(enabledIDs)
+        let disabledIDs = calendars.filter { !$0.isEnabled }.map { $0.id }
+        cacheService.saveDisabledCalendarIDs(disabledIDs)
     }
 
     func goToToday() {

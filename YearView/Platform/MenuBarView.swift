@@ -219,7 +219,7 @@ struct MiniDayCell: View {
     let onTap: () -> Void
 
     var body: some View {
-        Button(action: onTap) {
+        WobbleTapButton(hasEvents: hasEvents, action: onTap) {
             ZStack {
                 if isToday {
                     Circle()

@@ -106,17 +106,6 @@ struct ContentView: View {
         .sheet(isPresented: $showingCalendarSelection) {
             NavigationStack {
                 CalendarSelectionView()
-                    .navigationTitle("Calendars")
-                    #if os(iOS)
-                    .navigationBarTitleDisplayMode(.inline)
-                    #endif
-                    .toolbar {
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("Done") {
-                                showingCalendarSelection = false
-                            }
-                        }
-                    }
             }
             #if os(macOS)
             .frame(minWidth: 300, minHeight: 400)

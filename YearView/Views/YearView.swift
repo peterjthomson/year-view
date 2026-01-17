@@ -219,13 +219,14 @@ private struct LayoutStyleButton: View {
         }
         #if os(iOS)
         .buttonStyle(.bordered)
-        .tint(isSelected ? Color.secondary : Color.gray)
+        .buttonBorderShape(.circle)
+        .tint(isSelected ? Color.secondary.opacity(0.35) : Color.secondary.opacity(0.18))
+        .foregroundStyle(isSelected ? Color.primary : Color.secondary)
+        .background(isSelected ? Color.secondary.opacity(0.12) : Color.clear, in: Circle())
         #else
         .buttonStyle(.plain)
         .foregroundStyle(isSelected ? Color.primary : Color.secondary)
         #endif
-        .background(isSelected ? Color.secondary.opacity(0.14) : Color.clear)
-        .clipShape(RoundedRectangle(cornerRadius: 6))
         #if os(macOS)
         .help(style.description)
         #endif

@@ -20,8 +20,7 @@ struct MonthGridView: View {
         VStack(alignment: .leading, spacing: 8) {
             // Month header - use short name on compact displays to avoid line breaks
             Text(horizontalSizeClass == .compact ? month.shortName : month.name)
-                .font(.headline)
-                .fontWeight(.semibold)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
                 .foregroundStyle(appSettings.rowHeadingColor)
                 .accessibilityAddTraits(.isHeader)
 
@@ -31,8 +30,7 @@ struct MonthGridView: View {
                     let weekdayNum = month.weekdayNumbers[index]
                     let isWeekendColumn = appSettings.isWeekend(weekday: weekdayNum)
                     Text(header)
-                        .font(.caption2)
-                        .fontWeight(.medium)
+                        .font(.system(size: 8, weight: .medium, design: .rounded))
                         .foregroundStyle(isWeekendColumn ? appSettings.columnHeadingColor.opacity(0.7) : appSettings.columnHeadingColor)
                         .frame(maxWidth: .infinity)
                 }

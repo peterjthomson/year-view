@@ -77,9 +77,11 @@ enum MonthLabelFontSize: String, CaseIterable, Identifiable {
 final class AppSettings {
     // MARK: - Color Settings
     // All defaults use system-adaptive colors that work in both light and dark mode
+
+    static let defaultLightGray: Color = Color.gray.opacity(0.06)
     
     /// Background color for the page/view
-    var pageBackgroundColor: Color = Color.systemBackground
+    var pageBackgroundColor: Color = AppSettings.defaultLightGray
     
     /// Background color for weekday cells
     var weekdayBackgroundColor: Color = .white
@@ -88,7 +90,7 @@ final class AppSettings {
     var weekendBackgroundColor: Color = Color.gray.opacity(0.1)
     
     /// Background color for unused/placeholder cells (cells that maintain grid but have no day)
-    var unusedCellColor: Color = Color.secondarySystemGroupedBackground.opacity(0.3)
+    var unusedCellColor: Color = AppSettings.defaultLightGray
     
     /// Color for date labels inside views
     var dateLabelColor: Color = .primary

@@ -23,14 +23,14 @@ struct DayCell: View {
     
     private var fontSize: Font {
         #if os(iOS)
-        return horizontalSizeClass == .compact ? .system(size: 9, design: .rounded) : .system(.callout, design: .rounded)
+        return horizontalSizeClass == .compact ? .system(size: 8, design: .rounded) : .system(size: 9, design: .rounded)
         #else
-        return .system(.callout, design: .rounded)
+        return .system(size: 9, design: .rounded)
         #endif
     }
 
     var body: some View {
-        Button(action: onTap) {
+        WobbleTapButton(hasEvents: !eventColors.isEmpty, wobbleScale: 1.1, wobbleRotation: 2.5, action: onTap) {
             VStack(spacing: 2) {
                 ZStack {
                     // Weekend/weekday background
@@ -111,7 +111,7 @@ struct CompactDayCell: View {
     let onTap: () -> Void
 
     var body: some View {
-        Button(action: onTap) {
+        WobbleTapButton(hasEvents: hasEvents, action: onTap) {
             ZStack {
                 // Background for today
                 if day.isToday {
@@ -152,6 +152,64 @@ struct CompactDayCell: View {
         }
 
         return label
+    }
+}
+
+struct WobbleTapButton<Label: View>: View {
+    let hasEvents: Bool
+    let wobbleScale: CGFloat
+    let wobbleRotation: Double
+    let wobbleDuration: TimeInterval
+    let action: () -> Void
+    let label: () -> Label
+
+    @State private var isWobbling = false
+
+    init(
+        hasEvents: Bool,
+        wobbleScale: CGFloat = 1.03,
+        wobbleRotation: Double = 1.2,
+        wobbleDuration: TimeInterval = 0.12,
+        action: @escaping () -> Void,
+        @ViewBuilder label: @escaping () -> Label
+    ) {
+        self.hasEvents = hasEvents
+        self.wobbleScale = wobbleScale
+        self.wobbleRotation = wobbleRotation
+        self.wobbleDuration = wobbleDuration
+        self.action = action
+        self.label = label
+    }
+
+    var body: some View {
+        Button(action: handleTap) {
+            label()
+                .scaleEffect(isWobbling ? wobbleScale : 1)
+                .rotationEffect(.degrees(isWobbling ? wobbleRotation : 0))
+        }
+    }
+
+    private func handleTap() {
+        if hasEvents {
+            action()
+        } else {
+            triggerWobble()
+        }
+    }
+
+    private func triggerWobble() {
+        HapticFeedback.light()
+
+        let animation = Animation.spring(response: 0.18, dampingFraction: 0.45)
+        withAnimation(animation) {
+            isWobbling = true
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + wobbleDuration) {
+            withAnimation(animation) {
+                isWobbling = false
+            }
+        }
     }
 }
 

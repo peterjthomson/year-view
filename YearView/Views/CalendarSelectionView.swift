@@ -12,13 +12,13 @@ struct CalendarSelectionView: View {
                 Button {
                     enabledCalendarIDs = Set(calendarViewModel.calendars.map(\.id))
                 } label: {
-                    Label("Show All", systemImage: "checkmark.circle.fill")
+                    Label("Show All", systemImage: isShowAllSelected ? "checkmark.circle.fill" : "circle")
                 }
 
                 Button {
                     enabledCalendarIDs = []
                 } label: {
-                    Label("Hide All", systemImage: "circle")
+                    Label("Hide All", systemImage: isHideAllSelected ? "checkmark.circle.fill" : "circle")
                 }
             }
 
@@ -54,6 +54,9 @@ struct CalendarSelectionView: View {
             calendarViewModel.setEnabledCalendarIDs(enabledCalendarIDs)
         }
         .navigationTitle("Manage Calendars")
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Done") {
@@ -61,6 +64,16 @@ struct CalendarSelectionView: View {
                 }
             }
         }
+    }
+
+    private var isShowAllSelected: Bool {
+        guard !calendarViewModel.calendars.isEmpty else { return false }
+        let allCalendarIDs = Set(calendarViewModel.calendars.map(\.id))
+        return enabledCalendarIDs == allCalendarIDs
+    }
+
+    private var isHideAllSelected: Bool {
+        enabledCalendarIDs.isEmpty
     }
 
     private var groupedCalendars: [(key: CalendarSource.SourceType, value: [CalendarSource])] {
@@ -105,6 +118,8 @@ struct CalendarRow: View {
                         .fontWeight(.semibold)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(calendar.title) calendar")

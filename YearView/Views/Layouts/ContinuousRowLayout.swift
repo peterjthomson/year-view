@@ -95,7 +95,7 @@ struct DayRowView: View {
     private var isWeekend: Bool { appSettings.isWeekend(weekday: day.weekday) }
 
     var body: some View {
-        Button(action: onTap) {
+        WobbleTapButton(hasEvents: !events.isEmpty, action: onTap) {
             HStack(spacing: 12) {
                 // Day number and weekday
                 VStack(alignment: .center, spacing: 2) {

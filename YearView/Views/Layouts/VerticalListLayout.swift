@@ -169,7 +169,7 @@ struct DayStripCell: View {
     private var isWeekend: Bool { appSettings.isWeekend(weekday: day.weekday) }
 
     var body: some View {
-        Button(action: onTap) {
+        WobbleTapButton(hasEvents: !eventColors.isEmpty, action: onTap) {
             VStack(spacing: 4) {
                 // Weekday
                 Text(weekdayAbbreviation)

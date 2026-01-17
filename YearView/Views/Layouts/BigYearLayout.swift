@@ -95,6 +95,7 @@ struct WeekRowView: View {
             HStack(spacing: 0) {
                 ForEach(Array(daysInWeek.enumerated()), id: \.element) { index, date in
                     let isWeekend = appSettings.isWeekend(date: date)
+                    let hasEvents = hasEvents(on: date)
                     DayCellBigYear(
                         date: date,
                         isInYear: calendar.component(.year, from: date) == year,
@@ -102,6 +103,7 @@ struct WeekRowView: View {
                         isSelected: selectedDate.map { calendar.isDate($0, inSameDayAs: date) } ?? false,
                         showMonthLabel: shouldShowMonthLabel(for: date),
                         isWeekend: isWeekend,
+                        hasEvents: hasEvents,
                         appSettings: appSettings,
                         onTap: { onDateTap(date) }
                     )
@@ -162,6 +164,11 @@ struct WeekRowView: View {
         // Show month label on the 1st of each month
         return calendar.component(.day, from: date) == 1
     }
+    
+    private func hasEvents(on date: Date) -> Bool {
+        let events = calendarViewModel.events(for: date)
+        return !appSettings.filterEvents(events).isEmpty
+    }
 }
 
 struct DayCellBigYear: View {
@@ -171,13 +178,14 @@ struct DayCellBigYear: View {
     let isSelected: Bool
     let showMonthLabel: Bool
     let isWeekend: Bool
+    let hasEvents: Bool
     let appSettings: AppSettings
     let onTap: () -> Void
 
     private var calendar: Calendar { appSettings.calendar }
 
     var body: some View {
-        Button(action: onTap) {
+        WobbleTapButton(hasEvents: hasEvents, action: onTap) {
             VStack(alignment: .leading, spacing: 2) {
                 // Header: weekday + day number + month label
                 HStack(spacing: 4) {

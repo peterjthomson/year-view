@@ -56,14 +56,17 @@ struct YearMonthRowLayout: View {
             
             // Height sizing: fill vertical space with 12 month rows plus header
             // On mobile, account for floating mode panel that overlays bottom of view
-            let headerHeight: CGFloat = 20
+            let isCompactLandscape = horizontalSizeClass == .compact && geometry.size.width > geometry.size.height
+            let headerHeight: CGFloat = isCompactLandscape ? 16 : 20
+            let headerSpacing: CGFloat = isCompactLandscape ? 4 : headerBottomPadding
+            let rowVerticalPadding: CGFloat = isCompactLandscape ? 1 : monthRowVerticalPadding
             let panelInset: CGFloat = horizontalSizeClass == .compact ? floatingPanelHeight : 0
-            let chromeHeight = (outerPadding * 2) + headerHeight + headerBottomPadding + panelInset
+            let chromeHeight = (outerPadding * 2) + headerHeight + headerSpacing + panelInset
             let availableHeight = max(0, geometry.size.height - chromeHeight)
             
             let monthCount = CGFloat(max(1, months.count))
             let dividerCount = CGFloat(max(0, months.count - 1))
-            let totalRowPaddingHeight = monthCount * (monthRowVerticalPadding * 2)
+            let totalRowPaddingHeight = monthCount * (rowVerticalPadding * 2)
             let totalDividerHeight = dividerCount * rowDividerHeight
             
             // MonthRow's total height is cellHeight + (verticalPadding*2), plus dividers between rows.
@@ -81,7 +84,7 @@ struct YearMonthRowLayout: View {
             ScrollView(.horizontal, showsIndicators: true) {
                 VStack(alignment: .leading, spacing: 0) {
                     weekdayHeader(cellSize: CGSize(width: cellWidth, height: headerHeight), monthLabelWidth: monthLabelWidth)
-                        .padding(.bottom, headerBottomPadding)
+                        .padding(.bottom, headerSpacing)
 
                     VStack(alignment: .leading, spacing: 0) {
                         ForEach(Array(months.enumerated()), id: \.element.id) { index, month in
@@ -93,7 +96,7 @@ struct YearMonthRowLayout: View {
                                 selectedDate: selectedDate,
                                 calendarViewModel: calendarViewModel,
                                 appSettings: appSettings,
-                                verticalPadding: monthRowVerticalPadding,
+                                verticalPadding: rowVerticalPadding,
                                 onDateTap: onDateTap
                             )
                             
@@ -172,6 +175,7 @@ private struct MonthRow: View {
                             day: paddedDays[index],
                             cellSize: cellSize,
                             isSelected: isSelected(paddedDays[index]?.date),
+                            hasEvents: hasEvents(paddedDays[index]),
                             appSettings: appSettings,
                             onTap: { date in onDateTap(date) }
                         )
@@ -252,6 +256,12 @@ private struct MonthRow: View {
         }
         
         return result
+    }
+    
+    private func hasEvents(_ day: DayData?) -> Bool {
+        guard let day else { return false }
+        let events = calendarViewModel.events(for: day.date)
+        return !appSettings.filterEvents(events).isEmpty
     }
 
     private func isSelected(_ date: Date?) -> Bool {
@@ -391,15 +401,14 @@ private struct MonthRowDayCell: View {
     let day: DayData?
     let cellSize: CGSize
     let isSelected: Bool
+    let hasEvents: Bool
     let appSettings: AppSettings
     let onTap: (Date) -> Void
 
     var body: some View {
         Group {
             if let day {
-                Button {
-                    onTap(day.date)
-                } label: {
+                WobbleTapButton(hasEvents: hasEvents, wobbleScale: 1.1, wobbleRotation: 2.5, action: { onTap(day.date) }) {
                     ZStack(alignment: .top) {
                         if isSelected && !day.isToday {
                             Rectangle()
@@ -411,7 +420,7 @@ private struct MonthRowDayCell: View {
                             .fontWeight(day.isToday ? .bold : .medium)
                             .foregroundStyle(appSettings.dateLabelColor)
                             .frame(width: cellSize.width, alignment: .center)
-                            .padding(.top, 6)
+                        .padding(.top, dayNumberTopPadding)
                     }
                     .frame(width: cellSize.width, height: cellSize.height, alignment: .top)
                     .contentShape(Rectangle())
@@ -423,6 +432,10 @@ private struct MonthRowDayCell: View {
                     .frame(width: cellSize.width, height: cellSize.height)
             }
         }
+    }
+
+    private var dayNumberTopPadding: CGFloat {
+        max(1, min(6, cellSize.height * 0.2))
     }
 }
 

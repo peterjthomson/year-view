@@ -3,6 +3,7 @@ import SwiftUI
 struct PowerLawLayout: View {
     @Environment(CalendarViewModel.self) private var calendarViewModel
     @Environment(AppSettings.self) private var appSettings
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     @Binding var selectedDate: Date?
     let onDateTap: (Date) -> Void
@@ -11,56 +12,19 @@ struct PowerLawLayout: View {
     
     var body: some View {
         GeometryReader { geometry in
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: 1) {
-                    // TODAY Panel
-                    TodayPanel(
-                        date: today,
-                        events: calendarViewModel.events(for: today),
-                        onEventTap: { _ in onDateTap(today) },
-                        height: geometry.size.height
-                    )
-                    .frame(width: panelWidth(for: geometry, index: 0))
-                    .background(Color.white)
-                    
-                    // THIS WEEK Panel
-                    ThisWeekPanel(
-                        startDate: today,
-                        calendarViewModel: calendarViewModel,
-                        onDateTap: onDateTap,
-                        height: geometry.size.height
-                    )
-                    .frame(width: panelWidth(for: geometry, index: 1))
-                    .background(Color.white)
-                    
-                    // THIS MONTH Panel
-                    ThisMonthPanel(
-                        startDate: today,
-                        calendarViewModel: calendarViewModel,
-                        appSettings: appSettings,
-                        onDateTap: onDateTap
-                    )
-                    .frame(width: panelWidth(for: geometry, index: 2))
-                    .background(Color.white)
-                    
-                    // THIS QUARTER Panel
-                    ThisQuarterPanel(
-                        calendarViewModel: calendarViewModel,
-                        appSettings: appSettings,
-                        onDateTap: onDateTap,
-                        height: geometry.size.height
-                    )
-                    .frame(width: panelWidth(for: geometry, index: 3))
-                    .background(Color.white)
-                    
-                    // THIS YEAR Panel
-                    ThisYearPanel(
-                        calendarViewModel: calendarViewModel,
-                        onDateTap: onDateTap,
-                        height: geometry.size.height
-                    )
-                    .frame(width: panelWidth(for: geometry, index: 4))
-                    .background(Color.white)
+            let panelSpacing: CGFloat = isCompactPhone ? 0 : 1
+
+            Group {
+                if isCompactPhone {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        panelStack(for: geometry, spacing: panelSpacing)
+                            .scrollTargetLayout()
+                    }
+                    .scrollTargetBehavior(.paging)
+                } else {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        panelStack(for: geometry, spacing: panelSpacing)
+                    }
                 }
             }
         }
@@ -72,6 +36,9 @@ struct PowerLawLayout: View {
         let minPanelWidth: CGFloat = 240
         
         #if os(iOS)
+        if isCompactPhone {
+            return totalWidth
+        }
         if totalWidth < minPanelWidth * 2 {
             return totalWidth * 0.85
         } else if totalWidth < minPanelWidth * 5 {
@@ -82,6 +49,68 @@ struct PowerLawLayout: View {
         let weights: [CGFloat] = [1.1, 1.0, 1.0, 1.0, 1.1]
         let totalWeight = weights.reduce(0, +)
         return (totalWidth / totalWeight) * weights[index]
+    }
+
+    @ViewBuilder
+    private func panelStack(for geometry: GeometryProxy, spacing: CGFloat) -> some View {
+        HStack(alignment: .top, spacing: spacing) {
+            // TODAY Panel
+            TodayPanel(
+                date: today,
+                events: calendarViewModel.events(for: today),
+                onEventTap: { _ in onDateTap(today) },
+                height: geometry.size.height
+            )
+            .frame(width: panelWidth(for: geometry, index: 0))
+            .background(Color.white)
+            
+            // THIS WEEK Panel
+            ThisWeekPanel(
+                startDate: today,
+                calendarViewModel: calendarViewModel,
+                onDateTap: onDateTap,
+                height: geometry.size.height
+            )
+            .frame(width: panelWidth(for: geometry, index: 1))
+            .background(Color.white)
+            
+            // THIS MONTH Panel
+            ThisMonthPanel(
+                startDate: today,
+                calendarViewModel: calendarViewModel,
+                appSettings: appSettings,
+                onDateTap: onDateTap
+            )
+            .frame(width: panelWidth(for: geometry, index: 2))
+            .background(Color.white)
+            
+            // THIS QUARTER Panel
+            ThisQuarterPanel(
+                calendarViewModel: calendarViewModel,
+                appSettings: appSettings,
+                onDateTap: onDateTap,
+                height: geometry.size.height
+            )
+            .frame(width: panelWidth(for: geometry, index: 3))
+            .background(Color.white)
+            
+            // THIS YEAR Panel
+            ThisYearPanel(
+                calendarViewModel: calendarViewModel,
+                onDateTap: onDateTap,
+                height: geometry.size.height
+            )
+            .frame(width: panelWidth(for: geometry, index: 4))
+            .background(Color.white)
+        }
+    }
+
+    private var isCompactPhone: Bool {
+        #if os(iOS)
+        return horizontalSizeClass == .compact
+        #else
+        return false
+        #endif
     }
 }
 
@@ -278,7 +307,7 @@ private struct WeekDayRow: View {
     let onTap: () -> Void
     
     var body: some View {
-        Button(action: onTap) {
+        WobbleTapButton(hasEvents: !events.isEmpty, action: onTap) {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(alignment: .firstTextBaseline) {
                     Text(dayName)
@@ -405,48 +434,50 @@ private struct MonthDayRow: View {
     let onTap: () -> Void
     
     var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            VStack(alignment: .leading, spacing: 0) {
-                Text(dayNumber)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(isWeekend ? .secondary : .primary)
-                Text(dayName)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .textCase(.uppercase)
-            }
-            .frame(width: 32, alignment: .leading)
-            
-            if !events.isEmpty {
-                VStack(alignment: .leading, spacing: 2) {
-                    ForEach(events.prefix(2)) { event in
-                        HStack(spacing: 5) {
-                            Circle()
-                                .fill(event.calendarColor)
-                                .frame(width: 5, height: 5)
-                            Text(event.title)
-                                .font(.caption)
-                                .lineLimit(1)
+        WobbleTapButton(hasEvents: !events.isEmpty, action: onTap) {
+            HStack(alignment: .top, spacing: 10) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(dayNumber)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(isWeekend ? .secondary : .primary)
+                    Text(dayName)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
+                }
+                .frame(width: 32, alignment: .leading)
+                
+                if !events.isEmpty {
+                    VStack(alignment: .leading, spacing: 2) {
+                        ForEach(events.prefix(2)) { event in
+                            HStack(spacing: 5) {
+                                Circle()
+                                    .fill(event.calendarColor)
+                                    .frame(width: 5, height: 5)
+                                Text(event.title)
+                                    .font(.caption)
+                                    .lineLimit(1)
+                            }
+                        }
+                        
+                        if events.count > 2 {
+                            Text("+\(events.count - 2)")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                                .padding(.leading, 10)
                         }
                     }
-                    
-                    if events.count > 2 {
-                        Text("+\(events.count - 2)")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                            .padding(.leading, 10)
-                    }
                 }
+                
+                Spacer()
             }
-            
-            Spacer()
+            .padding(.vertical, 6)
+            .padding(.horizontal, 4)
+            .background(isWeekend ? weekendColor : Color.clear)
+            .contentShape(Rectangle())
         }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 4)
-        .background(isWeekend ? weekendColor : Color.clear)
-        .contentShape(Rectangle())
-        .onTapGesture(perform: onTap)
+        .buttonStyle(.plain)
     }
     
     private var dayNumber: String {
@@ -738,6 +769,7 @@ private struct YearQuarterSection: View {
     let height: CGFloat
     
     var body: some View {
+        let maxRows = maxContentRows
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 6) {
                 Text(name)
@@ -752,37 +784,51 @@ private struct YearQuarterSection: View {
             if events.isEmpty {
                 // Show months in lighter font when empty
                 VStack(alignment: .leading, spacing: 2) {
-                    ForEach(months, id: \.self) { month in
+                    ForEach(months.prefix(maxRows), id: \.self) { month in
                         Text(month)
                             .font(.caption)
                             .foregroundStyle(Color.secondary.opacity(0.4))
                     }
                 }
             } else {
-                ForEach(events.prefix(5)) { event in
-                    HStack(spacing: 6) {
-                        RoundedRectangle(cornerRadius: 1)
-                            .fill(Color.secondary.opacity(0.3))
-                            .frame(width: 2, height: 14)
-                        Text(event.title)
-                            .font(.caption)
-                            .lineLimit(1)
-                            .foregroundStyle(.secondary)
+                let showMoreLabel = events.count > maxRows && maxRows > 1
+                let visibleCount = showMoreLabel ? max(1, maxRows - 1) : maxRows
+
+                VStack(alignment: .leading, spacing: 2) {
+                    ForEach(events.prefix(visibleCount)) { event in
+                        HStack(spacing: 6) {
+                            RoundedRectangle(cornerRadius: 1)
+                                .fill(Color.secondary.opacity(0.3))
+                                .frame(width: 2, height: 14)
+                            Text(event.title)
+                                .font(.caption)
+                                .lineLimit(1)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    
+                    if showMoreLabel {
+                        Text("+\(events.count - visibleCount) more")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                            .padding(.leading, 8)
                     }
                 }
-                
-                if events.count > 5 {
-                    Text("+\(events.count - 5) more")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                        .padding(.leading, 8)
-                }
             }
-            
-            Spacer(minLength: 0)
         }
-        .frame(height: height)
+        .frame(height: height, alignment: .topLeading)
         .padding(.horizontal)
+        .clipped()
+    }
+
+    private var maxContentRows: Int {
+        let headerHeight: CGFloat = 22
+        let headerSpacing: CGFloat = 6
+        let rowHeight: CGFloat = 16
+        let rowSpacing: CGFloat = 2
+        let availableHeight = max(0, height - headerHeight - headerSpacing)
+        let rows = Int((availableHeight + rowSpacing) / (rowHeight + rowSpacing))
+        return max(1, rows)
     }
 }
 

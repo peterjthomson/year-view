@@ -107,10 +107,10 @@ struct SettingsView: View {
     
     private func resetToDefaults() {
         appSettings.weekStartsOn = .monday
-        appSettings.pageBackgroundColor = Color.systemBackground
+        appSettings.pageBackgroundColor = AppSettings.defaultLightGray
         appSettings.weekdayBackgroundColor = .clear
         appSettings.weekendBackgroundColor = Color.secondarySystemGroupedBackground.opacity(0.5)
-        appSettings.unusedCellColor = Color.secondarySystemGroupedBackground.opacity(0.3)
+        appSettings.unusedCellColor = AppSettings.defaultLightGray
         appSettings.dateLabelColor = .primary
         appSettings.columnHeadingColor = .secondary
         appSettings.rowHeadingColor = .primary

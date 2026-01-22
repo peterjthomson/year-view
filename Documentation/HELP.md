@@ -60,7 +60,7 @@ The main screen shows your entire year with events displayed as colored dots or 
 
 ## Layout Options
 
-Year View offers **five different layouts** to suit your preferences. Switch between them using the layout buttons at the bottom of the screen (iOS) or in the toolbar (Mac).
+Year View offers **six different layouts** to suit your preferences. Switch between them using the layout buttons at the bottom of the screen (iOS) or in the toolbar (Mac).
 
 ### 1. Month Rows (Default)
 
@@ -90,7 +90,7 @@ A traditional 4×3 grid showing all 12 months in a familiar calendar format. Eac
 
 **Icon:** Horizontal bars
 
-Months are arranged in a horizontally scrollable row. Swipe left and right to move through the year.
+Months are arranged in a horizontally scrollable row. Scroll to move through months.
 
 **Best for:** Focusing on one month at a time while maintaining year context.
 
@@ -102,18 +102,25 @@ A vertical scrolling list of months, each displayed as a complete month grid.
 
 **Best for:** Scrolling through the year on narrow screens, detailed month-by-month review.
 
+### 6. Power Law (Multi-Horizon)
+
+**Icon:** Split panels
+
+Five stacked horizons (Today, This Week, This Month, This Quarter, This Year) shown side by side.
+
+**Best for:** Scanning near-term details without losing the longer-term view.
+
 ---
 
 ## Navigating Between Years
 
 ### Changing the Year
 
-**Tap the year** in the navigation bar (or toolbar) to open the year picker. You can select any year within a 20-year range (10 years before and after the current year).
+**Tap the year** in the navigation bar (or toolbar) to open the year picker. You can select any year from 10 years before to 10 years after the current year.
 
 ### Quick Navigation
 
 - **"Today" button:** Instantly jumps to the current year and highlights today's date
-- **Swipe gestures:** Swipe left to go to the next year, swipe right to go to the previous year
 
 ### Mac Keyboard Shortcuts
 
@@ -333,11 +340,6 @@ Year View supports keyboard shortcuts on macOS:
 
 ## Gestures
 
-### Swipe Between Years
-
-- **Swipe left** — Next year
-- **Swipe right** — Previous year
-
 ### Pinch to Zoom (Future)
 
 Pinch gestures are recognized and may be used for zooming in future updates.
@@ -352,34 +354,29 @@ Pinch gestures are recognized and may be used for zooming in future updates.
 
 ## Accessibility
 
-Year View is designed with accessibility in mind:
+Year View aims to be accessible, but coverage varies by layout and density:
 
 ### VoiceOver Support
 
-- All days announce their full date (e.g., "Saturday, January 10, 2026")
+- Core controls and event rows include descriptive labels
 - Today is announced as "Today" followed by the date
-- Event counts are announced (e.g., "3 events")
-- Events announce their title, time, location, and calendar name
+- Event counts are announced when present
 
 ### Dynamic Type
 
-All text respects your system text size preferences. Increase text size in **Settings → Display & Brightness → Text Size**.
+Most text respects your system text size preferences, but some dense grid layouts use fixed sizes for readability.
 
 ### Reduce Motion
 
-Year View respects the **Reduce Motion** system setting for animations.
+Standard animations respect **Reduce Motion**, while some custom effects may not yet adapt.
 
 ### Keyboard Navigation (Mac)
 
-Full keyboard navigation is supported:
-
-- Use Tab to move between elements
-- Use arrow keys to navigate within lists
-- Press Return/Enter to select
+Navigation works in standard lists and toolbars; dense grids may still require pointer input.
 
 ### Color Contrast
 
-Year View maintains sufficient contrast in both light and dark modes.
+Contrast is designed to work in both light and dark modes, with user-adjustable colors where available.
 
 ---
 

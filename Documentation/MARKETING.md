@@ -19,13 +19,16 @@ Year View transforms how you see your calendar. Instead of scrolling through wee
 
 **A companion, not a replacement.**
 
-Year View works alongside Apple Calendar and Google Calendar. We don't try to replace your existing calendar—we enhance it. Tap any event to open it in your native calendar app. Creating a new event? We'll take you right there.
+Year View works alongside Apple Calendar and the calendars you connect there (including Google). We don't try to replace your existing calendar—we enhance it. Tap any event to open it in your native calendar app. Creating a new event? We'll take you right there.
 
-**Three beautiful ways to view your year:**
+**Six beautiful ways to view your year:**
 
+• **Month Rows** — Calendar.app-style month strips
+• **Year View** — Continuous week rows across the year
 • **Grid View** — The classic 4×3 layout showing all 12 months
-• **Continuous Row** — Scroll horizontally through your year like a timeline
+• **Row View** — Scroll horizontally through months like a timeline
 • **List View** — Months stacked vertically for quick scanning
+• **Power Law** — Multi-horizon panels from today to the year
 
 **Works with all your calendars:**
 
@@ -71,7 +74,10 @@ When you zoom out, everything changes. Spot the busy weeks before they arrive. F
 
 ---
 
-## Three Views. One Year.
+## Multiple Views. One Year.
+
+Choose from multiple layouts depending on the horizon you want to see.
+Examples include:
 
 **Grid**
 The classic layout. Four rows, three columns, twelve months. Your entire year in the most intuitive arrangement.
@@ -94,7 +100,7 @@ No new accounts. No data migration. Just instant access to your existing life.
 
 ## A Companion, Not a Replacement
 
-We don't do event editing. That's what Apple Calendar and Google Calendar are for, and they're excellent at it.
+We don't do event editing. That's what your native calendar app is for, and it's excellent at it.
 
 Instead, Year View does one thing perfectly: showing you the year. Tap an event and we'll open it in your calendar app. Want to add something? We'll take you there.
 
@@ -105,7 +111,7 @@ Less is more.
 ## Everywhere You Need It
 
 **iPhone**
-Your year in your pocket. Swipe between years. Tap any day to see what's happening.
+Your year in your pocket. Jump between years. Tap any day to see what's happening.
 
 **iPad**
 See all 12 months without scrolling. Stage Manager and Split View ready.
@@ -153,24 +159,24 @@ Available for iPhone, iPad, and Mac.
 Year View is a native Apple app that shows your entire calendar year on a single screen.
 
 ### Boilerplate
-Year View is a free calendar companion app for iPhone, iPad, and Mac. It connects to Apple Calendar and Google Calendar to display a full year of events in one beautiful, scannable view. Unlike traditional calendar apps focused on daily scheduling, Year View emphasizes the big picture—helping users spot patterns, find free time, and plan ahead. All event creation and editing is handled by native calendar apps via deep links, keeping Year View focused on its core purpose: clarity.
+Year View is a free calendar companion app for iPhone, iPad, and Mac. It connects to Apple Calendar (including Google calendars connected through Apple Calendar) to display a full year of events in one beautiful, scannable view. Unlike traditional calendar apps focused on daily scheduling, Year View emphasizes the big picture—helping users spot patterns, find free time, and plan ahead. All event creation and editing is handled by native calendar apps via deep links, keeping Year View focused on its core purpose: clarity.
 
 ### Key Facts
 - **Price:** Free (no IAP, no subscriptions)
 - **Platforms:** iOS 17+, iPadOS 17+, macOS 14+
-- **Calendar Support:** Apple Calendar, Google Calendar (includes iCloud, Exchange, Outlook, CalDAV, subscribed, shared)
+- **Calendar Support:** Apple Calendar (including Google calendars connected via Apple Calendar)
 - **Privacy:** No account required, no tracking, data stays on device
 - **Developer:** [Your Company Name]
 
 ### Feature Highlights
 - Full year displayed on one screen
-- Five layout options (Year View, Month Rows, Grid, Row, List)
+- Six layout options (Year View, Month Rows, Grid, Row, List, Power Law)
 - Event dots with calendar colors
 - Day detail popover with event list
 - Video call detection (Zoom, Meet, Teams)
 - Deep links to native calendar apps
 - Menu bar access (macOS)
-- Full accessibility support
+- Accessibility-focused design
 
 ---
 
@@ -193,10 +199,13 @@ See all 12 months at once. Spot the busy weeks. Find the free time. Plan with cl
 
 See your whole year on one screen. No scrolling. No guessing. Just clarity.
 
-2/ Three ways to see your year:
+2/ Ways to see your year:
 📊 Grid — Classic 4×3 layout
+🧱 Month Rows — Calendar.app-style strips
 📜 Continuous — Horizontal timeline scroll
 📋 List — Vertical month stack
+🧭 Year View — Continuous week rows
+📐 Power Law — Multi-horizon panels
 
 Pick the view that fits how you think.
 
@@ -275,7 +284,7 @@ Not scrolling through months. Not flipping between views. Actually seeing all 12
 
 That's what Year View does.
 
-It's a free companion app that connects to your existing calendars—Apple Calendar, Google Calendar, whatever you use—and shows you the big picture.
+It's a free companion app that connects to your existing calendars through Apple Calendar (Google, Exchange, and more) and shows you the big picture.
 
 **Why it matters:**
 - Spot busy periods before they sneak up on you

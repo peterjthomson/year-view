@@ -31,102 +31,27 @@ These requirements enable use of:
 
 ## Project Structure
 
-```
-YearView/
-├── YearViewApp.swift          # App entry point, scene configuration
-├── ContentView.swift          # Root view with navigation
-├── Models/
-│   ├── CalendarEvent.swift    # Event data model
-│   ├── CalendarSource.swift   # Calendar/source data model
-│   └── CalendarSet.swift      # User-defined calendar groups
-├── ViewModels/
-│   ├── CalendarViewModel.swift # Main app state
-│   ├── YearViewModel.swift     # Year view configuration
-│   └── DayViewModel.swift      # Day detail state
-├── Views/
-│   ├── YearView.swift         # Core year visualization
-│   ├── MonthGridView.swift    # Month grid component
-│   ├── DayCell.swift          # Individual day cell
-│   ├── DayDetailView.swift    # Day popover/sheet
-│   ├── EventRow.swift         # Event list item
-│   ├── CalendarSelectionView.swift
-│   ├── YearPickerView.swift
-│   ├── SearchView.swift
-│   └── Layouts/
-│       ├── YearMonthRowLayout.swift    # Month rows (default)
-│       ├── BigYearLayout.swift         # Continuous weeks
-│       ├── StandardGridLayout.swift    # 4×3 grid
-│       ├── ContinuousRowLayout.swift   # Horizontal scroll
-│       └── VerticalListLayout.swift    # Vertical months
-├── Services/
-│   ├── EventKitService.swift          # Apple Calendar integration
-│   ├── GoogleCalendarService.swift    # Google Calendar API
-│   ├── CalendarDeepLinkService.swift  # Native app deep links
-│   └── CalendarCacheService.swift     # UserDefaults persistence
-├── Utilities/
-│   ├── DateUtilities.swift    # Date helpers
-│   ├── ColorUtilities.swift   # Color helpers
-│   └── HapticFeedback.swift   # Haptic feedback (iOS)
-└── Platform/
-    ├── MenuBarView.swift      # macOS menu bar view
-    └── MacCommands.swift      # macOS keyboard shortcuts
-```
+- `YearViewApp.swift` — App entry point, scene configuration
+- `ContentView.swift` — Root view with navigation
+- `Models/` — Calendar data models and (future) sets
+- `ViewModels/` — App state and view models
+- `Views/` — SwiftUI views and layouts
+- `Services/` — EventKit, deep links, and caching
+- `Utilities/` — Date/color helpers and haptics
+- `Platform/` — macOS‑specific UI and commands
 
 ## Data Flow
-
-```
-┌─────────────────┐     ┌─────────────────┐
-│   EventKit      │────▶│  EventKitService │
-│ (Apple Calendar)│     └────────┬────────┘
-└─────────────────┘              │
-                                 ▼
-┌─────────────────┐     ┌─────────────────┐
-│ Google Calendar │────▶│GoogleCalService  │
-│      API        │     └────────┬────────┘
-└─────────────────┘              │
-                                 ▼
-                        ┌─────────────────┐
-                        │CalendarViewModel │ ◀── @Observable
-                        │                 │
-                        │ • calendars     │
-                        │ • events        │
-                        │ • displayedYear │
-                        └────────┬────────┘
-                                 │
-            ┌────────────────────┼────────────────────┐
-            ▼                    ▼                    ▼
-    ┌───────────────┐   ┌───────────────┐   ┌───────────────┐
-    │   YearView    │   │ DayDetailView │   │CalendarSelect │
-    └───────────────┘   └───────────────┘   └───────────────┘
-```
+- Apple Calendar data flows through `EventKitService` into `CalendarViewModel`.
+- Google Calendar data can flow through `GoogleCalendarService` (experimental).
+- `CalendarViewModel` aggregates and filters events for UI consumption.
+- `YearView`, `DayDetailView`, and `CalendarSelectionView` consume view model state.
 
 ## Key Patterns
 
 ### @Observable ViewModels
 
-ViewModels use the `@Observable` macro for automatic UI updates:
-
-```swift
-@Observable
-final class CalendarViewModel {
-    var calendars: [CalendarSource] = []
-    var events: [CalendarEvent] = []
-    var displayedYear: Int
-
-    // Computed properties automatically trigger updates
-    var filteredEvents: [CalendarEvent] {
-        events.filter { enabledCalendarIDs.contains($0.calendarID) }
-    }
-}
-```
-
-Views receive the ViewModel via environment:
-
-```swift
-struct YearView: View {
-    @Environment(CalendarViewModel.self) private var calendarViewModel
-}
-```
+ViewModels use the `@Observable` macro to drive SwiftUI updates. Views access
+the shared models via environment injection from `YearViewApp`.
 
 ### Service Layer
 
@@ -141,17 +66,8 @@ Services are instantiated by ViewModels, not injected, keeping the architecture 
 
 ### Platform Abstraction
 
-Platform-specific code is isolated using `#if os()`:
-
-```swift
-#if os(macOS)
-struct MenuBarView: View { ... }
-#endif
-
-#if os(iOS)
-HapticFeedback.light()
-#endif
-```
+Platform-specific code is isolated under `Platform/` and gated with `#if os(...)`
+checks so iOS and macOS behaviors stay cleanly separated.
 
 ## Calendar Integration
 
@@ -207,11 +123,11 @@ Views include SwiftUI previews for visual testing during development.
 
 ## Accessibility
 
-- Full VoiceOver support with descriptive labels
-- Dynamic Type for all text
-- Respects Reduce Motion system setting
-- Keyboard navigation on macOS
-- Sufficient color contrast in both light/dark modes
+- VoiceOver labels for core controls and event rows
+- Dynamic Type support for most text; dense grids use fixed sizes
+- Reduce Motion respected for standard animations; some custom effects may not yet adapt
+- Keyboard navigation on macOS in standard lists and toolbars
+- Contrast designed for light/dark modes with user-adjustable colors
 
 ## Performance Considerations
 

@@ -14,7 +14,7 @@ This guide helps developers set up and run Year View locally.
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/peterjthomson/year-view.git
+git clone https://github.com/your-org/year-view.git
 cd year-view
 ```
 
@@ -24,9 +24,12 @@ cd year-view
 open YearView.xcodeproj
 ```
 
-### 3. Select the Scheme
+### 3. Select a Scheme
 
-Select **YearView** — the iOS/iPadOS/macOS multiplatform app.
+Choose from the available schemes:
+- **YearView** — iOS/iPadOS/macOS multiplatform app
+- **YearView Watch App** — watchOS app
+- **YearViewWidgetExtension** — Widget extension
 
 ### 4. Configure Signing
 
@@ -45,6 +48,8 @@ Press `Cmd+R` or click the Run button.
 year-view/
 ├── YearView.xcodeproj/     # Xcode project
 ├── YearView/               # Main app source
+├── YearView Watch App/     # watchOS app source
+├── YearViewWidgetExtension/# Widget source
 ├── YearViewTests/          # Unit tests
 ├── Documentation/          # Architecture & API docs
 ├── README.md
@@ -58,8 +63,6 @@ year-view/
 
 1. Select the YearView scheme
 2. Press `Cmd+U` or go to Product → Test
-
-> Note: `YearViewTests/` currently contains unit test files, but the Xcode project does not define a unit test target for them yet. Until a test target is created and the files are added to it, `Cmd+U` / CI test steps will not run these tests.
 
 ### From Command Line
 
@@ -127,6 +130,31 @@ Add URL scheme to handle OAuth callback:
 </array>
 ```
 
+## Widgets
+
+### iOS Widgets
+
+Widgets require an App Group for data sharing:
+
+1. Add App Group capability to main app and widget extension
+2. Use the same group identifier (e.g., `group.com.yearview.app`)
+3. Share data via `UserDefaults(suiteName:)`
+
+### macOS Widgets
+
+macOS widgets work similarly but use a different container:
+
+1. Add App Group capability
+2. Ensure both app and widget use the same group
+
+## watchOS
+
+The watch app is a standalone WatchKit app:
+
+1. Requires separate provisioning profile
+2. Calendar access requested independently
+3. Uses WatchConnectivity for iPhone communication (future enhancement)
+
 ## Troubleshooting
 
 ### "Calendar access denied"
@@ -134,6 +162,12 @@ Add URL scheme to handle OAuth callback:
 1. Go to Settings → Privacy & Security → Calendars
 2. Find Year View and enable access
 3. Restart the app
+
+### Widgets not appearing
+
+1. Ensure widget extension builds successfully
+2. Add the widget from the widget gallery
+3. Check that App Groups are configured correctly
 
 ### Build errors with @Observable
 

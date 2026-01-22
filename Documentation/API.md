@@ -35,7 +35,7 @@ Can be initialized directly or from an `EKEvent` (EventKit).
 
 ### CalendarSource
 
-Represents a calendar from Apple Calendar or Google Calendar. Conforms to `Identifiable` and `Hashable`.
+Represents a calendar from Apple Calendar (including connected accounts such as Google). Conforms to `Identifiable` and `Hashable`.
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -62,7 +62,8 @@ Each case provides `displayName` and `icon` (SF Symbol) properties.
 
 ### CalendarSet
 
-User-defined group of calendars (persisted with SwiftData).
+User-defined group of calendars. The model exists in code but is not currently
+surfaced in the UI.
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -139,8 +140,12 @@ Year view display configuration.
 | `standardGrid` | Traditional 4×3 month grid |
 | `continuousRow` | Horizontal month scroll |
 | `verticalList` | Vertical month list |
+| `powerLaw` | Multi-horizon panels (Today → Year) |
 
 Each case provides `icon` (SF Symbol name) and `description` properties.
+
+Note: `showWeekends`, `showWeekNumbers`, and `zoomLevel` are defined on the
+view model but are not currently wired to UI controls.
 
 ---
 
@@ -214,6 +219,9 @@ Opens native calendar apps for viewing/editing events.
 ### CalendarCacheService
 
 UserDefaults persistence for preferences.
+
+Note: the app currently reads/writes disabled calendar IDs and the last viewed
+year. Other keys are present for future wiring.
 
 | Data | Methods |
 |------|---------|

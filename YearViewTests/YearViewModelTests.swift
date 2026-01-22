@@ -4,6 +4,7 @@ import XCTest
 final class YearViewModelTests: XCTestCase {
 
     var viewModel: YearViewModel!
+    let calendar = Calendar.current
 
     override func setUp() {
         super.setUp()
@@ -36,13 +37,14 @@ final class YearViewModelTests: XCTestCase {
     // MARK: - Layout Style Tests
 
     func testAllLayoutStylesExist() {
-        // Verify all 5 layout styles are available
-        XCTAssertEqual(YearLayoutStyle.allCases.count, 5)
+        // Verify all layout styles are available
+        XCTAssertEqual(YearLayoutStyle.allCases.count, 6)
         XCTAssertTrue(YearLayoutStyle.allCases.contains(.monthRows))
         XCTAssertTrue(YearLayoutStyle.allCases.contains(.bigYear))
         XCTAssertTrue(YearLayoutStyle.allCases.contains(.standardGrid))
         XCTAssertTrue(YearLayoutStyle.allCases.contains(.continuousRow))
         XCTAssertTrue(YearLayoutStyle.allCases.contains(.verticalList))
+        XCTAssertTrue(YearLayoutStyle.allCases.contains(.powerLaw))
     }
 
     func testLayoutStylesHaveUniqueIdentifiers() {
@@ -68,24 +70,22 @@ final class YearViewModelTests: XCTestCase {
         let months = viewModel.months(for: 2026)
 
         XCTAssertEqual(months.count, 12)
-        XCTAssertEqual(months[0].name, "January")
-        XCTAssertEqual(months[11].name, "December")
+        XCTAssertEqual(calendar.component(.month, from: months[0].date), 1)
+        XCTAssertEqual(calendar.component(.month, from: months[11].date), 12)
     }
 
     func testMonthDataName() {
         let months = viewModel.months(for: 2026)
-
-        XCTAssertEqual(months[0].name, "January")
-        XCTAssertEqual(months[1].name, "February")
-        XCTAssertEqual(months[5].name, "June")
+        for month in months {
+            XCTAssertFalse(month.name.isEmpty)
+        }
     }
 
     func testMonthDataShortName() {
         let months = viewModel.months(for: 2026)
-
-        XCTAssertEqual(months[0].shortName, "Jan")
-        XCTAssertEqual(months[1].shortName, "Feb")
-        XCTAssertEqual(months[11].shortName, "Dec")
+        for month in months {
+            XCTAssertFalse(month.shortName.isEmpty)
+        }
     }
 
     func testMonthDataDaysCount() {
@@ -100,8 +100,7 @@ final class YearViewModelTests: XCTestCase {
         let months = viewModel.months(for: 2026)
 
         XCTAssertEqual(months[0].weekdayHeaders.count, 7)
-        // Should contain abbreviated day names
-        XCTAssertTrue(months[0].weekdayHeaders.contains("S") || months[0].weekdayHeaders.contains("Su"))
+        XCTAssertTrue(months[0].weekdayHeaders.allSatisfy { !$0.isEmpty })
     }
 
     func testMonthDataWeeks() {

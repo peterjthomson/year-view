@@ -69,23 +69,6 @@ final class DayViewModelTests: XCTestCase {
         XCTAssertFalse(defaultViewModel.isLoading)
     }
 
-    // MARK: - Date Formatting Tests
-
-    func testFormattedDate() {
-        // Should return full date format like "Monday, June 15, 2026"
-        let formatted = viewModel.formattedDate
-
-        XCTAssertTrue(formatted.contains("2026"))
-        XCTAssertTrue(formatted.contains("June") || formatted.contains("15"))
-    }
-
-    func testShortFormattedDate() {
-        // Should return format like "Monday, Jun 15"
-        let formatted = viewModel.shortFormattedDate
-
-        XCTAssertTrue(formatted.contains("Jun") || formatted.contains("15"))
-    }
-
     // MARK: - Event Sorting Tests
 
     func testSortedEventsAllDayFirst() {

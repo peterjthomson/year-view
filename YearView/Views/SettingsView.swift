@@ -106,25 +106,26 @@ struct SettingsView: View {
     }
     
     private func resetToDefaults() {
-        appSettings.weekStartsOn = .monday
-        appSettings.pageBackgroundColor = AppSettings.defaultLightGray
-        appSettings.weekdayBackgroundColor = .clear
-        appSettings.weekendBackgroundColor = Color.secondarySystemGroupedBackground.opacity(0.5)
-        appSettings.unusedCellColor = AppSettings.defaultLightGray
-        appSettings.dateLabelColor = .primary
-        appSettings.columnHeadingColor = .secondary
-        appSettings.rowHeadingColor = .primary
-        appSettings.todayColor = .accentColor
-        appSettings.gridlineColor = Color.separator.opacity(0.5)
-        appSettings.showGridlinesBigYear = true
-        appSettings.showGridlinesMonthRows = true
-        appSettings.showGridlinesGrid = false
-        appSettings.showGridlinesRow = false
-        appSettings.showGridlinesList = false
-        appSettings.monthLabelFormat = .letter
-        appSettings.monthLabelFontSize = .medium
-        appSettings.showAllDayEvents = true
-        appSettings.showTimeBasedEvents = false
+        let defaults = AppSettings()
+        appSettings.weekStartsOn = defaults.weekStartsOn
+        appSettings.pageBackgroundColor = defaults.pageBackgroundColor
+        appSettings.weekdayBackgroundColor = defaults.weekdayBackgroundColor
+        appSettings.weekendBackgroundColor = defaults.weekendBackgroundColor
+        appSettings.unusedCellColor = defaults.unusedCellColor
+        appSettings.dateLabelColor = defaults.dateLabelColor
+        appSettings.columnHeadingColor = defaults.columnHeadingColor
+        appSettings.rowHeadingColor = defaults.rowHeadingColor
+        appSettings.todayColor = defaults.todayColor
+        appSettings.gridlineColor = defaults.gridlineColor
+        appSettings.showGridlinesBigYear = defaults.showGridlinesBigYear
+        appSettings.showGridlinesMonthRows = defaults.showGridlinesMonthRows
+        appSettings.showGridlinesGrid = defaults.showGridlinesGrid
+        appSettings.showGridlinesRow = defaults.showGridlinesRow
+        appSettings.showGridlinesList = defaults.showGridlinesList
+        appSettings.monthLabelFormat = defaults.monthLabelFormat
+        appSettings.monthLabelFontSize = defaults.monthLabelFontSize
+        appSettings.showAllDayEvents = defaults.showAllDayEvents
+        appSettings.showTimeBasedEvents = defaults.showTimeBasedEvents
     }
 }
 

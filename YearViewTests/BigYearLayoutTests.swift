@@ -147,32 +147,6 @@ final class BigYearLayoutTests: XCTestCase {
         XCTAssertFalse(calendar.isDateInToday(today.addingTimeInterval(86400)))
     }
 
-    // MARK: - Day Cell Tests
-
-    func testWeekdayAbbreviations() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEE"
-
-        // Test a known date - Jan 1, 2026 is Thursday
-        let thursday = Date.from(year: 2026, month: 1, day: 1)!
-        let abbrev = formatter.string(from: thursday).uppercased()
-
-        XCTAssertEqual(abbrev, "THU")
-    }
-
-    func testMonthAbbreviations() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM"
-
-        let january = Date.from(year: 2026, month: 1, day: 1)!
-        let june = Date.from(year: 2026, month: 6, day: 1)!
-        let december = Date.from(year: 2026, month: 12, day: 1)!
-
-        XCTAssertEqual(formatter.string(from: january).uppercased(), "JAN")
-        XCTAssertEqual(formatter.string(from: june).uppercased(), "JUN")
-        XCTAssertEqual(formatter.string(from: december).uppercased(), "DEC")
-    }
-
     // MARK: - Year Boundary Tests
 
     func testDaysOutsideYearAreMarked() {

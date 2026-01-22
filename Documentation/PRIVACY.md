@@ -14,8 +14,8 @@ Year View ("the App") is a read-only calendar visualization app for macOS, iOS, 
 ### What We Do NOT Collect
 
 - We do **not** collect personal information
-- We do **not** collect usage analytics or telemetry
-- We do **not** collect crash reports
+- The app does **not** include analytics or telemetry SDKs
+- The app does **not** include crash-reporting SDKs
 - We do **not** track your location
 - We do **not** use advertising or ad tracking
 - We do **not** have user accounts or registration
@@ -27,10 +27,9 @@ The App stores the following data **locally on your device only**:
 
 | Data Type | Storage Method | Purpose |
 |-----------|----------------|---------|
-| Calendar preferences | UserDefaults | Remember which calendars you've enabled |
-| Display settings | UserDefaults | Remember your layout, weekend, and week number preferences |
-| Last viewed year | UserDefaults | Restore your view when reopening the app |
-| Google OAuth tokens (if used) | Keychain | Securely authenticate with Google Calendar |
+| Calendar visibility | UserDefaults | Remember which calendars you've enabled |
+| Last viewed year | UserDefaults | Saved locally (the app still opens to the current year) |
+| Google OAuth tokens (if enabled) | Keychain | Securely authenticate with Google Calendar |
 
 This data never leaves your device and is not accessible to us.
 
@@ -46,9 +45,9 @@ Year View uses Apple's EventKit framework to read calendar data. This is a secur
 - You control which calendars Year View can access through iOS/macOS Settings
 - You can revoke calendar access at any time in your device's Privacy settings
 
-### Google Calendar (Optional)
+### Google Calendar (Optional / Experimental)
 
-If you choose to connect a Google account:
+If Google Calendar integration is enabled and you choose to connect a Google account:
 
 - Authentication occurs **directly between your device and Google's servers** using OAuth 2.0
 - We use read-only scopes (`calendar.readonly` and `calendar.events.readonly`)
@@ -60,7 +59,7 @@ If you choose to connect a Google account:
 
 ### Event Creation and Editing
 
-Year View is intentionally **read-only**. When you want to create or edit events, the App opens your native calendar app (Apple Calendar or Google Calendar) using deep links. We never modify your calendar data directly.
+Year View is intentionally **read-only**. When you want to create or edit events, the App opens your native Calendar app using deep links. We never modify your calendar data directly.
 
 ## Third-Party Services
 
@@ -69,7 +68,7 @@ Year View is intentionally **read-only**. When you want to create or edit events
 - **EventKit**: On-device calendar access (no network transmission)
 - **App Store**: App distribution and optional in-app purchases (governed by [Apple's Privacy Policy](https://www.apple.com/legal/privacy/))
 
-### Google (Optional)
+### Google (Optional / Experimental)
 
 - **Google Calendar API**: Direct device-to-Google communication for users who connect their Google account
 - **Google OAuth**: Authentication handled directly by Google
@@ -117,7 +116,7 @@ To disconnect your Google account:
 
 - **Local preferences**: Retained until you delete the app or clear app data
 - **Google tokens**: Retained until you sign out or delete the app
-- **Calendar data**: Not retained—read fresh from EventKit/Google API each time
+- **Calendar data**: Not retained—read fresh from EventKit (and Google API, if enabled) each time
 
 We retain no data on any servers because we do not operate data-collecting servers.
 

@@ -120,23 +120,20 @@ Suggested screenshots:
 
 Include this in the App Review Notes field:
 
-```
-Year View is a read-only calendar visualization app. It displays events from 
+Year View is a read-only calendar visualization app. It displays events from
 the user's existing calendars (via EventKit) in a year-at-a-glance format.
 
 Key points for review:
-• Calendar permission is required to display events
-• No account or sign-in required
-• All event creation/editing opens the native Calendar app via deep link
-• No data is collected or transmitted to servers
-• The app works offline once calendar access is granted
+- Calendar permission is required to display events.
+- No account or sign-in required.
+- All event creation/editing opens the native Calendar app via deep link.
+- No data is collected or transmitted to servers.
+- The app works offline once calendar access is granted.
 
 To test:
-1. Grant calendar access when prompted
-2. If no events exist, create a few in the Calendar app first
-3. Return to Year View to see them displayed
-
-```
+1. Grant calendar access when prompted.
+2. If no events exist, create a few in the Calendar app first.
+3. Return to Year View to see them displayed.
 
 ### Contact Information
 
@@ -167,23 +164,19 @@ Provide a valid email for App Review to contact you if needed.
 
 ### What's New (v1.0)
 
-```
 Introducing Year View — see your entire year at a glance.
 
-• Five beautiful layouts: Year View, Month Rows, Grid, Row, and List
-• Works with all your calendars: iCloud, Google, Exchange, and more
-• Customizable colors for backgrounds, text, and gridlines
-• Tap any day to see events, tap an event to open in Calendar
-• Video call detection for Zoom, Meet, Teams, and Webex
-• Full dark mode support
-• Privacy-first: all data stays on your device
-```
+- Six layouts: Year View, Month Rows, Grid, Row, List, and Power Law
+- Works with all your calendars: iCloud, Google, Exchange, and more
+- Customizable colors for backgrounds, text, and gridlines
+- Tap any day to see events, tap an event to open in Calendar
+- Video call detection for Zoom, Meet, Teams, and Webex
+- Full dark mode support
+- Privacy-first: all data stays on your device
 
 ### Promotional Text (170 chars, can be updated without new build)
 
-```
 See your entire year in one beautiful view. Year View is the calendar companion that brings clarity to your schedule without the clutter.
-```
 
 ---
 
@@ -200,16 +193,8 @@ Before uploading your build, verify:
 
 ### Entitlements Reminder
 
-Ensure `YearView.entitlements` contains:
-
-```xml
-<key>com.apple.security.app-sandbox</key>
-<true/>
-<key>com.apple.security.personal-information.calendars</key>
-<true/>
-<key>com.apple.security.network.client</key>
-<true/>
-```
+Ensure `YearView.entitlements` includes App Sandbox, calendar access, and
+network client capabilities.
 
 ---
 
@@ -239,7 +224,7 @@ Before submitting for App Review, test via TestFlight:
 - [ ] Fresh install (no prior calendar permission)
 - [ ] Permission granted flow
 - [ ] Permission denied flow (error message shown)
-- [ ] Year navigation (swipe, year picker)
+- [ ] Year navigation (year picker, Today button)
 - [ ] Day detail view (tap day, see events)
 - [ ] Event tap (opens Calendar app)
 - [ ] Calendar selection (toggle calendars)

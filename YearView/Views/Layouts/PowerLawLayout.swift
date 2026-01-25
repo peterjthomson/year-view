@@ -53,7 +53,7 @@ struct PowerLawLayout: View {
 
     @ViewBuilder
     private func panelStack(for geometry: GeometryProxy, spacing: CGFloat) -> some View {
-        HStack(alignment: .top, spacing: spacing) {
+        LazyHStack(alignment: .top, spacing: spacing) {
             // TODAY Panel
             TodayPanel(
                 date: today,
@@ -63,7 +63,8 @@ struct PowerLawLayout: View {
             )
             .frame(width: panelWidth(for: geometry, index: 0))
             .background(Color.white)
-            
+            .id(0)
+
             // THIS WEEK Panel
             ThisWeekPanel(
                 startDate: today,
@@ -73,7 +74,8 @@ struct PowerLawLayout: View {
             )
             .frame(width: panelWidth(for: geometry, index: 1))
             .background(Color.white)
-            
+            .id(1)
+
             // THIS MONTH Panel
             ThisMonthPanel(
                 startDate: today,
@@ -83,7 +85,8 @@ struct PowerLawLayout: View {
             )
             .frame(width: panelWidth(for: geometry, index: 2))
             .background(Color.white)
-            
+            .id(2)
+
             // THIS QUARTER Panel
             ThisQuarterPanel(
                 calendarViewModel: calendarViewModel,
@@ -93,7 +96,8 @@ struct PowerLawLayout: View {
             )
             .frame(width: panelWidth(for: geometry, index: 3))
             .background(Color.white)
-            
+            .id(3)
+
             // THIS YEAR Panel
             ThisYearPanel(
                 calendarViewModel: calendarViewModel,
@@ -102,6 +106,7 @@ struct PowerLawLayout: View {
             )
             .frame(width: panelWidth(for: geometry, index: 4))
             .background(Color.white)
+            .id(4)
         }
     }
 
@@ -402,8 +407,8 @@ private struct ThisMonthPanel: View {
     
     private var remainingDays: [Date] {
         let startOffset = 7
-        guard let monthEnd = calendar.date(byAdding: DateComponents(month: 1, day: -1),
-                                           to: calendar.date(from: calendar.dateComponents([.year, .month], from: startDate))!) else {
+        guard let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: startDate)),
+              let monthEnd = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: monthStart) else {
             return []
         }
         
@@ -660,13 +665,15 @@ private struct MiniMonthGrid: View {
     }
     
     private var weeks: [[Date?]] {
-        guard let range = calendar.range(of: .day, in: .month, for: month) else { return [] }
-        
+        guard let range = calendar.range(of: .day, in: .month, for: month),
+              let firstDay = calendar.date(from: calendar.dateComponents([.year, .month], from: month)) else {
+            return []
+        }
+
         var weeks: [[Date?]] = []
         var currentWeek: [Date?] = []
-        
+
         // Get first day of month
-        let firstDay = calendar.date(from: calendar.dateComponents([.year, .month], from: month))!
         let firstWeekday = calendar.component(.weekday, from: firstDay)
         let offset = (firstWeekday - appSettings.weekStartsOn.rawValue + 7) % 7
         

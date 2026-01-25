@@ -137,7 +137,7 @@ struct CompactMonthGridView: View {
     components.year = 2026
     components.month = 1
     components.day = 1
-    let date = calendar.date(from: components)!
+    let date = calendar.date(from: components) ?? Date()
 
     return MonthGridView(
         month: MonthData(date: date, calendar: calendar),
@@ -155,7 +155,7 @@ struct CompactMonthGridView: View {
     components.year = 2026
     components.month = 1
     components.day = 1
-    let date = calendar.date(from: components)!
+    let date = calendar.date(from: components) ?? Date()
 
     return CompactMonthGridView(
         month: MonthData(date: date, calendar: calendar),

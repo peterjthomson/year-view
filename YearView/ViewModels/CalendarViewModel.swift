@@ -7,6 +7,7 @@ final class CalendarViewModel {
     private let eventKitService = EventKitService()
     private let googleCalendarService = GoogleCalendarService()
     private let cacheService = CalendarCacheService()
+    private var eventStoreObserver: NSObjectProtocol?
 
     var calendars: [CalendarSource] = []
     var events: [CalendarEvent] = []
@@ -38,6 +39,10 @@ final class CalendarViewModel {
         self.displayedYear = Calendar.current.component(.year, from: Date())
     }
 
+    deinit {
+        stopObservingEventStoreChanges()
+    }
+
     @MainActor
     func requestAccess() async {
         isLoading = true
@@ -50,6 +55,7 @@ final class CalendarViewModel {
             if granted {
                 await loadCalendars()
                 await loadEvents()
+                startObservingEventStoreChanges()
             } else {
                 errorMessage = "Calendar access denied. Please enable access in Settings."
             }
@@ -58,6 +64,26 @@ final class CalendarViewModel {
         }
 
         isLoading = false
+    }
+
+    // MARK: - EventKit Change Observation
+
+    private func startObservingEventStoreChanges() {
+        // Observe changes to the event store (events added/modified/deleted in Calendar app)
+        eventStoreObserver = eventKitService.startObservingChanges { [weak self] in
+            guard let self = self else { return }
+            Task { @MainActor in
+                await self.loadCalendars()
+                await self.loadEvents()
+            }
+        }
+    }
+
+    private func stopObservingEventStoreChanges() {
+        if let observer = eventStoreObserver {
+            eventKitService.stopObservingChanges(observer: observer)
+            eventStoreObserver = nil
+        }
     }
 
     @MainActor

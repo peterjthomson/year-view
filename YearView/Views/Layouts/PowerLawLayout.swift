@@ -9,6 +9,7 @@ struct PowerLawLayout: View {
     let onDateTap: (Date) -> Void
     
     private let today = Date()
+    private let panelCount = 5
     
     var body: some View {
         GeometryReader { geometry in
@@ -31,29 +32,33 @@ struct PowerLawLayout: View {
         .background(Color.gray.opacity(0.1))
     }
     
-    private func panelWidth(for geometry: GeometryProxy, index: Int) -> CGFloat {
+    private func panelWidth(for geometry: GeometryProxy, index: Int, spacing: CGFloat) -> CGFloat {
         let totalWidth = geometry.size.width
         let minPanelWidth: CGFloat = 240
+        let isLandscape = geometry.size.width > geometry.size.height
         
         #if os(iOS)
         if isCompactPhone {
             return totalWidth
         }
-        if totalWidth < minPanelWidth * 2 {
-            return totalWidth * 0.85
-        } else if totalWidth < minPanelWidth * 5 {
-            return totalWidth / 2.5
+        if !isLandscape {
+            if totalWidth < minPanelWidth * 2 {
+                return totalWidth * 0.85
+            } else if totalWidth < minPanelWidth * 5 {
+                return totalWidth / 2.5
+            }
         }
         #endif
         
+        let availableWidth = max(totalWidth - spacing * CGFloat(panelCount - 1), 0)
         let weights: [CGFloat] = [1.1, 1.0, 1.0, 1.0, 1.1]
         let totalWeight = weights.reduce(0, +)
-        return (totalWidth / totalWeight) * weights[index]
+        return (availableWidth / totalWeight) * weights[index]
     }
 
     @ViewBuilder
     private func panelStack(for geometry: GeometryProxy, spacing: CGFloat) -> some View {
-        HStack(alignment: .top, spacing: spacing) {
+        LazyHStack(alignment: .top, spacing: spacing) {
             // TODAY Panel
             TodayPanel(
                 date: today,
@@ -61,9 +66,10 @@ struct PowerLawLayout: View {
                 onEventTap: { _ in onDateTap(today) },
                 height: geometry.size.height
             )
-            .frame(width: panelWidth(for: geometry, index: 0))
+            .frame(width: panelWidth(for: geometry, index: 0, spacing: spacing), height: geometry.size.height, alignment: .top)
             .background(Color.white)
-            
+            .id(0)
+
             // THIS WEEK Panel
             ThisWeekPanel(
                 startDate: today,
@@ -71,9 +77,10 @@ struct PowerLawLayout: View {
                 onDateTap: onDateTap,
                 height: geometry.size.height
             )
-            .frame(width: panelWidth(for: geometry, index: 1))
+            .frame(width: panelWidth(for: geometry, index: 1, spacing: spacing), height: geometry.size.height, alignment: .top)
             .background(Color.white)
-            
+            .id(1)
+
             // THIS MONTH Panel
             ThisMonthPanel(
                 startDate: today,
@@ -81,9 +88,10 @@ struct PowerLawLayout: View {
                 appSettings: appSettings,
                 onDateTap: onDateTap
             )
-            .frame(width: panelWidth(for: geometry, index: 2))
+            .frame(width: panelWidth(for: geometry, index: 2, spacing: spacing), height: geometry.size.height, alignment: .top)
             .background(Color.white)
-            
+            .id(2)
+
             // THIS QUARTER Panel
             ThisQuarterPanel(
                 calendarViewModel: calendarViewModel,
@@ -91,17 +99,19 @@ struct PowerLawLayout: View {
                 onDateTap: onDateTap,
                 height: geometry.size.height
             )
-            .frame(width: panelWidth(for: geometry, index: 3))
+            .frame(width: panelWidth(for: geometry, index: 3, spacing: spacing), height: geometry.size.height, alignment: .top)
             .background(Color.white)
-            
+            .id(3)
+
             // THIS YEAR Panel
             ThisYearPanel(
                 calendarViewModel: calendarViewModel,
                 onDateTap: onDateTap,
                 height: geometry.size.height
             )
-            .frame(width: panelWidth(for: geometry, index: 4))
+            .frame(width: panelWidth(for: geometry, index: 4, spacing: spacing), height: geometry.size.height, alignment: .top)
             .background(Color.white)
+            .id(4)
         }
     }
 
@@ -274,22 +284,26 @@ private struct ThisWeekPanel: View {
         VStack(alignment: .leading, spacing: 0) {
             PanelHeader(icon: "calendar", title: "THIS WEEK", subtitle: "Next 6 days")
             
-            // Days fill the height
             let headerHeight: CGFloat = 50
-            let availableHeight = max(height - headerHeight, 300)
+            let availableHeight = max(height - headerHeight, 0)
+            let minRowHeight: CGFloat = 72
             let dayCount = max(1, upcomingDays.count)
-            let dayHeight = availableHeight / CGFloat(dayCount)
+            let dayHeight = max(minRowHeight, availableHeight / CGFloat(dayCount))
             
-            ForEach(upcomingDays, id: \.self) { date in
-                WeekDayRow(
-                    date: date,
-                    events: calendarViewModel.events(for: date),
-                    onTap: { onDateTap(date) }
-                )
-                .frame(height: dayHeight)
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(upcomingDays, id: \.self) { date in
+                        WeekDayRow(
+                            date: date,
+                            events: calendarViewModel.events(for: date),
+                            onTap: { onDateTap(date) }
+                        )
+                        .frame(height: dayHeight)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .topLeading)
             }
-            
-            Spacer(minLength: 0)
+            .frame(height: availableHeight)
         }
         .padding(.top, 8)
     }
@@ -402,16 +416,25 @@ private struct ThisMonthPanel: View {
     
     private var remainingDays: [Date] {
         let startOffset = 7
-        guard let monthEnd = calendar.date(byAdding: DateComponents(month: 1, day: -1),
-                                           to: calendar.date(from: calendar.dateComponents([.year, .month], from: startDate))!) else {
+        guard let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: startDate)),
+              let monthEnd = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: monthStart) else {
             return []
         }
         
         let daysInMonth = calendar.component(.day, from: monthEnd)
         let currentDay = calendar.component(.day, from: startDate)
         let endDay = min(currentDay + 30, daysInMonth)
+        let endOffset = max(0, endDay - currentDay)
+        let offsets: ClosedRange<Int>
+        if endOffset >= startOffset {
+            offsets = startOffset...endOffset
+        } else if endOffset > 0 {
+            offsets = 1...endOffset
+        } else {
+            offsets = 0...0
+        }
         
-        return (startOffset...(endDay - currentDay)).compactMap { offset in
+        return offsets.compactMap { offset in
             calendar.date(byAdding: .day, value: offset, to: calendar.startOfDay(for: startDate))
         }
     }
@@ -507,21 +530,25 @@ private struct ThisQuarterPanel: View {
         VStack(alignment: .leading, spacing: 0) {
             PanelHeader(icon: "chart.bar", title: "THIS QUARTER", subtitle: quarterName)
             
-            // Spread months to fill height
             let headerHeight: CGFloat = 50
-            let availableHeight = max(height - headerHeight, 400)
-            let monthHeight = availableHeight / 3
+            let availableHeight = max(height - headerHeight, 0)
+            let minMonthHeight: CGFloat = 140
+            let monthHeight = max(minMonthHeight, availableHeight / 3)
             
-            ForEach(quarterMonths, id: \.self) { month in
-                QuarterMonthSection(
-                    month: month,
-                    events: eventsForMonth(month),
-                    appSettings: appSettings,
-                    height: monthHeight
-                )
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(quarterMonths, id: \.self) { month in
+                        QuarterMonthSection(
+                            month: month,
+                            events: eventsForMonth(month),
+                            appSettings: appSettings,
+                            height: monthHeight
+                        )
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .topLeading)
             }
-            
-            Spacer(minLength: 0)
+            .frame(height: availableHeight)
         }
         .padding(.top, 8)
     }
@@ -660,13 +687,15 @@ private struct MiniMonthGrid: View {
     }
     
     private var weeks: [[Date?]] {
-        guard let range = calendar.range(of: .day, in: .month, for: month) else { return [] }
-        
+        guard let range = calendar.range(of: .day, in: .month, for: month),
+              let firstDay = calendar.date(from: calendar.dateComponents([.year, .month], from: month)) else {
+            return []
+        }
+
         var weeks: [[Date?]] = []
         var currentWeek: [Date?] = []
-        
+
         // Get first day of month
-        let firstDay = calendar.date(from: calendar.dateComponents([.year, .month], from: month))!
         let firstWeekday = calendar.component(.weekday, from: firstDay)
         let offset = (firstWeekday - appSettings.weekStartsOn.rawValue + 7) % 7
         
@@ -711,23 +740,27 @@ private struct ThisYearPanel: View {
         VStack(alignment: .leading, spacing: 0) {
             PanelHeader(icon: "calendar.circle", title: "THIS YEAR", subtitle: String(currentYear))
             
-            // Spread quarters to fill height
             let headerHeight: CGFloat = 50
-            let availableHeight = max(height - headerHeight, 400)
+            let availableHeight = max(height - headerHeight, 0)
+            let minQuarterHeight: CGFloat = 110
             let quarterCount = max(1, quarters.count)
-            let quarterHeight = availableHeight / CGFloat(quarterCount)
+            let quarterHeight = max(minQuarterHeight, availableHeight / CGFloat(quarterCount))
             
-            ForEach(quarters, id: \.name) { quarter in
-                YearQuarterSection(
-                    name: quarter.name,
-                    dateRange: quarter.dateRange,
-                    months: quarter.months,
-                    events: quarter.events,
-                    height: quarterHeight
-                )
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(quarters, id: \.name) { quarter in
+                        YearQuarterSection(
+                            name: quarter.name,
+                            dateRange: quarter.dateRange,
+                            months: quarter.months,
+                            events: quarter.events,
+                            height: quarterHeight
+                        )
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .topLeading)
             }
-            
-            Spacer(minLength: 0)
+            .frame(height: availableHeight)
         }
         .padding(.top, 8)
     }

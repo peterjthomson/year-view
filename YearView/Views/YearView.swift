@@ -174,6 +174,9 @@ struct YearView: View {
                     .frame(width: 32, height: 32)
             }
             .buttonStyle(.bordered)
+            .buttonBorderShape(.circle)
+            .tint(Color.secondary.opacity(0.18))
+            .foregroundStyle(Color.secondary)
             .accessibilityLabel("Settings")
         }
     }

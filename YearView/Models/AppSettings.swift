@@ -136,6 +136,9 @@ final class AppSettings {
     
     /// Font size for month labels in YearMonth view
     var monthLabelFontSize: MonthLabelFontSize = .medium
+
+    /// Whether to show event titles in Month Rows view
+    var showMonthRowEvents: Bool = false
     
     // MARK: - Event Display Settings
     

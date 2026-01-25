@@ -75,6 +75,7 @@ struct SettingsView: View {
                         Text(size.rawValue).tag(size)
                     }
                 }
+                Toggle("Show Events", isOn: $settings.showMonthRowEvents)
             } header: {
                 Label("Month Rows View", systemImage: "rectangle.grid.1x2")
             }
@@ -124,6 +125,7 @@ struct SettingsView: View {
         appSettings.showGridlinesList = defaults.showGridlinesList
         appSettings.monthLabelFormat = defaults.monthLabelFormat
         appSettings.monthLabelFontSize = defaults.monthLabelFontSize
+        appSettings.showMonthRowEvents = defaults.showMonthRowEvents
         appSettings.showAllDayEvents = defaults.showAllDayEvents
         appSettings.showTimeBasedEvents = defaults.showTimeBasedEvents
     }

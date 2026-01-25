@@ -188,6 +188,7 @@ final class CalendarViewModel {
         return filteredEvents.filter { event in
             if event.isAllDay {
                 // For all-day events, check if date falls within the event range
+                // EventKit uses exclusive endDate (day after event ends)
                 let eventStart = calendar.startOfDay(for: event.startDate)
                 let eventEnd = calendar.startOfDay(for: event.endDate)
                 let targetDate = calendar.startOfDay(for: date)

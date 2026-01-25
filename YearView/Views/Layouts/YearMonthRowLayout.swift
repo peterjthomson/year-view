@@ -186,7 +186,8 @@ private struct MonthRow: View {
                 if appSettings.showMonthRowEvents {
                     FeaturedEventOverlay(
                         segments: featuredEventSegments,
-                        cellSize: cellSize
+                        cellSize: cellSize,
+                        totalColumns: totalColumns
                     )
                     .padding(.vertical, verticalPadding)
                 } else {
@@ -272,74 +273,108 @@ private struct MonthRow: View {
         return !appSettings.filterEvents(events).isEmpty
     }
 
+    /// Calculate featured event segments using date math (matching EventBarsOverlay approach)
     private var featuredEventSegments: [FeaturedEventSegment] {
-        guard appSettings.showMonthRowEvents else { return [] }
+        guard appSettings.showMonthRowEvents,
+              let firstDayDate = month.days.first?.date,
+              let lastDayDate = month.days.last?.date else { return [] }
+        
+        // Normalize to start of day for consistent calculations
+        let monthStart = calendar.startOfDay(for: firstDayDate)
+        let monthEnd = calendar.startOfDay(for: lastDayDate)
+        
+        // Get events that overlap this month
+        let monthEvents = appSettings.filterEvents(calendarViewModel.filteredEvents).filter { event in
+            let eStart = calendar.startOfDay(for: event.startDate)
+            let eEnd = calendar.startOfDay(for: event.endDate)
+            // For all-day events, endDate is exclusive (day after event ends)
+            let effectiveEnd = event.isAllDay ? eEnd.addingTimeInterval(-1) : eEnd
+            return eStart <= monthEnd && effectiveEnd >= monthStart
+        }
+        
+        // Sort by priority: longest duration, all-day, earliest start, then title
+        let sortedEvents = monthEvents.sorted { lhs, rhs in
+            if lhs.duration != rhs.duration { return lhs.duration > rhs.duration }
+            if lhs.isAllDay != rhs.isAllDay { return lhs.isAllDay && !rhs.isAllDay }
+            if lhs.startDate != rhs.startDate { return lhs.startDate < rhs.startDate }
+            return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+        }
+        
+        // Calculate grid offset for this month (weekday offset for first day)
+        let firstDayWeekday = calendar.component(.weekday, from: monthStart)
+        let offset = (firstDayWeekday - calendar.firstWeekday + 7) % 7
+        
+        // Track which column has been claimed by an event
+        var columnEvent: [CalendarEvent?] = Array(repeating: nil, count: totalColumns)
+        
+        // Assign events to columns (first event wins each column since sorted by priority)
+        for event in sortedEvents {
+            // Calculate start column from start date
+            let eventStartDay = calendar.startOfDay(for: event.startDate)
+            let startDist = calendar.dateComponents([.day], from: monthStart, to: eventStartDay).day ?? 0
+            let colStart = max(0, startDist + offset)
+            
+            // Calculate day span using duration - this is robust regardless of endDate convention
+            // EventKit all-day events: endDate is exclusive (day after), so duration = N * 86400 for N days
+            // Even if endDate were inclusive (end of last day), ceil() handles it correctly
+            let secondsPerDay: Double = 86400
+            let daySpan: Int
+            if event.isAllDay {
+                daySpan = max(1, Int(ceil(event.duration / secondsPerDay)))
+            } else {
+                // For timed events, include both start and end days
+                let eventEndDay = calendar.startOfDay(for: event.endDate)
+                let dayDiff = calendar.dateComponents([.day], from: eventStartDay, to: eventEndDay).day ?? 0
+                daySpan = max(1, dayDiff + 1)
+            }
+            
+            let colEnd = min(totalColumns - 1, colStart + daySpan - 1)
+            
+            guard colStart <= colEnd else { continue }
+            
+            for col in colStart...colEnd {
+                if columnEvent[col] == nil {
+                    columnEvent[col] = event
+                }
+            }
+        }
+        
+        // Build segments from consecutive columns with the same event
         var segments: [FeaturedEventSegment] = []
         var currentEvent: CalendarEvent?
         var currentStart = 0
-
-        for index in paddedDays.indices {
-            guard let day = paddedDays[index] else {
-                if let event = currentEvent {
-                    let span = index - currentStart
-                    if span > 0 {
-                        segments.append(FeaturedEventSegment(event: event, startIndex: currentStart, span: span))
-                    }
-                }
-                currentEvent = nil
-                continue
-            }
-
-            let dayEvents = appSettings.filterEvents(calendarViewModel.events(for: day.date))
-            let featured = featuredEvent(from: dayEvents)
-
-            if let featured {
-                if let event = currentEvent, event.id == featured.id {
+        
+        for col in 0..<totalColumns {
+            let event = columnEvent[col]
+            
+            if let event = event {
+                if let current = currentEvent, current.id == event.id {
+                    // Same event continues
                     continue
-                }
-
-                if let event = currentEvent {
-                    let span = index - currentStart
-                    if span > 0 {
-                        segments.append(FeaturedEventSegment(event: event, startIndex: currentStart, span: span))
+                } else {
+                    // Close previous segment
+                    if let current = currentEvent {
+                        segments.append(FeaturedEventSegment(event: current, startIndex: currentStart, span: col - currentStart))
                     }
+                    // Start new segment
+                    currentEvent = event
+                    currentStart = col
                 }
-
-                currentEvent = featured
-                currentStart = index
-            } else if let event = currentEvent {
-                let span = index - currentStart
-                if span > 0 {
-                    segments.append(FeaturedEventSegment(event: event, startIndex: currentStart, span: span))
+            } else {
+                // No event - close any open segment
+                if let current = currentEvent {
+                    segments.append(FeaturedEventSegment(event: current, startIndex: currentStart, span: col - currentStart))
+                    currentEvent = nil
                 }
-                currentEvent = nil
             }
         }
-
-        if let event = currentEvent {
-            let span = paddedDays.count - currentStart
-            if span > 0 {
-                segments.append(FeaturedEventSegment(event: event, startIndex: currentStart, span: span))
-            }
+        
+        // Close final segment
+        if let current = currentEvent {
+            segments.append(FeaturedEventSegment(event: current, startIndex: currentStart, span: totalColumns - currentStart))
         }
-
+        
         return segments
-    }
-
-    private func featuredEvent(from events: [CalendarEvent]) -> CalendarEvent? {
-        guard !events.isEmpty else { return nil }
-        return events.sorted { lhs, rhs in
-            if lhs.duration != rhs.duration {
-                return lhs.duration > rhs.duration
-            }
-            if lhs.isAllDay != rhs.isAllDay {
-                return lhs.isAllDay && !rhs.isAllDay
-            }
-            if lhs.startDate != rhs.startDate {
-                return lhs.startDate < rhs.startDate
-            }
-            return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
-        }.first
     }
 
     private func isSelected(_ date: Date?) -> Bool {
@@ -432,21 +467,34 @@ private struct EventBarsOverlay: View {
         var occupied: [[Bool]] = Array(repeating: Array(repeating: false, count: totalColumns), count: 5)
         
         guard let firstDayDate = month.days.first?.date else { return [] }
-        let firstDayWeekday = calendar.component(.weekday, from: firstDayDate)
+        // Normalize to start of day for consistent calculations
+        let monthStart = calendar.startOfDay(for: firstDayDate)
+        let firstDayWeekday = calendar.component(.weekday, from: monthStart)
         // Adjust offset logic to match MonthRow's padded grid
         // MonthRow puts first day at: (weekday - firstWeekday + 7) % 7
         let offset = (firstDayWeekday - calendar.firstWeekday + 7) % 7
         
         for event in sorted {
-            let startDist = calendar.dateComponents([.day], from: firstDayDate, to: event.startDate).day ?? 0
-            let endDist = calendar.dateComponents([.day], from: firstDayDate, to: event.endDate).day ?? 0
-            let effectiveEndDist = event.isAllDay ? endDist - 1 : endDist
-            
+            // Calculate start column from start date
+            let eventStartDay = calendar.startOfDay(for: event.startDate)
+            let startDist = calendar.dateComponents([.day], from: monthStart, to: eventStartDay).day ?? 0
             let colStart = max(0, startDist + offset)
-            let colEnd = min(totalColumns - 1, effectiveEndDist + offset)
+            
+            // Calculate day span using duration - robust regardless of endDate convention
+            let secondsPerDay: Double = 86400
+            let daySpan: Int
+            if event.isAllDay {
+                daySpan = max(1, Int(ceil(event.duration / secondsPerDay)))
+            } else {
+                let eventEndDay = calendar.startOfDay(for: event.endDate)
+                let dayDiff = calendar.dateComponents([.day], from: eventStartDay, to: eventEndDay).day ?? 0
+                daySpan = max(1, dayDiff + 1)
+            }
+            
+            let colEnd = min(totalColumns - 1, colStart + daySpan - 1)
             
             if colStart > colEnd { continue }
-            let span = colEnd - colStart + 1
+            let span = daySpan
             
             for r in 0..<occupied.count {
                 var fits = true
@@ -528,26 +576,37 @@ private struct FeaturedEventSegment: Identifiable {
 private struct FeaturedEventOverlay: View {
     let segments: [FeaturedEventSegment]
     let cellSize: CGSize
+    let totalColumns: Int
 
     var body: some View {
-        let barHeight = max(8, min(12, cellSize.height * 0.4))
-        let fontSize = max(6, min(10, barHeight * 0.7))
-        let y = max(0, cellSize.height - barHeight - 2)
+        // Calculate explicit size for the overlay
+        let totalWidth = CGFloat(totalColumns) * cellSize.width
+        let barHeight: CGFloat = max(10, min(14, cellSize.height * 0.45))
+        let fontSize: CGFloat = max(7, min(11, barHeight * 0.75))
+        // Position at bottom of cell
+        let y = cellSize.height - barHeight / 2 - 2
 
-        ForEach(segments) { segment in
-            let width = CGFloat(segment.span) * cellSize.width - 2
-            let x = CGFloat(segment.startIndex) * cellSize.width + 1
+        ZStack(alignment: .topLeading) {
+            // Invisible spacer to establish size
+            Color.clear
+                .frame(width: totalWidth, height: cellSize.height)
 
-            if width > 6 {
-                Text(segment.event.title)
-                    .font(.system(size: fontSize))
-                    .fontWeight(.medium)
-                    .foregroundStyle(segment.event.calendarColor.contrastingTextColor)
-                    .lineLimit(1)
-                    .padding(.horizontal, 4)
-                    .frame(width: width, height: barHeight, alignment: .leading)
-                    .background(segment.event.calendarColor, in: RoundedRectangle(cornerRadius: 3))
-                    .offset(x: x, y: y)
+            ForEach(segments) { segment in
+                let width = CGFloat(segment.span) * cellSize.width - 4
+                let x = CGFloat(segment.startIndex) * cellSize.width + 2
+
+                if width > 10 {
+                    Text(segment.event.title)
+                        .font(.system(size: fontSize))
+                        .fontWeight(.semibold)
+                        .foregroundStyle(segment.event.calendarColor.contrastingTextColor)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .padding(.horizontal, 3)
+                        .frame(width: width, height: barHeight, alignment: .leading)
+                        .background(segment.event.calendarColor, in: RoundedRectangle(cornerRadius: 4))
+                        .position(x: x + width / 2, y: y)
+                }
             }
         }
     }

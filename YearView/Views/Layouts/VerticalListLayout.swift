@@ -126,12 +126,9 @@ struct WeekStripView: View {
                         onTap: { onDateTap(day.date) }
                     )
                 } else {
-                    // Unused cell - weekend shading takes priority
-                    let weekday = weekdayNumbers.indices.contains(index) ? weekdayNumbers[index] : (index + 1)
-                    appSettings.unusedCellBackgroundColor(forWeekday: weekday)
+                    Color.clear
                         .frame(maxWidth: .infinity)
                         .aspectRatio(1, contentMode: .fit)
-                        .clipShape(Circle())
                 }
             }
         }

@@ -49,11 +49,8 @@ struct MonthGridView: View {
                                 onTap: { onDateTap(day.date) }
                             )
                         } else {
-                            // Unused cell - weekend shading takes priority
-                            let weekday = month.weekdayNumbers[dayIndex]
-                            appSettings.unusedCellBackgroundColor(forWeekday: weekday)
+                            Color.clear
                                 .aspectRatio(1, contentMode: .fit)
-                                .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
                     }
                 }

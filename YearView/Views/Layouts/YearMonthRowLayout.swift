@@ -183,15 +183,23 @@ private struct MonthRow: View {
                 }
                 .padding(.vertical, verticalPadding)
                 
-                // Event Bars Overlay
-                EventBarsOverlay(
-                    month: month,
-                    events: appSettings.filterEvents(calendarViewModel.filteredEvents),
-                    cellSize: cellSize,
-                    totalColumns: totalColumns,
-                    appSettings: appSettings
-                )
-                .padding(.vertical, verticalPadding)
+                if appSettings.showMonthRowEvents {
+                    FeaturedEventOverlay(
+                        segments: featuredEventSegments,
+                        cellSize: cellSize
+                    )
+                    .padding(.vertical, verticalPadding)
+                } else {
+                    // Event Bars Overlay
+                    EventBarsOverlay(
+                        month: month,
+                        events: appSettings.filterEvents(calendarViewModel.filteredEvents),
+                        cellSize: cellSize,
+                        totalColumns: totalColumns,
+                        appSettings: appSettings
+                    )
+                    .padding(.vertical, verticalPadding)
+                }
             }
         }
         .accessibilityElement(children: .contain)
@@ -262,6 +270,76 @@ private struct MonthRow: View {
         guard let day else { return false }
         let events = calendarViewModel.events(for: day.date)
         return !appSettings.filterEvents(events).isEmpty
+    }
+
+    private var featuredEventSegments: [FeaturedEventSegment] {
+        guard appSettings.showMonthRowEvents else { return [] }
+        var segments: [FeaturedEventSegment] = []
+        var currentEvent: CalendarEvent?
+        var currentStart = 0
+
+        for index in paddedDays.indices {
+            guard let day = paddedDays[index] else {
+                if let event = currentEvent {
+                    let span = index - currentStart
+                    if span > 0 {
+                        segments.append(FeaturedEventSegment(event: event, startIndex: currentStart, span: span))
+                    }
+                }
+                currentEvent = nil
+                continue
+            }
+
+            let dayEvents = appSettings.filterEvents(calendarViewModel.events(for: day.date))
+            let featured = featuredEvent(from: dayEvents)
+
+            if let featured {
+                if let event = currentEvent, event.id == featured.id {
+                    continue
+                }
+
+                if let event = currentEvent {
+                    let span = index - currentStart
+                    if span > 0 {
+                        segments.append(FeaturedEventSegment(event: event, startIndex: currentStart, span: span))
+                    }
+                }
+
+                currentEvent = featured
+                currentStart = index
+            } else if let event = currentEvent {
+                let span = index - currentStart
+                if span > 0 {
+                    segments.append(FeaturedEventSegment(event: event, startIndex: currentStart, span: span))
+                }
+                currentEvent = nil
+            }
+        }
+
+        if let event = currentEvent {
+            let span = paddedDays.count - currentStart
+            if span > 0 {
+                segments.append(FeaturedEventSegment(event: event, startIndex: currentStart, span: span))
+            }
+        }
+
+        return segments
+    }
+
+    private func featuredEvent(from events: [CalendarEvent]) -> CalendarEvent? {
+        guard !events.isEmpty else { return nil }
+        return events.sorted { lhs, rhs in
+            if lhs.duration != rhs.duration {
+                return lhs.duration > rhs.duration
+            }
+            if lhs.isAllDay != rhs.isAllDay {
+                return lhs.isAllDay && !rhs.isAllDay
+            }
+            if lhs.startDate != rhs.startDate {
+                return lhs.startDate < rhs.startDate
+            }
+            return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+        }.first
     }
 
     private func isSelected(_ date: Date?) -> Bool {
@@ -409,7 +487,7 @@ private struct MonthRowDayCell: View {
         Group {
             if let day {
                 WobbleTapButton(hasEvents: hasEvents, wobbleScale: 1.1, wobbleRotation: 2.5, action: { onTap(day.date) }) {
-                    ZStack(alignment: .top) {
+                    ZStack(alignment: .topLeading) {
                         if isSelected && !day.isToday {
                             Rectangle()
                                 .stroke(appSettings.todayColor, lineWidth: 2)
@@ -420,7 +498,7 @@ private struct MonthRowDayCell: View {
                             .fontWeight(day.isToday ? .bold : .medium)
                             .foregroundStyle(appSettings.dateLabelColor)
                             .frame(width: cellSize.width, alignment: .center)
-                        .padding(.top, dayNumberTopPadding)
+                            .padding(.top, dayNumberTopPadding)
                     }
                     .frame(width: cellSize.width, height: cellSize.height, alignment: .top)
                     .contentShape(Rectangle())
@@ -436,6 +514,42 @@ private struct MonthRowDayCell: View {
 
     private var dayNumberTopPadding: CGFloat {
         max(1, min(6, cellSize.height * 0.2))
+    }
+}
+
+private struct FeaturedEventSegment: Identifiable {
+    let event: CalendarEvent
+    let startIndex: Int
+    let span: Int
+
+    var id: String { "\(event.id)-\(startIndex)" }
+}
+
+private struct FeaturedEventOverlay: View {
+    let segments: [FeaturedEventSegment]
+    let cellSize: CGSize
+
+    var body: some View {
+        let barHeight = max(8, min(12, cellSize.height * 0.4))
+        let fontSize = max(6, min(10, barHeight * 0.7))
+        let y = max(0, cellSize.height - barHeight - 2)
+
+        ForEach(segments) { segment in
+            let width = CGFloat(segment.span) * cellSize.width - 2
+            let x = CGFloat(segment.startIndex) * cellSize.width + 1
+
+            if width > 6 {
+                Text(segment.event.title)
+                    .font(.system(size: fontSize))
+                    .fontWeight(.medium)
+                    .foregroundStyle(segment.event.calendarColor.contrastingTextColor)
+                    .lineLimit(1)
+                    .padding(.horizontal, 4)
+                    .frame(width: width, height: barHeight, alignment: .leading)
+                    .background(segment.event.calendarColor, in: RoundedRectangle(cornerRadius: 3))
+                    .offset(x: x, y: y)
+            }
+        }
     }
 }
 

@@ -262,12 +262,13 @@ final class CalendarViewModel {
     func eventsForRestOfMonth(from date: Date = Date()) -> [CalendarEvent] {
         let calendar = Calendar.current
         let weekEnd = calendar.date(byAdding: .day, value: 7, to: calendar.startOfDay(for: date)) ?? date
-        
+
         // Get end of current month
-        guard let endOfMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: calendar.startOfDay(for: calendar.date(from: calendar.dateComponents([.year, .month], from: date))!)) else {
+        guard let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: date)),
+              let endOfMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: calendar.startOfDay(for: monthStart)) else {
             return []
         }
-        
+
         guard weekEnd <= endOfMonth else { return [] }
         return events(from: weekEnd, to: endOfMonth)
     }
@@ -294,25 +295,27 @@ final class CalendarViewModel {
     func eventsForUpcomingMonths(monthCount: Int = 2) -> [(month: Date, events: [CalendarEvent])] {
         let calendar = Calendar.current
         let now = Date()
-        
+
         // Start from next month
-        guard let nextMonth = calendar.date(byAdding: .month, value: 1, to: now) else { return [] }
-        let startOfNextMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: nextMonth))!
-        
+        guard let nextMonth = calendar.date(byAdding: .month, value: 1, to: now),
+              let startOfNextMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: nextMonth)) else {
+            return []
+        }
+
         var result: [(month: Date, events: [CalendarEvent])] = []
-        
+
         for i in 0..<monthCount {
             guard let monthStart = calendar.date(byAdding: .month, value: i, to: startOfNextMonth),
                   let monthEnd = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: monthStart) else {
                 continue
             }
-            
+
             let monthEvents = events(from: monthStart, to: monthEnd)
             if !monthEvents.isEmpty {
                 result.append((month: monthStart, events: monthEvents))
             }
         }
-        
+
         return result
     }
 }

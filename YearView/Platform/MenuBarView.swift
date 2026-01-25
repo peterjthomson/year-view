@@ -77,7 +77,9 @@ struct MenuBarView: View {
             // Quick actions
             HStack {
                 Button {
-                    NSWorkspace.shared.open(URL(string: "x-apple-calevent://")!)
+                    if let url = URL(string: "x-apple-calevent://") {
+                        NSWorkspace.shared.open(url)
+                    }
                 } label: {
                     Label("Open Calendar", systemImage: "calendar")
                 }

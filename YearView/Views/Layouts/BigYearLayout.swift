@@ -336,7 +336,7 @@ private struct EventBarsOverlay: View {
 
     private func columnRange(for event: CalendarEvent) -> (start: Int, end: Int) {
         let eventStart = calendar.startOfDay(for: event.startDate)
-        
+
         // All-day events use an exclusive endDate; use the last moment so single-day all-day events
         // don't incorrectly span into the next day/column.
         let effectiveEndDate = event.isAllDay ? event.endDate.addingTimeInterval(-1) : event.endDate
@@ -347,17 +347,22 @@ private struct EventBarsOverlay: View {
 
         for (index, day) in daysInWeek.enumerated() {
             let dayStart = calendar.startOfDay(for: day)
-            if dayStart <= eventStart && eventStart < calendar.date(byAdding: .day, value: 1, to: dayStart)! {
-                startCol = index
-            }
-            if dayStart <= eventEnd && eventEnd < calendar.date(byAdding: .day, value: 1, to: dayStart)! {
-                endCol = index
+            if let nextDay = calendar.date(byAdding: .day, value: 1, to: dayStart) {
+                if dayStart <= eventStart && eventStart < nextDay {
+                    startCol = index
+                }
+                if dayStart <= eventEnd && eventEnd < nextDay {
+                    endCol = index
+                }
             }
         }
 
         // Clamp to week boundaries
-        let weekStartDay = calendar.startOfDay(for: daysInWeek.first!)
-        let weekEndDay = calendar.startOfDay(for: daysInWeek.last!)
+        guard let firstDay = daysInWeek.first, let lastDay = daysInWeek.last else {
+            return (startCol, endCol)
+        }
+        let weekStartDay = calendar.startOfDay(for: firstDay)
+        let weekEndDay = calendar.startOfDay(for: lastDay)
 
         if eventStart < weekStartDay {
             startCol = 0

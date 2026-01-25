@@ -40,13 +40,19 @@ struct MacCommands: Commands {
 
         // Help menu additions
         CommandGroup(replacing: .help) {
-            Link("Year View Help", destination: URL(string: "https://yearview.app/help")!)
+            if let helpURL = URL(string: "https://yearview.app/help") {
+                Link("Year View Help", destination: helpURL)
+            }
 
             Divider()
 
-            Link("Send Feedback", destination: URL(string: "mailto:support@yearview.app")!)
+            if let feedbackURL = URL(string: "mailto:support@yearview.app") {
+                Link("Send Feedback", destination: feedbackURL)
+            }
 
-            Link("Privacy Policy", destination: URL(string: "https://yearview.app/privacy")!)
+            if let privacyURL = URL(string: "https://yearview.app/privacy") {
+                Link("Privacy Policy", destination: privacyURL)
+            }
         }
     }
 }

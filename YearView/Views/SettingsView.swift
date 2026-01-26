@@ -106,26 +106,7 @@ struct SettingsView: View {
     }
     
     private func resetToDefaults() {
-        let defaults = AppSettings()
-        appSettings.weekStartsOn = defaults.weekStartsOn
-        appSettings.pageBackgroundColor = defaults.pageBackgroundColor
-        appSettings.weekdayBackgroundColor = defaults.weekdayBackgroundColor
-        appSettings.weekendBackgroundColor = defaults.weekendBackgroundColor
-        appSettings.unusedCellColor = defaults.unusedCellColor
-        appSettings.dateLabelColor = defaults.dateLabelColor
-        appSettings.columnHeadingColor = defaults.columnHeadingColor
-        appSettings.rowHeadingColor = defaults.rowHeadingColor
-        appSettings.todayColor = defaults.todayColor
-        appSettings.gridlineColor = defaults.gridlineColor
-        appSettings.showGridlinesBigYear = defaults.showGridlinesBigYear
-        appSettings.showGridlinesMonthRows = defaults.showGridlinesMonthRows
-        appSettings.showGridlinesGrid = defaults.showGridlinesGrid
-        appSettings.showGridlinesRow = defaults.showGridlinesRow
-        appSettings.showGridlinesList = defaults.showGridlinesList
-        appSettings.monthLabelFormat = defaults.monthLabelFormat
-        appSettings.monthLabelFontSize = defaults.monthLabelFontSize
-        appSettings.showAllDayEvents = defaults.showAllDayEvents
-        appSettings.showTimeBasedEvents = defaults.showTimeBasedEvents
+        appSettings.resetToDefaults()
     }
 }
 

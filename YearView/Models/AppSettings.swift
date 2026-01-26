@@ -78,72 +78,137 @@ final class AppSettings {
     // MARK: - Color Settings
     // All defaults use system-adaptive colors that work in both light and dark mode
 
+    private let cache = CalendarCacheService.shared
+
     static let defaultLightGray: Color = Color.gray.opacity(0.06)
-    
+
     /// Background color for the page/view
-    var pageBackgroundColor: Color = AppSettings.defaultLightGray
-    
+    var pageBackgroundColor: Color {
+        didSet { cache.pageBackgroundColor = pageBackgroundColor }
+    }
+
     /// Background color for weekday cells
-    var weekdayBackgroundColor: Color = .white
-    
+    var weekdayBackgroundColor: Color {
+        didSet { cache.weekdayBackgroundColor = weekdayBackgroundColor }
+    }
+
     /// Background color for weekend cells
-    var weekendBackgroundColor: Color = Color.gray.opacity(0.1)
-    
+    var weekendBackgroundColor: Color {
+        didSet { cache.weekendBackgroundColor = weekendBackgroundColor }
+    }
+
     /// Background color for unused/placeholder cells (cells that maintain grid but have no day)
-    var unusedCellColor: Color = AppSettings.defaultLightGray
-    
+    var unusedCellColor: Color {
+        didSet { cache.unusedCellColor = unusedCellColor }
+    }
+
     /// Color for date labels inside views
-    var dateLabelColor: Color = .primary
-    
+    var dateLabelColor: Color {
+        didSet { cache.dateLabelColor = dateLabelColor }
+    }
+
     /// Color for column headings (weekday headers)
-    var columnHeadingColor: Color = .secondary
-    
+    var columnHeadingColor: Color {
+        didSet { cache.columnHeadingColor = columnHeadingColor }
+    }
+
     /// Color for row headings (month labels)
-    var rowHeadingColor: Color = .primary
-    
+    var rowHeadingColor: Color {
+        didSet { cache.rowHeadingColor = rowHeadingColor }
+    }
+
     /// Color for today highlight
-    var todayColor: Color = Color.gray.opacity(0.25)
-    
+    var todayColor: Color {
+        didSet { cache.todayColor = todayColor }
+    }
+
     /// Color for gridlines
-    var gridlineColor: Color = Color.separator.opacity(0.5)
-    
+    var gridlineColor: Color {
+        didSet { cache.gridlineColor = gridlineColor }
+    }
+
     // MARK: - Gridline Settings
-    
+
     /// Show gridlines in Year view (Big Year)
-    var showGridlinesBigYear: Bool = true
-    
+    var showGridlinesBigYear: Bool {
+        didSet { cache.showGridlinesBigYear = showGridlinesBigYear }
+    }
+
     /// Show gridlines in Month Rows view
-    var showGridlinesMonthRows: Bool = true
-    
+    var showGridlinesMonthRows: Bool {
+        didSet { cache.showGridlinesMonthRows = showGridlinesMonthRows }
+    }
+
     /// Show gridlines in Grid view
-    var showGridlinesGrid: Bool = false
-    
+    var showGridlinesGrid: Bool {
+        didSet { cache.showGridlinesGrid = showGridlinesGrid }
+    }
+
     /// Show gridlines in Row view
-    var showGridlinesRow: Bool = false
-    
+    var showGridlinesRow: Bool {
+        didSet { cache.showGridlinesRow = showGridlinesRow }
+    }
+
     /// Show gridlines in List view
-    var showGridlinesList: Bool = false
-    
+    var showGridlinesList: Bool {
+        didSet { cache.showGridlinesList = showGridlinesList }
+    }
+
     // MARK: - Calendar Settings
-    
+
     /// Which day the week starts on (1=Sunday, 2=Monday, 7=Saturday)
-    var weekStartsOn: WeekStartDay = .monday
-    
+    var weekStartsOn: WeekStartDay {
+        didSet { cache.weekStartsOn = weekStartsOn.rawValue }
+    }
+
     // MARK: - YearMonth View Settings
-    
+
     /// Format for month labels in YearMonth view
-    var monthLabelFormat: MonthLabelFormat = .letter
-    
+    var monthLabelFormat: MonthLabelFormat {
+        didSet { cache.monthLabelFormat = monthLabelFormat.rawValue }
+    }
+
     /// Font size for month labels in YearMonth view
-    var monthLabelFontSize: MonthLabelFontSize = .medium
-    
+    var monthLabelFontSize: MonthLabelFontSize {
+        didSet { cache.monthLabelFontSize = monthLabelFontSize.rawValue }
+    }
+
     // MARK: - Event Display Settings
-    
+
     /// Whether to show all-day events
-    var showAllDayEvents: Bool = true
-    
+    var showAllDayEvents: Bool {
+        didSet { cache.showAllDayEvents = showAllDayEvents }
+    }
+
     /// Whether to show time-based events
-    var showTimeBasedEvents: Bool = false
+    var showTimeBasedEvents: Bool {
+        didSet { cache.showTimeBasedEvents = showTimeBasedEvents }
+    }
+
+    // MARK: - Initialization
+
+    init() {
+        // Load all settings from cache
+        self.pageBackgroundColor = cache.pageBackgroundColor
+        self.weekdayBackgroundColor = cache.weekdayBackgroundColor
+        self.weekendBackgroundColor = cache.weekendBackgroundColor
+        self.unusedCellColor = cache.unusedCellColor
+        self.dateLabelColor = cache.dateLabelColor
+        self.columnHeadingColor = cache.columnHeadingColor
+        self.rowHeadingColor = cache.rowHeadingColor
+        self.todayColor = cache.todayColor
+        self.gridlineColor = cache.gridlineColor
+        self.showGridlinesBigYear = cache.showGridlinesBigYear
+        self.showGridlinesMonthRows = cache.showGridlinesMonthRows
+        self.showGridlinesGrid = cache.showGridlinesGrid
+        self.showGridlinesRow = cache.showGridlinesRow
+        self.showGridlinesList = cache.showGridlinesList
+        self.weekStartsOn = WeekStartDay(rawValue: cache.weekStartsOn) ?? .monday
+        self.monthLabelFormat = MonthLabelFormat(rawValue: cache.monthLabelFormat) ?? .letter
+        self.monthLabelFontSize = MonthLabelFontSize(rawValue: cache.monthLabelFontSize) ?? .medium
+        self.showAllDayEvents = cache.showAllDayEvents
+        self.showTimeBasedEvents = cache.showTimeBasedEvents
+    }
     
     // MARK: - Computed Properties
     
@@ -200,5 +265,28 @@ final class AppSettings {
                 return showTimeBasedEvents
             }
         }
+    }
+
+    /// Resets all settings to their default values
+    func resetToDefaults() {
+        pageBackgroundColor = AppSettings.defaultLightGray
+        weekdayBackgroundColor = .white
+        weekendBackgroundColor = Color.gray.opacity(0.1)
+        unusedCellColor = AppSettings.defaultLightGray
+        dateLabelColor = .primary
+        columnHeadingColor = .secondary
+        rowHeadingColor = .primary
+        todayColor = Color.gray.opacity(0.25)
+        gridlineColor = Color.gray.opacity(0.3)
+        showGridlinesBigYear = true
+        showGridlinesMonthRows = true
+        showGridlinesGrid = false
+        showGridlinesRow = false
+        showGridlinesList = false
+        weekStartsOn = .monday
+        monthLabelFormat = .letter
+        monthLabelFontSize = .medium
+        showAllDayEvents = true
+        showTimeBasedEvents = false
     }
 }

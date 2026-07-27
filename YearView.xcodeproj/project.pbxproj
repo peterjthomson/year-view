@@ -49,6 +49,7 @@
 		F2000001006 /* DateUtilitiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002006 /* DateUtilitiesTests.swift */; };
 		F2000001007 /* DayViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002007 /* DayViewModelTests.swift */; };
 		F2000001008 /* YearViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002008 /* YearViewModelTests.swift */; };
+		F2000001020 /* GoToTodayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002020 /* GoToTodayTests.swift */; };
 		F2000001009 /* CalendarEventDayRangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002009 /* CalendarEventDayRangeTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -111,6 +112,7 @@
 		F2000002006 /* DateUtilitiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtilitiesTests.swift; sourceTree = "<group>"; };
 		F2000002007 /* DayViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayViewModelTests.swift; sourceTree = "<group>"; };
 		F2000002008 /* YearViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearViewModelTests.swift; sourceTree = "<group>"; };
+		F2000002020 /* GoToTodayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoToTodayTests.swift; sourceTree = "<group>"; };
 		F2000002009 /* CalendarEventDayRangeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventDayRangeTests.swift; sourceTree = "<group>"; };
 		F2000002010 /* YearViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YearViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -262,6 +264,7 @@
 				F2000002006 /* DateUtilitiesTests.swift */,
 				F2000002007 /* DayViewModelTests.swift */,
 				F2000002008 /* YearViewModelTests.swift */,
+				F2000002020 /* GoToTodayTests.swift */,
 			);
 			path = YearViewTests;
 			sourceTree = "<group>";
@@ -425,6 +428,7 @@
 				F2000001006 /* DateUtilitiesTests.swift in Sources */,
 				F2000001007 /* DayViewModelTests.swift in Sources */,
 				F2000001008 /* YearViewModelTests.swift in Sources */,
+				F2000001020 /* GoToTodayTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

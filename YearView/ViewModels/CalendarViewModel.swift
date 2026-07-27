@@ -7,7 +7,11 @@ final class CalendarViewModel {
     private let eventKitService = EventKitService()
     private let googleCalendarService = GoogleCalendarService()
     private let cacheService = CalendarCacheService()
-    private var eventStoreObserver: NSObjectProtocol?
+    // Must be @ObservationIgnored: deinit calls stopObservingEventStoreChanges(), which
+    // reads and writes this property. On an @Observable class that routes through the
+    // observation registrar, and touching the registrar for an object that is mid-
+    // deallocation is not safe. eventLoadTask is ignored for the same reason.
+    @ObservationIgnored private var eventStoreObserver: NSObjectProtocol?
     @ObservationIgnored private var eventLoadTask: Task<Void, Never>?
     @ObservationIgnored private var eventsByDay: [Date: [CalendarEvent]] = [:]
 
@@ -27,6 +31,11 @@ final class CalendarViewModel {
     var isLoading = false
     var errorMessage: String?
     var hasCalendarAccess = false
+
+    /// Incremented every time the user asks to jump to today. Layouts observe this and
+    /// scroll today into view. A counter rather than a flag so that asking again while
+    /// already on the current year still re-triggers the scroll.
+    private(set) var scrollToTodayToken: Int = 0
 
     var enabledCalendarIDs: Set<String> {
         Set(calendars.filter { $0.isEnabled }.map { $0.id })
@@ -229,6 +238,9 @@ final class CalendarViewModel {
             displayedYear = currentYear
         }
         selectedDate = Date()
+        // Changing the year alone doesn't move the viewport - the layouts scroll
+        // themselves in response to this.
+        scrollToTodayToken += 1
     }
 
     func goToPreviousYear() {

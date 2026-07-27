@@ -6,7 +6,16 @@ struct ContinuousRowLayout: View {
     let onDateTap: (Date) -> Void
 
     @Environment(AppSettings.self) private var appSettings
+    @Environment(CalendarViewModel.self) private var calendarViewModel
     @State private var scrollPosition: Int?
+
+    /// Index of the month containing today, if today is in the displayed year
+    private var todayMonthIndex: Int? {
+        let today = Date()
+        return months.firstIndex {
+            Calendar.current.isDate($0.date, equalTo: today, toGranularity: .month)
+        }
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -32,8 +41,13 @@ struct ContinuousRowLayout: View {
         .background(appSettings.pageBackgroundColor)
         .onAppear {
             // Scroll to current month
-            let currentMonth = Calendar.current.component(.month, from: Date()) - 1
-            scrollPosition = currentMonth
+            scrollPosition = todayMonthIndex
+        }
+        .onChange(of: calendarViewModel.scrollToTodayToken) {
+            guard let index = todayMonthIndex else { return }
+            withAnimation(.easeInOut(duration: 0.3)) {
+                scrollPosition = index
+            }
         }
     }
 }

@@ -14,24 +14,40 @@ struct BigYearLayout: View {
     private let rowHeight: CGFloat = 80
 
     var body: some View {
-        ScrollView([.vertical, .horizontal], showsIndicators: true) {
-            LazyVStack(spacing: 0) {
-                ForEach(weeksInYear, id: \.self) { weekStart in
-                    WeekRowView(
-                        weekStart: weekStart,
-                        year: year,
-                        selectedDate: selectedDate,
-                        onDateTap: onDateTap,
-                        dayColumnWidth: dayColumnWidth,
-                        rowHeight: rowHeight,
-                        appSettings: appSettings
-                    )
-                    .id(weekStart)
+        ScrollViewReader { proxy in
+            ScrollView([.vertical, .horizontal], showsIndicators: true) {
+                LazyVStack(spacing: 0) {
+                    ForEach(weeksInYear, id: \.self) { weekStart in
+                        WeekRowView(
+                            weekStart: weekStart,
+                            year: year,
+                            selectedDate: selectedDate,
+                            onDateTap: onDateTap,
+                            dayColumnWidth: dayColumnWidth,
+                            rowHeight: rowHeight,
+                            appSettings: appSettings
+                        )
+                        .id(weekStart)
+                    }
+                }
+            }
+            .defaultScrollAnchor(.topLeading)
+            .background(appSettings.pageBackgroundColor)
+            .onChange(of: calendarViewModel.scrollToTodayToken) {
+                guard let week = todayWeekStart else { return }
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    proxy.scrollTo(week, anchor: .center)
                 }
             }
         }
-        .defaultScrollAnchor(.topLeading)
-        .background(appSettings.pageBackgroundColor)
+    }
+
+    /// Week-row anchor containing today, if today is in the displayed year
+    private var todayWeekStart: Date? {
+        let today = Date()
+        guard calendar.component(.year, from: today) == year else { return nil }
+        let target = startOfWeek(for: today)
+        return weeksInYear.first { calendar.isDate($0, inSameDayAs: target) }
     }
 
     /// All weeks that have at least one day in the target year

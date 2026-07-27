@@ -50,6 +50,31 @@ struct YearMonthRowLayout: View {
         appSettings.monthLabelFormat.suggestedWidth
     }
 
+    /// Scroll anchor id for a grid column
+    private func columnID(_ index: Int) -> String { "column-\(index)" }
+
+    /// Column index holding today, if today falls inside the displayed year.
+    /// Months are offset so weekdays line up, so today's column is that month's
+    /// weekday offset plus the day of the month.
+    private var todayColumnIndex: Int? {
+        let today = Date()
+        guard let month = months.first(where: {
+            calendar.isDate($0.date, equalTo: today, toGranularity: .month)
+        }), let firstDay = month.days.first?.date else { return nil }
+
+        let firstDayWeekday = calendar.component(.weekday, from: firstDay)
+        let offset = (firstDayWeekday - calendar.firstWeekday + 7) % 7
+        let index = offset + calendar.component(.day, from: today) - 1
+        return index < totalColumns ? index : nil
+    }
+
+    private func scrollToToday(_ proxy: ScrollViewProxy) {
+        guard let index = todayColumnIndex else { return }
+        withAnimation(.easeInOut(duration: 0.3)) {
+            proxy.scrollTo(columnID(index), anchor: .center)
+        }
+    }
+
     var body: some View {
         GeometryReader { geometry in
             let columns = CGFloat(totalColumns)
@@ -81,35 +106,40 @@ struct YearMonthRowLayout: View {
 
             let cellSize = CGSize(width: cellWidth, height: cellHeight)
 
-            ScrollView(.horizontal, showsIndicators: true) {
-                VStack(alignment: .leading, spacing: 0) {
-                    weekdayHeader(cellSize: CGSize(width: cellWidth, height: headerHeight), monthLabelWidth: monthLabelWidth)
-                        .padding(.bottom, headerSpacing)
-
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: true) {
                     VStack(alignment: .leading, spacing: 0) {
-                        ForEach(Array(months.enumerated()), id: \.element.id) { index, month in
-                            MonthRow(
-                                month: month,
-                                cellSize: cellSize,
-                                monthLabelWidth: monthLabelWidth,
-                                totalColumns: totalColumns,
-                                selectedDate: selectedDate,
-                                calendarViewModel: calendarViewModel,
-                                appSettings: appSettings,
-                                verticalPadding: rowVerticalPadding,
-                                onDateTap: onDateTap
-                            )
+                        weekdayHeader(cellSize: CGSize(width: cellWidth, height: headerHeight), monthLabelWidth: monthLabelWidth)
+                            .padding(.bottom, headerSpacing)
 
-                            if index < months.count - 1 {
-                                Divider()
+                        VStack(alignment: .leading, spacing: 0) {
+                            ForEach(Array(months.enumerated()), id: \.element.id) { index, month in
+                                MonthRow(
+                                    month: month,
+                                    cellSize: cellSize,
+                                    monthLabelWidth: monthLabelWidth,
+                                    totalColumns: totalColumns,
+                                    selectedDate: selectedDate,
+                                    calendarViewModel: calendarViewModel,
+                                    appSettings: appSettings,
+                                    verticalPadding: rowVerticalPadding,
+                                    onDateTap: onDateTap
+                                )
+
+                                if index < months.count - 1 {
+                                    Divider()
+                                }
                             }
                         }
                     }
+                    .padding(outerPadding)
+                    .frame(minWidth: geometry.size.width, alignment: .topLeading)
                 }
-                .padding(outerPadding)
-                .frame(minWidth: geometry.size.width, alignment: .topLeading)
+                .background(appSettings.pageBackgroundColor)
+                .onChange(of: calendarViewModel.scrollToTodayToken) {
+                    scrollToToday(proxy)
+                }
             }
-            .background(appSettings.pageBackgroundColor)
         }
     }
 
@@ -132,6 +162,9 @@ struct YearMonthRowLayout: View {
                     .fontWeight(.semibold)
                     .foregroundStyle(isWeekend ? appSettings.columnHeadingColor.opacity(0.7) : appSettings.columnHeadingColor)
                     .frame(width: cellSize.width, height: cellSize.height)
+                    // Scroll anchor: the header spans every column and is always laid out,
+                    // so it's a stable target for scrolling a column into view.
+                    .id(columnID(index))
             }
         }
     }

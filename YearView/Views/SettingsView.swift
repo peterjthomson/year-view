@@ -1,4 +1,7 @@
 import SwiftUI
+#if os(macOS)
+import AppKit
+#endif
 
 struct SettingsView: View {
     @Environment(AppSettings.self) private var appSettings
@@ -103,12 +106,30 @@ struct SettingsView: View {
         .formStyle(.grouped)
         #if os(macOS)
         .frame(minWidth: 350, minHeight: 600)
+        .onDisappear {
+            closeSharedColorPanel()
+        }
         #endif
     }
-    
+
     private func resetToDefaults() {
         appSettings.resetToDefaults()
     }
+
+    #if os(macOS)
+    /// Dismiss the shared colour panel when settings goes away.
+    ///
+    /// ColorPicker drives the process-wide NSColorPanel and installs itself as its
+    /// target. The panel outlives this window, so leaving it open once the pickers are
+    /// gone leaves it pointing at views that no longer exist.
+    private func closeSharedColorPanel() {
+        guard NSColorPanel.sharedColorPanelExists else { return }
+        let panel = NSColorPanel.shared
+        panel.setTarget(nil)
+        panel.setAction(nil)
+        panel.close()
+    }
+    #endif
 }
 
 #Preview {

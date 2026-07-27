@@ -29,7 +29,7 @@ struct PowerLawLayout: View {
                 }
             }
         }
-        .background(Color.gray.opacity(0.1))
+        .background(appSettings.pageBackgroundColor)
     }
     
     private func panelWidth(for geometry: GeometryProxy, index: Int, spacing: CGFloat) -> CGFloat {
@@ -67,7 +67,7 @@ struct PowerLawLayout: View {
                 height: geometry.size.height
             )
             .frame(width: panelWidth(for: geometry, index: 0, spacing: spacing), height: geometry.size.height, alignment: .top)
-            .background(Color.white)
+            .background(panelBackground)
             .id(0)
 
             // THIS WEEK Panel
@@ -78,7 +78,7 @@ struct PowerLawLayout: View {
                 height: geometry.size.height
             )
             .frame(width: panelWidth(for: geometry, index: 1, spacing: spacing), height: geometry.size.height, alignment: .top)
-            .background(Color.white)
+            .background(panelBackground)
             .id(1)
 
             // THIS MONTH Panel
@@ -89,7 +89,7 @@ struct PowerLawLayout: View {
                 onDateTap: onDateTap
             )
             .frame(width: panelWidth(for: geometry, index: 2, spacing: spacing), height: geometry.size.height, alignment: .top)
-            .background(Color.white)
+            .background(panelBackground)
             .id(2)
 
             // THIS QUARTER Panel
@@ -100,7 +100,7 @@ struct PowerLawLayout: View {
                 height: geometry.size.height
             )
             .frame(width: panelWidth(for: geometry, index: 3, spacing: spacing), height: geometry.size.height, alignment: .top)
-            .background(Color.white)
+            .background(panelBackground)
             .id(3)
 
             // THIS YEAR Panel
@@ -110,9 +110,17 @@ struct PowerLawLayout: View {
                 height: geometry.size.height
             )
             .frame(width: panelWidth(for: geometry, index: 4, spacing: spacing), height: geometry.size.height, alignment: .top)
-            .background(Color.white)
+            .background(panelBackground)
             .id(4)
         }
+    }
+
+    /// Surface colour for each panel.
+    ///
+    /// Must adapt to light/dark: these panels carry `.primary`/`.secondary` text, so a
+    /// hard-coded white background renders white-on-white in dark mode.
+    private var panelBackground: Color {
+        Color.systemBackground
     }
 
     private var isCompactPhone: Bool {

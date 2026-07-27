@@ -28,6 +28,11 @@ final class CalendarViewModel {
     var errorMessage: String?
     var hasCalendarAccess = false
 
+    /// Incremented every time the user asks to jump to today. Layouts observe this and
+    /// scroll today into view. A counter rather than a flag so that asking again while
+    /// already on the current year still re-triggers the scroll.
+    private(set) var scrollToTodayToken: Int = 0
+
     var enabledCalendarIDs: Set<String> {
         Set(calendars.filter { $0.isEnabled }.map { $0.id })
     }
@@ -229,6 +234,9 @@ final class CalendarViewModel {
             displayedYear = currentYear
         }
         selectedDate = Date()
+        // Changing the year alone doesn't move the viewport - the layouts scroll
+        // themselves in response to this.
+        scrollToTodayToken += 1
     }
 
     func goToPreviousYear() {

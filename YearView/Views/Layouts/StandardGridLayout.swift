@@ -7,6 +7,15 @@ struct StandardGridLayout: View {
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(AppSettings.self) private var appSettings
+    @Environment(CalendarViewModel.self) private var calendarViewModel
+
+    /// The month containing today, if today is in the displayed year
+    private var todayMonth: MonthData? {
+        let today = Date()
+        return months.first {
+            Calendar.current.isDate($0.date, equalTo: today, toGranularity: .month)
+        }
+    }
 
     private var columns: Int {
         #if os(macOS)
@@ -26,21 +35,30 @@ struct StandardGridLayout: View {
     }
 
     var body: some View {
-        ScrollView {
-            LazyVGrid(columns: gridColumns, alignment: .leading, spacing: 16) {
-                ForEach(months) { month in
-                    MonthGridView(
-                        month: month,
-                        selectedDate: selectedDate,
-                        appSettings: appSettings,
-                        onDateTap: onDateTap
-                    )
-                    .frame(maxWidth: .infinity, alignment: .topLeading)
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVGrid(columns: gridColumns, alignment: .leading, spacing: 16) {
+                    ForEach(months) { month in
+                        MonthGridView(
+                            month: month,
+                            selectedDate: selectedDate,
+                            appSettings: appSettings,
+                            onDateTap: onDateTap
+                        )
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                        .id(month.id)
+                    }
+                }
+                .padding()
+            }
+            .background(appSettings.pageBackgroundColor)
+            .onChange(of: calendarViewModel.scrollToTodayToken) {
+                guard let month = todayMonth else { return }
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    proxy.scrollTo(month.id, anchor: .center)
                 }
             }
-            .padding()
         }
-        .background(appSettings.pageBackgroundColor)
     }
 }
 

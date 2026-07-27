@@ -87,6 +87,10 @@ final class CalendarCacheServiceTests: XCTestCase {
         XCTAssertFalse(loaded) // Default is false
     }
 
+    func testMonthRowEventTitlesDefaultToVisible() {
+        XCTAssertTrue(cacheService.showMonthRowEvents)
+    }
+
     func testSaveAndLoadFirstDayOfWeek() {
         cacheService.saveFirstDayOfWeek(2) // Monday
 

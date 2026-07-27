@@ -1,4 +1,4 @@
-# Launch Checklist (Pre-1.0)
+# Release Checklist (v1.3 Release Candidate)
 
 This doc is focused on shipping **Year View** (iOS + macOS) from this repo, with a bias toward **P0 launch blockers** and "things App Review will ask about".
 

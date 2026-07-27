@@ -109,7 +109,9 @@ Located in `YearViewTests/`:
 - **Service tests** - Caching, date utilities
 - **Utility tests** - Date calculations, color conversions
 
-Note: the test files exist in the repo, but the Xcode project does not currently include a unit test target for them. They won’t run until they’re added to a test target.
+The `YearViewTests` target runs through the shared `YearView` scheme locally and
+in CI. Calendar day-range tests cover exclusive all-day end dates, daylight
+saving transitions, midnight boundaries, and cross-month clipping.
 
 ### UI Tests
 

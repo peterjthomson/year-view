@@ -1,10 +1,19 @@
 import SwiftUI
 
 #if canImport(EventKit)
-import EventKit
+@preconcurrency import EventKit
 
 final class EventKitService {
-    private let eventStore = EKEventStore()
+    private final class EventStoreBox: @unchecked Sendable {
+        let value = EKEventStore()
+    }
+
+    private let eventStoreBox = EventStoreBox()
+    private var eventStore: EKEventStore { eventStoreBox.value }
+    private let eventQueue = DispatchQueue(
+        label: "com.yearview.eventkit.fetch",
+        qos: .userInitiated
+    )
 
     var authorizationStatus: EKAuthorizationStatus {
         EKEventStore.authorizationStatus(for: .event)
@@ -48,13 +57,21 @@ final class EventKitService {
         eventStore.calendars(for: .event)
     }
 
-    func fetchEvents(from startDate: Date, to endDate: Date, calendars: [EKCalendar]? = nil) -> [EKEvent] {
-        let predicate = eventStore.predicateForEvents(
-            withStart: startDate,
-            end: endDate,
-            calendars: calendars
-        )
-        return eventStore.events(matching: predicate)
+    func fetchEvents(
+        from startDate: Date,
+        to endDate: Date
+    ) async -> [EKEvent] {
+        await withCheckedContinuation { continuation in
+            eventQueue.async { [eventStoreBox] in
+                let eventStore = eventStoreBox.value
+                let predicate = eventStore.predicateForEvents(
+                    withStart: startDate,
+                    end: endDate,
+                    calendars: nil
+                )
+                continuation.resume(returning: eventStore.events(matching: predicate))
+            }
+        }
     }
 
     func fetchEvent(withIdentifier identifier: String) -> EKEvent? {
@@ -80,7 +97,7 @@ final class EventKitService {
 final class EventKitService {
     func requestAccess() async throws -> Bool { false }
     func fetchCalendars() -> [Any] { [] }
-    func fetchEvents(from startDate: Date, to endDate: Date, calendars: [Any]? = nil) -> [Any] { [] }
+    func fetchEvents(from startDate: Date, to endDate: Date) async -> [Any] { [] }
     func fetchEvent(withIdentifier identifier: String) -> Any? { nil }
     func startObservingChanges(handler: @escaping () -> Void) -> NSObjectProtocol {
         NotificationCenter.default.addObserver(forName: Notification.Name("EventKitUnavailable"), object: nil, queue: .main) { _ in }

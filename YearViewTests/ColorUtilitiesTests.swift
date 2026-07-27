@@ -32,6 +32,10 @@ final class ColorUtilitiesTests: XCTestCase {
         XCTAssertNotNil(color)
     }
 
+    func testGrayscaleColorSerializesToHex() {
+        XCTAssertNotNil(Color.gray.toHexString())
+    }
+
     // MARK: - Calendar Colors Tests
 
     func testDefaultColorsCount() {

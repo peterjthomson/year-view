@@ -231,7 +231,10 @@ final class CalendarCacheService {
     }
 
     var showMonthRowEvents: Bool {
-        get { userDefaults.bool(forKey: showMonthRowEventsKey) }
+        get {
+            if userDefaults.object(forKey: showMonthRowEventsKey) == nil { return true }
+            return userDefaults.bool(forKey: showMonthRowEventsKey)
+        }
         set { userDefaults.set(newValue, forKey: showMonthRowEventsKey) }
     }
 
@@ -299,7 +302,12 @@ extension Color {
         guard Scanner(string: hexSanitized).scanHexInt64(&rgb) else { return nil }
 
         let length = hexSanitized.count
-        if length == 6 {
+        if length == 3 {
+            let r = Double((rgb & 0xF00) >> 8) / 15.0
+            let g = Double((rgb & 0x0F0) >> 4) / 15.0
+            let b = Double(rgb & 0x00F) / 15.0
+            self.init(red: r, green: g, blue: b)
+        } else if length == 6 {
             let r = Double((rgb & 0xFF0000) >> 16) / 255.0
             let g = Double((rgb & 0x00FF00) >> 8) / 255.0
             let b = Double(rgb & 0x0000FF) / 255.0
@@ -316,24 +324,38 @@ extension Color {
     }
 
     func toHexString() -> String? {
+        let red: CGFloat
+        let green: CGFloat
+        let blue: CGFloat
+        let alpha: CGFloat
+
         #if os(macOS)
-        guard let cgColor = NSColor(self).cgColor,
-              let components = cgColor.components,
-              components.count >= 3 else {
-            return nil
-        }
+        guard let color = NSColor(self).usingColorSpace(.deviceRGB) else { return nil }
+        red = color.redComponent
+        green = color.greenComponent
+        blue = color.blueComponent
+        alpha = color.alphaComponent
         #else
-        guard let cgColor = UIColor(self).cgColor,
-              let components = cgColor.components,
-              components.count >= 3 else {
-            return nil
-        }
+        var convertedRed: CGFloat = 0
+        var convertedGreen: CGFloat = 0
+        var convertedBlue: CGFloat = 0
+        var convertedAlpha: CGFloat = 0
+        guard UIColor(self).getRed(
+            &convertedRed,
+            green: &convertedGreen,
+            blue: &convertedBlue,
+            alpha: &convertedAlpha
+        ) else { return nil }
+        red = convertedRed
+        green = convertedGreen
+        blue = convertedBlue
+        alpha = convertedAlpha
         #endif
 
-        let r = Int(components[0] * 255)
-        let g = Int(components[1] * 255)
-        let b = Int(components[2] * 255)
-        let a = components.count >= 4 ? Int(components[3] * 255) : 255
+        let r = Int((red * 255).rounded())
+        let g = Int((green * 255).rounded())
+        let b = Int((blue * 255).rounded())
+        let a = Int((alpha * 255).rounded())
 
         if a == 255 {
             return String(format: "#%02X%02X%02X", r, g, b)

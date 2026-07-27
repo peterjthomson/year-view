@@ -292,7 +292,7 @@ final class AppSettings {
         weekStartsOn = .monday
         monthLabelFormat = .letter
         monthLabelFontSize = .medium
-        showMonthRowEvents = false
+        showMonthRowEvents = true
         showAllDayEvents = true
         showTimeBasedEvents = false
     }

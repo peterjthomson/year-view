@@ -8,17 +8,19 @@ final class CalendarViewModel {
     private let googleCalendarService = GoogleCalendarService()
     private let cacheService = CalendarCacheService()
     private var eventStoreObserver: NSObjectProtocol?
+    @ObservationIgnored private var eventLoadTask: Task<Void, Never>?
+    @ObservationIgnored private var eventsByDay: [Date: [CalendarEvent]] = [:]
 
     var calendars: [CalendarSource] = []
-    var events: [CalendarEvent] = []
+    var events: [CalendarEvent] = [] {
+        didSet { rebuildEventIndex() }
+    }
     var displayedYear: Int {
         didSet {
             guard displayedYear != oldValue else { return }
             cacheService.saveLastViewedYear(displayedYear)
             guard hasCalendarAccess else { return }
-            Task { @MainActor in
-                await loadEvents()
-            }
+            scheduleEventReload()
         }
     }
     var selectedDate: Date?
@@ -40,6 +42,7 @@ final class CalendarViewModel {
     }
 
     deinit {
+        eventLoadTask?.cancel()
         stopObservingEventStoreChanges()
     }
 
@@ -74,7 +77,7 @@ final class CalendarViewModel {
             guard let self = self else { return }
             Task { @MainActor in
                 await self.loadCalendars()
-                await self.loadEvents()
+                self.scheduleEventReload()
             }
         }
     }
@@ -114,29 +117,65 @@ final class CalendarViewModel {
     func loadEvents() async {
         guard hasCalendarAccess else { return }
 
+        let requestedYear = displayedYear
         isLoading = true
+        defer {
+            if requestedYear == displayedYear {
+                isLoading = false
+            }
+        }
 
         let calendar = Calendar.current
         var components = DateComponents()
-        components.year = displayedYear
+        components.year = requestedYear
         components.month = 1
         components.day = 1
 
         guard let startOfYear = calendar.date(from: components) else {
-            isLoading = false
             return
         }
 
-        components.year = displayedYear + 1
+        components.year = requestedYear + 1
         guard let endOfYear = calendar.date(from: components) else {
-            isLoading = false
             return
         }
 
-        let ekEvents = eventKitService.fetchEvents(from: startOfYear, to: endOfYear)
+        let ekEvents = await eventKitService.fetchEvents(from: startOfYear, to: endOfYear)
+        guard !Task.isCancelled, requestedYear == displayedYear else { return }
         events = ekEvents.map { CalendarEvent(from: $0) }
+    }
 
-        isLoading = false
+    private func scheduleEventReload() {
+        eventLoadTask?.cancel()
+        eventLoadTask = Task { @MainActor [weak self] in
+            do {
+                try await Task.sleep(for: .milliseconds(150))
+            } catch {
+                return
+            }
+            await self?.loadEvents()
+        }
+    }
+
+    private func rebuildEventIndex() {
+        let calendar = Calendar.current
+        var index: [Date: [CalendarEvent]] = [:]
+
+        for event in events {
+            let interval = event.displayedDayInterval(calendar: calendar)
+            var day = interval.start
+
+            while day < interval.end {
+                index[day, default: []].append(event)
+                guard let nextDay = calendar.date(byAdding: .day, value: 1, to: day),
+                      nextDay > day else {
+                    break
+                }
+                day = nextDay
+            }
+        }
+
+        eventsByDay = index
     }
 
     func toggleCalendar(_ calendar: CalendarSource) {
@@ -188,48 +227,23 @@ final class CalendarViewModel {
         let currentYear = Calendar.current.component(.year, from: Date())
         if displayedYear != currentYear {
             displayedYear = currentYear
-            Task {
-                await loadEvents()
-            }
         }
         selectedDate = Date()
     }
 
     func goToPreviousYear() {
         displayedYear -= 1
-        Task {
-            await loadEvents()
-        }
     }
 
     func goToNextYear() {
         displayedYear += 1
-        Task {
-            await loadEvents()
-        }
     }
 
     func events(for date: Date) -> [CalendarEvent] {
         let calendar = Calendar.current
-        return filteredEvents.filter { event in
-            if event.isAllDay {
-                // For all-day events, check if date falls within the event range
-                // EventKit uses exclusive endDate (day after event ends)
-                let eventStart = calendar.startOfDay(for: event.startDate)
-                let eventEnd = calendar.startOfDay(for: event.endDate)
-                let targetDate = calendar.startOfDay(for: date)
-                return targetDate >= eventStart && targetDate < eventEnd
-            } else if event.isMultiDay {
-                // For multi-day events
-                let eventStart = calendar.startOfDay(for: event.startDate)
-                let eventEnd = calendar.startOfDay(for: event.endDate)
-                let targetDate = calendar.startOfDay(for: date)
-                return targetDate >= eventStart && targetDate <= eventEnd
-            } else {
-                // For regular events
-                return calendar.isDate(event.startDate, inSameDayAs: date)
-            }
-        }
+        let enabledIDs = enabledCalendarIDs
+        return eventsByDay[calendar.startOfDay(for: date), default: []]
+            .filter { enabledIDs.contains($0.calendarID) }
     }
 
     func eventColors(for date: Date) -> [Color] {

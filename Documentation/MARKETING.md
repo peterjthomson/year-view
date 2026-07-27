@@ -49,8 +49,8 @@ Your calendar data stays on your device. No accounts required. No tracking. No a
 ### Keywords
 calendar, year view, planner, schedule, yearly, annual, overview, planning, organizer, productivity
 
-### What's New (Version 1.0)
-Introducing Year View—your year at a glance. See all 12 months on one screen, tap any day for details, and open events directly in your calendar app.
+### What's New (Version 1.3)
+All-day events are clearer in Month Rows, calendar changes refresh automatically, and appearance preferences now persist between launches. This release also improves calendar stability and performance.
 
 ---
 
@@ -166,7 +166,7 @@ Year View is a free calendar companion app for iPhone, iPad, and Mac. It connect
 - **Platforms:** iOS 17+, iPadOS 17+, macOS 14+
 - **Calendar Support:** Apple Calendar (including Google calendars connected via Apple Calendar)
 - **Privacy:** No account required, no tracking, data stays on device
-- **Developer:** [Your Company Name]
+- **Developer:** Peter Thomson
 
 ### Feature Highlights
 - Full year displayed on one screen

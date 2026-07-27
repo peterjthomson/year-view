@@ -43,9 +43,6 @@ xcodebuild build \
 
 ### Testing
 
-**Important:** Unit test files exist in `YearViewTests/` but the Xcode project does not currently have a test target configured. Tests will not run via `Cmd+U` or CI until a test target is created and files are added to it.
-
-When test target is configured:
 ```bash
 # Run tests in Xcode: Cmd+U
 
@@ -53,7 +50,7 @@ When test target is configured:
 xcodebuild test \
   -project YearView.xcodeproj \
   -scheme YearView \
-  -destination 'platform=iOS Simulator,name=iPhone 15'
+  -destination 'platform=macOS'
 ```
 
 ### CI

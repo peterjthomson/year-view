@@ -7,17 +7,20 @@ final class CalendarViewModel {
     private let eventKitService = EventKitService()
     private let googleCalendarService = GoogleCalendarService()
     private let cacheService = CalendarCacheService()
+    private var eventStoreObserver: NSObjectProtocol?
+    @ObservationIgnored private var eventLoadTask: Task<Void, Never>?
+    @ObservationIgnored private var eventsByDay: [Date: [CalendarEvent]] = [:]
 
     var calendars: [CalendarSource] = []
-    var events: [CalendarEvent] = []
+    var events: [CalendarEvent] = [] {
+        didSet { rebuildEventIndex() }
+    }
     var displayedYear: Int {
         didSet {
             guard displayedYear != oldValue else { return }
             cacheService.saveLastViewedYear(displayedYear)
             guard hasCalendarAccess else { return }
-            Task { @MainActor in
-                await loadEvents()
-            }
+            scheduleEventReload()
         }
     }
     var selectedDate: Date?
@@ -38,6 +41,11 @@ final class CalendarViewModel {
         self.displayedYear = Calendar.current.component(.year, from: Date())
     }
 
+    deinit {
+        eventLoadTask?.cancel()
+        stopObservingEventStoreChanges()
+    }
+
     @MainActor
     func requestAccess() async {
         isLoading = true
@@ -50,6 +58,7 @@ final class CalendarViewModel {
             if granted {
                 await loadCalendars()
                 await loadEvents()
+                startObservingEventStoreChanges()
             } else {
                 errorMessage = "Calendar access denied. Please enable access in Settings."
             }
@@ -58,6 +67,26 @@ final class CalendarViewModel {
         }
 
         isLoading = false
+    }
+
+    // MARK: - EventKit Change Observation
+
+    private func startObservingEventStoreChanges() {
+        // Observe changes to the event store (events added/modified/deleted in Calendar app)
+        eventStoreObserver = eventKitService.startObservingChanges { [weak self] in
+            guard let self = self else { return }
+            Task { @MainActor in
+                await self.loadCalendars()
+                self.scheduleEventReload()
+            }
+        }
+    }
+
+    private func stopObservingEventStoreChanges() {
+        if let observer = eventStoreObserver {
+            eventKitService.stopObservingChanges(observer: observer)
+            eventStoreObserver = nil
+        }
     }
 
     @MainActor
@@ -88,29 +117,65 @@ final class CalendarViewModel {
     func loadEvents() async {
         guard hasCalendarAccess else { return }
 
+        let requestedYear = displayedYear
         isLoading = true
+        defer {
+            if requestedYear == displayedYear {
+                isLoading = false
+            }
+        }
 
         let calendar = Calendar.current
         var components = DateComponents()
-        components.year = displayedYear
+        components.year = requestedYear
         components.month = 1
         components.day = 1
 
         guard let startOfYear = calendar.date(from: components) else {
-            isLoading = false
             return
         }
 
-        components.year = displayedYear + 1
+        components.year = requestedYear + 1
         guard let endOfYear = calendar.date(from: components) else {
-            isLoading = false
             return
         }
 
-        let ekEvents = eventKitService.fetchEvents(from: startOfYear, to: endOfYear)
+        let ekEvents = await eventKitService.fetchEvents(from: startOfYear, to: endOfYear)
+        guard !Task.isCancelled, requestedYear == displayedYear else { return }
         events = ekEvents.map { CalendarEvent(from: $0) }
+    }
 
-        isLoading = false
+    private func scheduleEventReload() {
+        eventLoadTask?.cancel()
+        eventLoadTask = Task { @MainActor [weak self] in
+            do {
+                try await Task.sleep(for: .milliseconds(150))
+            } catch {
+                return
+            }
+            await self?.loadEvents()
+        }
+    }
+
+    private func rebuildEventIndex() {
+        let calendar = Calendar.current
+        var index: [Date: [CalendarEvent]] = [:]
+
+        for event in events {
+            let interval = event.displayedDayInterval(calendar: calendar)
+            var day = interval.start
+
+            while day < interval.end {
+                index[day, default: []].append(event)
+                guard let nextDay = calendar.date(byAdding: .day, value: 1, to: day),
+                      nextDay > day else {
+                    break
+                }
+                day = nextDay
+            }
+        }
+
+        eventsByDay = index
     }
 
     func toggleCalendar(_ calendar: CalendarSource) {
@@ -162,47 +227,23 @@ final class CalendarViewModel {
         let currentYear = Calendar.current.component(.year, from: Date())
         if displayedYear != currentYear {
             displayedYear = currentYear
-            Task {
-                await loadEvents()
-            }
         }
         selectedDate = Date()
     }
 
     func goToPreviousYear() {
         displayedYear -= 1
-        Task {
-            await loadEvents()
-        }
     }
 
     func goToNextYear() {
         displayedYear += 1
-        Task {
-            await loadEvents()
-        }
     }
 
     func events(for date: Date) -> [CalendarEvent] {
         let calendar = Calendar.current
-        return filteredEvents.filter { event in
-            if event.isAllDay {
-                // For all-day events, check if date falls within the event range
-                let eventStart = calendar.startOfDay(for: event.startDate)
-                let eventEnd = calendar.startOfDay(for: event.endDate)
-                let targetDate = calendar.startOfDay(for: date)
-                return targetDate >= eventStart && targetDate < eventEnd
-            } else if event.isMultiDay {
-                // For multi-day events
-                let eventStart = calendar.startOfDay(for: event.startDate)
-                let eventEnd = calendar.startOfDay(for: event.endDate)
-                let targetDate = calendar.startOfDay(for: date)
-                return targetDate >= eventStart && targetDate <= eventEnd
-            } else {
-                // For regular events
-                return calendar.isDate(event.startDate, inSameDayAs: date)
-            }
-        }
+        let enabledIDs = enabledCalendarIDs
+        return eventsByDay[calendar.startOfDay(for: date), default: []]
+            .filter { enabledIDs.contains($0.calendarID) }
     }
 
     func eventColors(for date: Date) -> [Color] {
@@ -262,12 +303,13 @@ final class CalendarViewModel {
     func eventsForRestOfMonth(from date: Date = Date()) -> [CalendarEvent] {
         let calendar = Calendar.current
         let weekEnd = calendar.date(byAdding: .day, value: 7, to: calendar.startOfDay(for: date)) ?? date
-        
+
         // Get end of current month
-        guard let endOfMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: calendar.startOfDay(for: calendar.date(from: calendar.dateComponents([.year, .month], from: date))!)) else {
+        guard let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: date)),
+              let endOfMonth = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: calendar.startOfDay(for: monthStart)) else {
             return []
         }
-        
+
         guard weekEnd <= endOfMonth else { return [] }
         return events(from: weekEnd, to: endOfMonth)
     }
@@ -294,25 +336,27 @@ final class CalendarViewModel {
     func eventsForUpcomingMonths(monthCount: Int = 2) -> [(month: Date, events: [CalendarEvent])] {
         let calendar = Calendar.current
         let now = Date()
-        
+
         // Start from next month
-        guard let nextMonth = calendar.date(byAdding: .month, value: 1, to: now) else { return [] }
-        let startOfNextMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: nextMonth))!
-        
+        guard let nextMonth = calendar.date(byAdding: .month, value: 1, to: now),
+              let startOfNextMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: nextMonth)) else {
+            return []
+        }
+
         var result: [(month: Date, events: [CalendarEvent])] = []
-        
+
         for i in 0..<monthCount {
             guard let monthStart = calendar.date(byAdding: .month, value: i, to: startOfNextMonth),
                   let monthEnd = calendar.date(byAdding: DateComponents(month: 1, day: -1), to: monthStart) else {
                 continue
             }
-            
+
             let monthEvents = events(from: monthStart, to: monthEnd)
             if !monthEvents.isEmpty {
                 result.append((month: monthStart, events: monthEvents))
             }
         }
-        
+
         return result
     }
 }

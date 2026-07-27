@@ -19,18 +19,65 @@ struct CalendarEvent: Identifiable, Hashable {
     let videoCallURL: URL?
 
     var isMultiDay: Bool {
-        let calendar = Calendar.current
-        
-        // EventKit represents all-day events with an *exclusive* endDate (typically next day at 00:00).
-        // Treat the "effective" end as the last moment of the event to avoid incorrectly marking
-        // single-day all-day events as multi-day.
-        let effectiveEndDate = isAllDay ? endDate.addingTimeInterval(-1) : endDate
-        
-        return !calendar.isDate(startDate, inSameDayAs: effectiveEndDate)
+        let span = displayedDayOffsets(
+            in: displayedDayInterval(calendar: .current),
+            calendar: .current
+        )?.span ?? 1
+        return span > 1
     }
 
     var duration: TimeInterval {
         endDate.timeIntervalSince(startDate)
+    }
+
+    /// The half-open range of calendar days occupied by the event.
+    ///
+    /// EventKit all-day event end dates are exclusive. Timed events ending
+    /// exactly at midnight also do not occupy the following day.
+    func displayedDayInterval(calendar: Calendar) -> DateInterval {
+        let startDay = calendar.startOfDay(for: startDate)
+        let endDay = calendar.startOfDay(for: endDate)
+        let nextStartDay = calendar.date(byAdding: .day, value: 1, to: startDay)
+            ?? startDay.addingTimeInterval(86_400)
+
+        let exclusiveEnd: Date
+        if isAllDay {
+            exclusiveEnd = max(endDay, nextStartDay)
+        } else if endDate > startDate, endDate == endDay, endDay > startDay {
+            exclusiveEnd = endDay
+        } else {
+            exclusiveEnd = calendar.date(byAdding: .day, value: 1, to: endDay)
+                ?? endDay.addingTimeInterval(86_400)
+        }
+
+        return DateInterval(start: startDay, end: max(exclusiveEnd, nextStartDay))
+    }
+
+    /// Returns the event's start offset and span after intersecting it with
+    /// a half-open day interval. Calendar arithmetic keeps this DST-safe.
+    func displayedDayOffsets(
+        in visibleInterval: DateInterval,
+        calendar: Calendar
+    ) -> (start: Int, span: Int)? {
+        let eventInterval = displayedDayInterval(calendar: calendar)
+        let overlapStart = max(eventInterval.start, visibleInterval.start)
+        let overlapEnd = min(eventInterval.end, visibleInterval.end)
+
+        guard overlapStart < overlapEnd else { return nil }
+
+        let start = calendar.dateComponents(
+            [.day],
+            from: visibleInterval.start,
+            to: overlapStart
+        ).day ?? 0
+        let span = calendar.dateComponents(
+            [.day],
+            from: overlapStart,
+            to: overlapEnd
+        ).day ?? 0
+
+        guard span > 0 else { return nil }
+        return (start, span)
     }
 
     init(

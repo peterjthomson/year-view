@@ -1,7 +1,7 @@
 # Privacy Policy
 
 **Effective Date:** January 10, 2026  
-**Last Updated:** January 10, 2026
+**Last Updated:** July 27, 2026
 
 ## Overview
 
@@ -104,7 +104,10 @@ System Settings → Privacy & Security → Calendars → Year View
 To remove all locally stored preferences:
 1. Delete the Year View app from your device
 2. All associated UserDefaults data is automatically removed
-3. Keychain items (Google tokens) are removed with app deletion
+
+If you used an experimental build with direct Google sign-in, sign out before
+deleting the app and revoke access in your Google Account. Keychain retention
+after app deletion can vary by platform and system behavior.
 
 ### Google Account Disconnection
 
@@ -115,7 +118,7 @@ To disconnect your Google account:
 ## Data Retention
 
 - **Local preferences**: Retained until you delete the app or clear app data
-- **Google tokens**: Retained until you sign out or delete the app
+- **Google tokens**: Retained until you sign out; you can also revoke access through your Google Account
 - **Calendar data**: Not retained—read fresh from EventKit (and Google API, if enabled) each time
 
 We retain no data on any servers because we do not operate data-collecting servers.
@@ -132,7 +135,7 @@ We encourage you to review this Privacy Policy periodically.
 
 If you have any questions about this Privacy Policy or Year View's privacy practices, please contact us:
 
-**Email:** [your-email@example.com]
+**Email:** support@yearview.app
 
 ## Summary
 

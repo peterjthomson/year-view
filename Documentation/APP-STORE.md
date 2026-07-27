@@ -145,7 +145,7 @@ Provide a valid email for App Review to contact you if needed.
 
 ### Price
 
-**Free** (no in-app purchases for v1.0)
+**Free** (no in-app purchases)
 
 ### Availability
 
@@ -162,17 +162,12 @@ Provide a valid email for App Review to contact you if needed.
 
 ## Version Information
 
-### What's New (v1.0)
+### What's New (v1.3)
 
-Introducing Year View — see your entire year at a glance.
-
-- Six layouts: Year View, Month Rows, Grid, Row, List, and Power Law
-- Works with all your calendars: iCloud, Google, Exchange, and more
-- Customizable colors for backgrounds, text, and gridlines
-- Tap any day to see events, tap an event to open in Calendar
-- Video call detection for Zoom, Meet, Teams, and Webex
-- Full dark mode support
-- Privacy-first: all data stays on your device
+- Clearer all-day event display in Month Rows
+- Automatic refresh when calendar data changes
+- Appearance and event display settings now persist between launches
+- Improved stability and performance for calendars with many events
 
 ### Promotional Text (170 chars, can be updated without new build)
 

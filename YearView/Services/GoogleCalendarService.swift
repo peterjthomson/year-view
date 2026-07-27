@@ -33,7 +33,9 @@ final class GoogleCalendarService: NSObject {
         let authorizationEndpoint = "https://accounts.google.com/o/oauth2/v2/auth"
         let scope = "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar.events.readonly"
 
-        var components = URLComponents(string: authorizationEndpoint)!
+        guard var components = URLComponents(string: authorizationEndpoint) else {
+            throw GoogleCalendarError.invalidURL
+        }
         components.queryItems = [
             URLQueryItem(name: "client_id", value: clientID),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
@@ -85,7 +87,9 @@ final class GoogleCalendarService: NSObject {
     }
 
     private func exchangeCodeForTokens(_ code: String) async throws {
-        let tokenEndpoint = URL(string: "https://oauth2.googleapis.com/token")!
+        guard let tokenEndpoint = URL(string: "https://oauth2.googleapis.com/token") else {
+            throw GoogleCalendarError.invalidURL
+        }
 
         var request = URLRequest(url: tokenEndpoint)
         request.httpMethod = "POST"
@@ -120,7 +124,9 @@ final class GoogleCalendarService: NSObject {
             throw GoogleCalendarError.noRefreshToken
         }
 
-        let tokenEndpoint = URL(string: "https://oauth2.googleapis.com/token")!
+        guard let tokenEndpoint = URL(string: "https://oauth2.googleapis.com/token") else {
+            throw GoogleCalendarError.invalidURL
+        }
 
         var request = URLRequest(url: tokenEndpoint)
         request.httpMethod = "POST"
@@ -153,7 +159,9 @@ final class GoogleCalendarService: NSObject {
     func fetchCalendars() async throws -> [GoogleCalendar] {
         try await ensureValidToken()
 
-        let url = URL(string: "https://www.googleapis.com/calendar/v3/users/me/calendarList")!
+        guard let url = URL(string: "https://www.googleapis.com/calendar/v3/users/me/calendarList") else {
+            throw GoogleCalendarError.invalidURL
+        }
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken ?? "")", forHTTPHeaderField: "Authorization")
 
@@ -174,7 +182,9 @@ final class GoogleCalendarService: NSObject {
         let formatter = ISO8601DateFormatter()
         let encodedCalendarID = calendarID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? calendarID
 
-        var components = URLComponents(string: "https://www.googleapis.com/calendar/v3/calendars/\(encodedCalendarID)/events")!
+        guard var components = URLComponents(string: "https://www.googleapis.com/calendar/v3/calendars/\(encodedCalendarID)/events") else {
+            throw GoogleCalendarError.invalidURL
+        }
         components.queryItems = [
             URLQueryItem(name: "timeMin", value: formatter.string(from: startDate)),
             URLQueryItem(name: "timeMax", value: formatter.string(from: endDate)),
@@ -183,7 +193,10 @@ final class GoogleCalendarService: NSObject {
             URLQueryItem(name: "maxResults", value: "2500")
         ]
 
-        var request = URLRequest(url: components.url!)
+        guard let requestURL = components.url else {
+            throw GoogleCalendarError.invalidURL
+        }
+        var request = URLRequest(url: requestURL)
         request.setValue("Bearer \(accessToken ?? "")", forHTTPHeaderField: "Authorization")
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -237,7 +250,9 @@ final class GoogleCalendarService: NSObject {
     }
 
     private func saveToKeychain(key: String, value: String) {
-        let data = value.data(using: .utf8)!
+        guard let data = value.data(using: .utf8) else {
+            return
+        }
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrAccount as String: key,

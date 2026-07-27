@@ -41,6 +41,15 @@
 		E1000001062 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002062 /* HapticFeedback.swift */; };
 		E1000001070 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002070 /* MenuBarView.swift */; };
 		E1000001071 /* MacCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002071 /* MacCommands.swift */; };
+		F2000001001 /* BigYearLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002001 /* BigYearLayoutTests.swift */; };
+		F2000001002 /* CalendarCacheServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002002 /* CalendarCacheServiceTests.swift */; };
+		F2000001003 /* CalendarEventTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002003 /* CalendarEventTests.swift */; };
+		F2000001004 /* CalendarSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002004 /* CalendarSourceTests.swift */; };
+		F2000001005 /* ColorUtilitiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002005 /* ColorUtilitiesTests.swift */; };
+		F2000001006 /* DateUtilitiesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002006 /* DateUtilitiesTests.swift */; };
+		F2000001007 /* DayViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002007 /* DayViewModelTests.swift */; };
+		F2000001008 /* YearViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002008 /* YearViewModelTests.swift */; };
+		F2000001009 /* CalendarEventDayRangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002009 /* CalendarEventDayRangeTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -94,10 +103,27 @@
 		E1000002062 /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
 		E1000002070 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		E1000002071 /* MacCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacCommands.swift; sourceTree = "<group>"; };
+		F2000002001 /* BigYearLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigYearLayoutTests.swift; sourceTree = "<group>"; };
+		F2000002002 /* CalendarCacheServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarCacheServiceTests.swift; sourceTree = "<group>"; };
+		F2000002003 /* CalendarEventTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventTests.swift; sourceTree = "<group>"; };
+		F2000002004 /* CalendarSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarSourceTests.swift; sourceTree = "<group>"; };
+		F2000002005 /* ColorUtilitiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorUtilitiesTests.swift; sourceTree = "<group>"; };
+		F2000002006 /* DateUtilitiesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateUtilitiesTests.swift; sourceTree = "<group>"; };
+		F2000002007 /* DayViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayViewModelTests.swift; sourceTree = "<group>"; };
+		F2000002008 /* YearViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearViewModelTests.swift; sourceTree = "<group>"; };
+		F2000002009 /* CalendarEventDayRangeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventDayRangeTests.swift; sourceTree = "<group>"; };
+		F2000002010 /* YearViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YearViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		E1000006001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2000006001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -111,6 +137,7 @@
 			isa = PBXGroup;
 			children = (
 				E1000007002 /* YearView */,
+				F2000007001 /* YearViewTests */,
 				E1000007005 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -137,6 +164,7 @@
 			isa = PBXGroup;
 			children = (
 				E1000002004 /* YearView.app */,
+				F2000002010 /* YearViewTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -222,6 +250,22 @@
 			path = Layouts;
 			sourceTree = "<group>";
 		};
+		F2000007001 /* YearViewTests */ = {
+			isa = PBXGroup;
+			children = (
+				F2000002001 /* BigYearLayoutTests.swift */,
+				F2000002002 /* CalendarCacheServiceTests.swift */,
+				F2000002003 /* CalendarEventTests.swift */,
+				F2000002009 /* CalendarEventDayRangeTests.swift */,
+				F2000002004 /* CalendarSourceTests.swift */,
+				F2000002005 /* ColorUtilitiesTests.swift */,
+				F2000002006 /* DateUtilitiesTests.swift */,
+				F2000002007 /* DayViewModelTests.swift */,
+				F2000002008 /* YearViewModelTests.swift */,
+			);
+			path = YearViewTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -243,6 +287,24 @@
 			productReference = E1000002004 /* YearView.app */;
 			productType = "com.apple.product-type.application";
 		};
+		F2000005001 /* YearViewTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F2000008001 /* Build configuration list for PBXNativeTarget "YearViewTests" */;
+			buildPhases = (
+				F2000009001 /* Sources */,
+				F2000006001 /* Frameworks */,
+				F200000A001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F200000C002 /* PBXTargetDependency */,
+			);
+			name = YearViewTests;
+			productName = YearViewTests;
+			productReference = F2000002010 /* YearViewTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -255,6 +317,10 @@
 				TargetAttributes = {
 					E1000005001 = {
 						CreatedOnToolsVersion = 15.0;
+					};
+					F2000005001 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = E1000005001;
 					};
 				};
 			};
@@ -272,9 +338,20 @@
 			projectRoot = "";
 			targets = (
 				E1000005001 /* YearView */,
+				F2000005001 /* YearViewTests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXContainerItemProxy section */
+		F200000C001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E1000004001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E1000005001;
+			remoteInfo = YearView;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		E100000A001 /* Resources */ = {
@@ -282,6 +359,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				E1000001003 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F200000A001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -328,7 +412,31 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F2000009001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F2000001001 /* BigYearLayoutTests.swift in Sources */,
+				F2000001002 /* CalendarCacheServiceTests.swift in Sources */,
+				F2000001003 /* CalendarEventTests.swift in Sources */,
+				F2000001009 /* CalendarEventDayRangeTests.swift in Sources */,
+				F2000001004 /* CalendarSourceTests.swift in Sources */,
+				F2000001005 /* ColorUtilitiesTests.swift in Sources */,
+				F2000001006 /* DateUtilitiesTests.swift in Sources */,
+				F2000001007 /* DayViewModelTests.swift in Sources */,
+				F2000001008 /* YearViewModelTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F200000C002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E1000005001 /* YearView */;
+			targetProxy = F200000C001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		E100000D001 /* Debug */ = {
@@ -457,7 +565,7 @@
 				CODE_SIGN_ENTITLEMENTS = YearView/YearView.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = R4RRG93J68;
@@ -480,7 +588,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.yearview.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -502,7 +610,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = R4RRG93J68;
@@ -525,7 +633,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.yearview.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -535,6 +643,46 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F200000D001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yearview.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/YearView.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/YearView";
+			};
+			name = Debug;
+		};
+		F200000D002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yearview.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/YearView.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/YearView";
 			};
 			name = Release;
 		};
@@ -555,6 +703,15 @@
 			buildConfigurations = (
 				E100000D003 /* Debug */,
 				E100000D004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F2000008001 /* Build configuration list for PBXNativeTarget "YearViewTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F200000D001 /* Debug */,
+				F200000D002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

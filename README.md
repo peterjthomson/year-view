@@ -12,7 +12,7 @@ Year View is intentionally read-only: it displays events from Apple Calendar (Ev
 
 **macOS App Store:** [Year View Planner](https://apps.apple.com/us/app/year-view-planner/id6757597694?platform=mac)
 
-**macOS direct download:** [YearView-1.1-macOS.zip](https://github.com/peterjthomson/year-view/releases/download/v1.1/YearView-1.1-macOS.zip) — notarized and signed, universal binary (Apple Silicon + Intel)
+**macOS direct download:** [YearView-v1.2.0-macOS.zip](https://github.com/peterjthomson/year-view/releases/download/v1.2.0/YearView-v1.2.0-macOS.zip) — notarized and signed, universal binary (Apple Silicon + Intel)
 
 ## Docs
 
@@ -37,7 +37,8 @@ Year View is intentionally read-only: it displays events from Apple Calendar (Ev
 
 Main target:
 - `YearView` (multiplatform iOS/iPadOS/macOS app)
+- `YearViewTests` (unit tests)
 
 ## CI
 
-GitHub Actions builds the main target on macOS runners via `.github/workflows/ci.yml`.
+GitHub Actions builds the iOS and macOS app and runs the unit test suite via `.github/workflows/ci.yml`.

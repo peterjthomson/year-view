@@ -7,7 +7,11 @@ final class CalendarViewModel {
     private let eventKitService = EventKitService()
     private let googleCalendarService = GoogleCalendarService()
     private let cacheService = CalendarCacheService()
-    private var eventStoreObserver: NSObjectProtocol?
+    // Must be @ObservationIgnored: deinit calls stopObservingEventStoreChanges(), which
+    // reads and writes this property. On an @Observable class that routes through the
+    // observation registrar, and touching the registrar for an object that is mid-
+    // deallocation is not safe. eventLoadTask is ignored for the same reason.
+    @ObservationIgnored private var eventStoreObserver: NSObjectProtocol?
     @ObservationIgnored private var eventLoadTask: Task<Void, Never>?
     @ObservationIgnored private var eventsByDay: [Date: [CalendarEvent]] = [:]
 

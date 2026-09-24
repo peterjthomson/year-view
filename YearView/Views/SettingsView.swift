@@ -42,6 +42,13 @@ struct SettingsView: View {
             Section {
                 Toggle("Show All-Day Events", isOn: $settings.showAllDayEvents)
                 Toggle("Show Time-Based Events", isOn: $settings.showTimeBasedEvents)
+                LabeledContent("Event Text Size", value: "\(Int(settings.eventFontSize)) pt")
+                Slider(value: $settings.eventFontSize, in: 1...24, step: 1) {
+                    Text("Event Text Size")
+                }
+                Text("Adjust event bars in Months and Year views. Choose 1 pt for thin lines without text.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             } header: {
                 Label("Event Display", systemImage: "calendar.badge.clock")
             }

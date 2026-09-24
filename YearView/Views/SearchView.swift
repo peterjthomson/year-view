@@ -2,7 +2,6 @@ import SwiftUI
 
 struct SearchView: View {
     @Environment(CalendarViewModel.self) private var calendarViewModel
-    @Environment(\.dismiss) private var dismiss
     @State private var searchText = ""
     @State private var selectedEvent: CalendarEvent?
 
@@ -54,14 +53,23 @@ struct SearchView: View {
                     SearchResultRow(event: event)
                         .onTapGesture {
                             selectedEvent = event
-                            // Navigate to the date
-                            calendarViewModel.displayedYear = Calendar.current.component(.year, from: event.startDate)
-                            calendarViewModel.selectedDate = event.startDate
-                            dismiss()
                         }
                 }
                 .listStyle(.plain)
             }
+        }
+        .sheet(item: $selectedEvent) { event in
+            NavigationStack {
+                DayDetailView(date: event.startDate, events: calendarViewModel.events(for: event.startDate))
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") { selectedEvent = nil }
+                        }
+                    }
+            }
+            #if os(macOS)
+            .frame(minWidth: 400, minHeight: 500)
+            #endif
         }
         .navigationTitle("Search")
         #if os(iOS)

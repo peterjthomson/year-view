@@ -5,7 +5,7 @@ struct YearView: View {
     @Environment(AppSettings.self) private var appSettings
     @State private var yearViewModel = YearViewModel()
     @State private var selectedDate: Date?
-    @State private var showingDayDetail = false
+    @State private var presentedDay: DaySelection?
     @State private var showingSettings = false
     @GestureState private var magnifyBy = 1.0
 
@@ -13,11 +13,13 @@ struct YearView: View {
         contentView
             .gesture(magnificationGesture)
             .overlay { loadingOverlay }
-            .sheet(isPresented: $showingDayDetail) { dayDetailSheet }
+            .sheet(item: $presentedDay) { selection in
+                dayDetailSheet(for: selection.date)
+            }
             .toolbar { toolbarContent }
             .sheet(isPresented: $showingSettings) { settingsSheet }
             .accessibilityAction(.escape) {
-                showingDayDetail = false
+                presentedDay = nil
             }
     }
     
@@ -95,27 +97,25 @@ struct YearView: View {
     // MARK: - Sheets
     
     @ViewBuilder
-    private var dayDetailSheet: some View {
-        if let date = selectedDate {
-            NavigationStack {
-                DayDetailView(
-                    date: date,
-                    events: calendarViewModel.events(for: date)
-                )
-                .toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Done") {
-                            showingDayDetail = false
-                        }
+    private func dayDetailSheet(for date: Date) -> some View {
+        NavigationStack {
+            DayDetailView(
+                date: date,
+                events: calendarViewModel.events(for: date)
+            )
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        presentedDay = nil
                     }
                 }
             }
-            #if os(macOS)
-            .frame(minWidth: 400, minHeight: 500)
-            #endif
         }
+        #if os(macOS)
+        .frame(minWidth: 400, minHeight: 500)
+        #endif
     }
-    
+
     @ViewBuilder
     private var settingsSheet: some View {
         NavigationStack {
@@ -199,8 +199,14 @@ struct YearView: View {
     private func handleDateTap(_ date: Date) {
         HapticFeedback.light()
         selectedDate = date
-        showingDayDetail = true
+        presentedDay = DaySelection(date: date)
     }
+}
+
+/// The sheet's identity and content travel together, including on the first tap.
+private struct DaySelection: Identifiable {
+    let date: Date
+    var id: Date { date }
 }
 
 // MARK: - Layout Style Button

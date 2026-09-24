@@ -62,7 +62,22 @@ Services encapsulate external dependencies:
 - **CalendarDeepLinkService** - Opens native calendar apps
 - **CalendarCacheService** - Persists user preferences
 
-Services are instantiated by ViewModels, not injected, keeping the architecture simple.
+ViewModels instantiate their services. `AppSettings` accepts a cache and
+`CalendarCacheService` accepts a `UserDefaults` instance so preference tests can
+use an isolated suite without changing the user's settings.
+
+### Event Layout
+
+`CalendarEvent.displayedDayInterval(calendar:)` defines the half-open range of
+occupied days. All-day end dates and timed events ending exactly at midnight
+exclude the following day. `displayedDayOffsets(in:calendar:)` clips that range
+to a visible month or week using calendar arithmetic, including across DST.
+
+The Months and Year layouts allocate overlapping events to separate lanes.
+`Views/EventBarMetrics.swift` contains shared bar sizing and capacity rules,
+plus the overflow indicator. When events exceed capacity, layouts reserve space
+for a per-day hidden-event count; very compact cells display a dot. Day selection
+still opens the complete event list.
 
 ### Platform Abstraction
 
@@ -112,6 +127,10 @@ Located in `YearViewTests/`:
 The `YearViewTests` target runs through the shared `YearView` scheme locally and
 in CI. Calendar day-range tests cover exclusive all-day end dates, daylight
 saving transitions, midnight boundaries, and cross-month clipping.
+Event-display regressions also cover overlapping lanes, saved font sizes, and
+overflow in small cells. Focused macOS `ImageRenderer` checks verify visible bars
+and indicators and attach images to the Xcode test results. These check rendering
+with synthetic events, not live EventKit ingestion.
 
 ### UI Tests
 

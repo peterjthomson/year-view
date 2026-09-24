@@ -135,12 +135,12 @@ struct WeekRowView: View {
             }
 
             // Event bars overlay
-            EventBarsOverlay(
-                weekStart: weekStart,
+            BigYearEventBarsOverlay(
                 daysInWeek: daysInWeek,
                 events: eventsForWeek,
                 dayColumnWidth: dayColumnWidth,
-                rowHeight: rowHeight
+                rowHeight: rowHeight,
+                fontSize: appSettings.eventFontSize
             )
         }
         .frame(height: rowHeight)
@@ -160,19 +160,11 @@ struct WeekRowView: View {
     }
 
     private var eventsForWeek: [CalendarEvent] {
-        guard let weekEnd = calendar.date(byAdding: .day, value: 6, to: weekStart) else {
-            return []
-        }
-
-        let filtered = appSettings.filterEvents(calendarViewModel.filteredEvents)
-        return filtered.filter { event in
-            // Event overlaps with this week
-            let eventStart = calendar.startOfDay(for: event.startDate)
-            let eventEnd = calendar.startOfDay(for: event.endDate)
-            let weekStartDay = calendar.startOfDay(for: weekStart)
-            let weekEndDay = calendar.startOfDay(for: weekEnd)
-
-            return eventStart <= weekEndDay && eventEnd >= weekStartDay
+        let start = calendar.startOfDay(for: weekStart)
+        guard let end = calendar.date(byAdding: .day, value: 7, to: start) else { return [] }
+        let interval = DateInterval(start: start, end: end)
+        return appSettings.filterEvents(calendarViewModel.filteredEvents).filter {
+            $0.displayedDayOffsets(in: interval, calendar: calendar) != nil
         }
     }
 
@@ -272,34 +264,53 @@ struct DayCellBigYear: View {
     }
 }
 
-private struct EventBarsOverlay: View {
-    let weekStart: Date
+struct BigYearEventBarsOverlay: View {
     let daysInWeek: [Date]
     let events: [CalendarEvent]
     let dayColumnWidth: CGFloat
     let rowHeight: CGFloat
 
-    private let barHeight: CGFloat = 18
+    let fontSize: Double
+
+    private var barHeight: CGFloat { EventBarMetrics(fontSize: CGFloat(fontSize), cellHeight: rowHeight).barHeight }
     private let barSpacing: CGFloat = 2
     private let topOffset: CGFloat = 24
 
     private let calendar = Calendar.current
 
     var body: some View {
-        ForEach(Array(layoutEvents.enumerated()), id: \.offset) { index, eventLayout in
-            EventBar(
-                event: eventLayout.event,
-                startOffset: eventLayout.startOffset,
-                width: eventLayout.width,
-                rowIndex: eventLayout.row,
-                barHeight: barHeight,
-                topOffset: topOffset,
-                barSpacing: barSpacing
-            )
+        let layouts = layoutEvents
+        let metrics = EventBarMetrics(fontSize: CGFloat(fontSize), cellHeight: rowHeight, topInset: topOffset)
+        let capacity = metrics.visibleCapacity(requiredRows: (layouts.map(\.row).max() ?? -1) + 1)
+        ZStack(alignment: .topLeading) {
+            ForEach(layouts.filter { $0.row < capacity }, id: \.event.id) { eventLayout in
+                EventBar(
+                    event: eventLayout.event,
+                    startOffset: eventLayout.startOffset,
+                    width: eventLayout.width,
+                    rowIndex: eventLayout.row,
+                    barHeight: barHeight,
+                    topOffset: topOffset,
+                    barSpacing: barSpacing,
+                    fontSize: CGFloat(fontSize)
+                )
+            }
+            ForEach(Array(daysInWeek.enumerated()), id: \.element) { column, day in
+                let dayStart = calendar.startOfDay(for: day)
+                let count = layouts.filter { layout in
+                    let interval = layout.event.displayedDayInterval(calendar: calendar)
+                    return layout.row >= capacity && interval.start <= dayStart && dayStart < interval.end
+                }.count
+                if count > 0 {
+                    EventOverflowIndicator(count: count, cellSize: CGSize(width: dayColumnWidth, height: rowHeight))
+                        .offset(x: CGFloat(column) * dayColumnWidth)
+                }
+            }
         }
+        .frame(width: CGFloat(daysInWeek.count) * dayColumnWidth, height: rowHeight, alignment: .topLeading)
     }
 
-    private var layoutEvents: [EventLayout] {
+    var layoutEvents: [EventLayout] {
         var layouts: [EventLayout] = []
         var rowOccupancy: [[Bool]] = [] // Track which columns are occupied in each row
 
@@ -307,19 +318,25 @@ private struct EventBarsOverlay: View {
             if e1.startDate != e2.startDate {
                 return e1.startDate < e2.startDate
             }
-            return e1.duration > e2.duration // Longer events first
+            if e1.duration != e2.duration { return e1.duration > e2.duration }
+            return e1.id < e2.id
         }
 
-        for event in sortedEvents {
-            let (startCol, endCol) = columnRange(for: event)
+        guard let firstDay = daysInWeek.first, let lastDay = daysInWeek.last,
+              let end = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: lastDay)) else { return [] }
+        let interval = DateInterval(start: calendar.startOfDay(for: firstDay), end: end)
 
-            guard startCol <= endCol && startCol >= 0 && endCol < 7 else { continue }
+        for event in sortedEvents {
+            guard let placement = event.displayedDayOffsets(in: interval, calendar: calendar) else { continue }
+            let startCol = placement.start
+            let endCol = startCol + placement.span - 1
+            guard startCol >= 0 && endCol < daysInWeek.count else { continue }
 
             // Find first row where this event fits
             var row = 0
             while true {
                 if row >= rowOccupancy.count {
-                    rowOccupancy.append(Array(repeating: false, count: 7))
+                    rowOccupancy.append(Array(repeating: false, count: daysInWeek.count))
                 }
 
                 let canFit = (startCol...endCol).allSatisfy { !rowOccupancy[row][$0] }
@@ -331,9 +348,6 @@ private struct EventBarsOverlay: View {
                     break
                 }
                 row += 1
-
-                // Safety limit
-                if row > 10 { break }
             }
 
             let startOffset = CGFloat(startCol) * dayColumnWidth
@@ -348,46 +362,6 @@ private struct EventBarsOverlay: View {
         }
 
         return layouts
-    }
-
-    private func columnRange(for event: CalendarEvent) -> (start: Int, end: Int) {
-        let eventStart = calendar.startOfDay(for: event.startDate)
-
-        // All-day events use an exclusive endDate; use the last moment so single-day all-day events
-        // don't incorrectly span into the next day/column.
-        let effectiveEndDate = event.isAllDay ? event.endDate.addingTimeInterval(-1) : event.endDate
-        let eventEnd = calendar.startOfDay(for: effectiveEndDate)
-
-        var startCol = 0
-        var endCol = 6
-
-        for (index, day) in daysInWeek.enumerated() {
-            let dayStart = calendar.startOfDay(for: day)
-            if let nextDay = calendar.date(byAdding: .day, value: 1, to: dayStart) {
-                if dayStart <= eventStart && eventStart < nextDay {
-                    startCol = index
-                }
-                if dayStart <= eventEnd && eventEnd < nextDay {
-                    endCol = index
-                }
-            }
-        }
-
-        // Clamp to week boundaries
-        guard let firstDay = daysInWeek.first, let lastDay = daysInWeek.last else {
-            return (startCol, endCol)
-        }
-        let weekStartDay = calendar.startOfDay(for: firstDay)
-        let weekEndDay = calendar.startOfDay(for: lastDay)
-
-        if eventStart < weekStartDay {
-            startCol = 0
-        }
-        if eventEnd > weekEndDay {
-            endCol = 6
-        }
-
-        return (startCol, endCol)
     }
 }
 
@@ -406,16 +380,20 @@ struct EventBar: View {
     let barHeight: CGFloat
     let topOffset: CGFloat
     let barSpacing: CGFloat
+    let fontSize: CGFloat
 
     var body: some View {
-        Text(event.title)
-            .font(.caption2)
+        Text(fontSize <= 1 ? "" : event.title)
+            .font(.system(size: fontSize))
             .fontWeight(.medium)
             .foregroundStyle(event.calendarColor.contrastingTextColor)
             .lineLimit(1)
             .padding(.horizontal, 6)
             .frame(width: width, height: barHeight, alignment: .leading)
-            .background(event.calendarColor, in: RoundedRectangle(cornerRadius: 4))
+            .background(event.calendarColor, in: RoundedRectangle(cornerRadius: min(4, barHeight / 2)))
+            .clipped()
+            .accessibilityLabel(event.title)
+            .allowsHitTesting(false)
             .offset(
                 x: startOffset,
                 y: topOffset + CGFloat(rowIndex) * (barHeight + barSpacing)

@@ -20,10 +20,15 @@ xcodebuild -exportArchive -archivePath build/YearView-GitHub.xcarchive \
 
 ditto -c -k --keepParent "build/github-export/YearView.app" build/YearView.zip
 
-# Stages 2-4: submit, collect whenever, staple. Never blocks on Apple.
+# Submit and collect status without waiting on Apple.
 ./scripts/release/notarize.sh submit build/YearView.zip
 ./scripts/release/notarize.sh status
-./scripts/release/notarize.sh staple
+# After the status is Accepted, staple the app (ZIP files cannot be stapled).
+xcrun stapler staple build/github-export/YearView.app
+xcrun stapler validate build/github-export/YearView.app
+
+# Repackage the exported app with its ticket before publishing.
+ditto -c -k --keepParent "build/github-export/YearView.app" build/YearView.zip
 ```
 
 Note `verify-mac-artifact.sh` is DMG-oriented; Year View ships a zip, so verify

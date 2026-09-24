@@ -4,7 +4,11 @@ import SwiftUI
 final class CalendarCacheService {
     static let shared = CalendarCacheService()
 
-    private let userDefaults = UserDefaults.standard
+    private let userDefaults: UserDefaults
+
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
+    }
 
     private let enabledCalendarsKey = "enabledCalendarIDs"
     private let disabledCalendarsKey = "disabledCalendarIDs"
@@ -33,6 +37,7 @@ final class CalendarCacheService {
     private let monthLabelFormatKey = "monthLabelFormat"
     private let monthLabelFontSizeKey = "monthLabelFontSize"
     private let showMonthRowEventsKey = "showMonthRowEvents"
+    private let eventFontSizeKey = "eventFontSize"
     private let showAllDayEventsKey = "showAllDayEvents"
     private let showTimeBasedEventsKey = "showTimeBasedEvents"
 
@@ -238,6 +243,15 @@ final class CalendarCacheService {
         set { userDefaults.set(newValue, forKey: showMonthRowEventsKey) }
     }
 
+    var eventFontSize: Double {
+        get {
+            guard let saved = userDefaults.object(forKey: eventFontSizeKey) as? NSNumber,
+                  saved.doubleValue.isFinite else { return 10 }
+            return min(24, max(1, saved.doubleValue))
+        }
+        set { userDefaults.set(newValue.isFinite ? min(24, max(1, newValue)) : 10, forKey: eventFontSizeKey) }
+    }
+
     var showAllDayEvents: Bool {
         get {
             if userDefaults.object(forKey: showAllDayEventsKey) == nil { return true }
@@ -281,6 +295,7 @@ final class CalendarCacheService {
             monthLabelFormatKey,
             monthLabelFontSizeKey,
             showMonthRowEventsKey,
+            eventFontSizeKey,
             showAllDayEventsKey,
             showTimeBasedEventsKey
         ]

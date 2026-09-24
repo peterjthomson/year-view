@@ -170,7 +170,7 @@ struct YearMonthRowLayout: View {
     }
 }
 
-private struct MonthRow: View {
+struct MonthRow: View {
     let month: MonthData
     let cellSize: CGSize
     let monthLabelWidth: CGFloat
@@ -220,7 +220,9 @@ private struct MonthRow: View {
                     FeaturedEventOverlay(
                         segments: featuredEventSegments,
                         cellSize: cellSize,
-                        totalColumns: totalColumns
+                        totalColumns: totalColumns,
+                        fontSize: appSettings.eventFontSize,
+                        indicatorColor: appSettings.dateLabelColor
                     )
                     .padding(.vertical, verticalPadding)
                 } else {
@@ -307,7 +309,7 @@ private struct MonthRow: View {
     }
 
     /// Calculate featured event segments using date math (matching EventBarsOverlay approach)
-    private var featuredEventSegments: [FeaturedEventSegment] {
+    var featuredEventSegments: [FeaturedEventSegment] {
         guard appSettings.showMonthRowEvents,
               let firstDayDate = month.days.first?.date,
               let lastDayDate = month.days.last?.date else { return [] }
@@ -330,67 +332,29 @@ private struct MonthRow: View {
             if lhs.duration != rhs.duration { return lhs.duration > rhs.duration }
             if lhs.isAllDay != rhs.isAllDay { return lhs.isAllDay && !rhs.isAllDay }
             if lhs.startDate != rhs.startDate { return lhs.startDate < rhs.startDate }
-            return lhs.title.localizedCaseInsensitiveCompare(rhs.title) == .orderedAscending
+            let titleOrder = lhs.title.localizedCaseInsensitiveCompare(rhs.title)
+            if titleOrder != .orderedSame { return titleOrder == .orderedAscending }
+            return lhs.id < rhs.id
         }
 
         // Calculate grid offset for this month (weekday offset for first day)
         let firstDayWeekday = calendar.component(.weekday, from: monthStart)
         let offset = (firstDayWeekday - calendar.firstWeekday + 7) % 7
 
-        // Track which column has been claimed by an event
-        var columnEvent: [CalendarEvent?] = Array(repeating: nil, count: totalColumns)
-
-        // Assign events to columns (first event wins each column since sorted by priority)
-        for event in sortedEvents {
-            guard let placement = event.displayedDayOffsets(
-                in: monthInterval,
-                calendar: calendar
-            ) else { continue }
-            let colStart = placement.start + offset
-            let colEnd = min(totalColumns - 1, colStart + placement.span - 1)
-
-            guard colStart <= colEnd else { continue }
-
-            for col in colStart...colEnd {
-                if columnEvent[col] == nil {
-                    columnEvent[col] = event
-                }
-            }
-        }
-
-        // Build segments from consecutive columns with the same event
+        // Allocate one lane for the entire interval so overlapping events never
+        // erase or split each other's days. Reuse lanes for disjoint intervals.
+        var occupied: [Set<Int>] = []
         var segments: [FeaturedEventSegment] = []
-        var currentEvent: CalendarEvent?
-        var currentStart = 0
-
-        for col in 0..<totalColumns {
-            let event = columnEvent[col]
-
-            if let event = event {
-                if let current = currentEvent, current.id == event.id {
-                    // Same event continues
-                    continue
-                } else {
-                    // Close previous segment
-                    if let current = currentEvent {
-                        segments.append(FeaturedEventSegment(event: current, startIndex: currentStart, span: col - currentStart))
-                    }
-                    // Start new segment
-                    currentEvent = event
-                    currentStart = col
-                }
-            } else {
-                // No event - close any open segment
-                if let current = currentEvent {
-                    segments.append(FeaturedEventSegment(event: current, startIndex: currentStart, span: col - currentStart))
-                    currentEvent = nil
-                }
-            }
-        }
-
-        // Close final segment
-        if let current = currentEvent {
-            segments.append(FeaturedEventSegment(event: current, startIndex: currentStart, span: totalColumns - currentStart))
+        for event in sortedEvents {
+            guard let placement = event.displayedDayOffsets(in: monthInterval, calendar: calendar) else { continue }
+            let start = placement.start + offset
+            let end = min(totalColumns, start + placement.span)
+            guard start < end else { continue }
+            let columns = Set(start..<end)
+            let row = occupied.firstIndex { $0.isDisjoint(with: columns) } ?? occupied.count
+            if row == occupied.count { occupied.append([]) }
+            occupied[row].formUnion(columns)
+            segments.append(FeaturedEventSegment(event: event, startIndex: start, span: end - start, row: row))
         }
 
         return segments
@@ -446,8 +410,11 @@ private struct EventBarsOverlay: View {
         GeometryReader { geometry in
             let monthEvents = eventsForMonth
             let laidOutEvents = layoutEvents(monthEvents)
+            let metrics = EventBarMetrics(barHeight: 4, cellHeight: cellSize.height, topInset: 24)
+            let capacity = metrics.visibleCapacity(requiredRows: (laidOutEvents.map(\.row).max() ?? -1) + 1)
+            let hidden = laidOutEvents.filter { $0.row >= capacity }
 
-            ForEach(laidOutEvents, id: \.event.id) { (event, row, startCol, span) in
+            ForEach(laidOutEvents.filter { $0.row < capacity }, id: \.event.id) { (event, row, startCol, span) in
                 let width = CGFloat(span) * cellSize.width - 2
                 let x = CGFloat(startCol) * cellSize.width + 1
                 let y = CGFloat(row) * 6 + 24 // Offset below date number (increased spacing)
@@ -459,7 +426,15 @@ private struct EventBarsOverlay: View {
                         .position(x: x + width/2, y: y + 2)
                 }
             }
+            ForEach(0..<totalColumns, id: \.self) { column in
+                let count = hidden.filter { column >= $0.colStart && column < $0.colStart + $0.colSpan }.count
+                if count > 0 {
+                    EventOverflowIndicator(count: count, cellSize: cellSize, color: appSettings.dateLabelColor)
+                        .offset(x: CGFloat(column) * cellSize.width)
+                }
+            }
         }
+        .allowsHitTesting(false)
     }
 
     private var eventsForMonth: [CalendarEvent] {
@@ -487,8 +462,7 @@ private struct EventBarsOverlay: View {
         }
 
         var result: [(event: CalendarEvent, row: Int, colStart: Int, colSpan: Int)] = []
-        // Max 5 rows of events to fit in cell height
-        var occupied: [[Bool]] = Array(repeating: Array(repeating: false, count: totalColumns), count: 5)
+        var occupied: [[Bool]] = []
 
         guard let firstDayDate = month.days.first?.date,
               let lastDayDate = month.days.last?.date else { return [] }
@@ -515,27 +489,14 @@ private struct EventBarsOverlay: View {
             if colStart > colEnd { continue }
             let span = colEnd - colStart + 1
 
-            for r in 0..<occupied.count {
-                var fits = true
-                for c in colStart...colEnd {
-                    if c >= 0 && c < totalColumns {
-                        if occupied[r][c] {
-                            fits = false
-                            break
-                        }
-                    }
-                }
-
-                if fits {
-                    for c in colStart...colEnd {
-                        if c >= 0 && c < totalColumns {
-                            occupied[r][c] = true
-                        }
-                    }
-                    result.append((event, r, colStart, span))
-                    break
-                }
+            let row = occupied.firstIndex { lane in
+                (colStart...colEnd).allSatisfy { !lane[$0] }
+            } ?? occupied.count
+            if row == occupied.count {
+                occupied.append(Array(repeating: false, count: totalColumns))
             }
+            for column in colStart...colEnd { occupied[row][column] = true }
+            result.append((event, row, colStart, span))
         }
 
         return result
@@ -584,10 +545,11 @@ private struct MonthRowDayCell: View {
     }
 }
 
-private struct FeaturedEventSegment: Identifiable {
+struct FeaturedEventSegment: Identifiable {
     let event: CalendarEvent
     let startIndex: Int
     let span: Int
+    let row: Int
 
     var id: String { "\(event.id)-\(startIndex)" }
 }
@@ -596,38 +558,52 @@ private struct FeaturedEventOverlay: View {
     let segments: [FeaturedEventSegment]
     let cellSize: CGSize
     let totalColumns: Int
+    let fontSize: Double
+    let indicatorColor: Color
 
     var body: some View {
-        // Calculate explicit size for the overlay
         let totalWidth = CGFloat(totalColumns) * cellSize.width
-        let barHeight: CGFloat = max(10, min(14, cellSize.height * 0.45))
-        let fontSize: CGFloat = max(7, min(11, barHeight * 0.75))
-        // Position at bottom of cell
-        let y = cellSize.height - barHeight / 2 - 2
+        let metrics = EventBarMetrics(fontSize: CGFloat(fontSize), cellHeight: cellSize.height)
+        let capacity = metrics.visibleCapacity(requiredRows: (segments.map(\.row).max() ?? -1) + 1)
+        let hidden = segments.filter { $0.row >= capacity }
 
         ZStack(alignment: .topLeading) {
-            // Invisible spacer to establish size
             Color.clear
                 .frame(width: totalWidth, height: cellSize.height)
 
-            ForEach(segments) { segment in
+            ForEach(segments.filter { $0.row < capacity }) { segment in
                 let width = CGFloat(segment.span) * cellSize.width - 4
                 let x = CGFloat(segment.startIndex) * cellSize.width + 2
+                let y = metrics.topInset + CGFloat(segment.row) * (metrics.barHeight + metrics.spacing)
 
-                if width > 10 {
-                    Text(segment.event.title)
-                        .font(.system(size: fontSize))
-                        .fontWeight(.semibold)
-                        .foregroundStyle(segment.event.calendarColor.contrastingTextColor)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .padding(.horizontal, 3)
-                        .frame(width: width, height: barHeight, alignment: .leading)
-                        .background(segment.event.calendarColor, in: RoundedRectangle(cornerRadius: 4))
-                        .position(x: x + width / 2, y: y)
+                if width > 0 {
+                    ZStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: min(4, metrics.barHeight / 2))
+                            .fill(segment.event.calendarColor)
+                        if fontSize > 1 {
+                            Text(segment.event.title)
+                                .font(.system(size: CGFloat(fontSize), weight: .semibold))
+                                .foregroundStyle(segment.event.calendarColor.contrastingTextColor)
+                                .lineLimit(1)
+                                .truncationMode(.tail)
+                                .padding(.horizontal, 3)
+                        }
+                    }
+                    .frame(width: width, height: metrics.barHeight, alignment: .leading)
+                    .clipped()
+                    .accessibilityLabel(segment.event.title)
+                    .position(x: x + width / 2, y: y + metrics.barHeight / 2)
+                }
+            }
+            ForEach(0..<totalColumns, id: \.self) { column in
+                let count = hidden.filter { column >= $0.startIndex && column < $0.startIndex + $0.span }.count
+                if count > 0 {
+                    EventOverflowIndicator(count: count, cellSize: cellSize, color: indicatorColor)
+                        .offset(x: CGFloat(column) * cellSize.width)
                 }
             }
         }
+        .allowsHitTesting(false)
     }
 }
 

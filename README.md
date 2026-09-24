@@ -21,6 +21,7 @@ Year View is intentionally read-only: it displays events from Apple Calendar (Ev
 - `Documentation/API.md`
 - `Documentation/LAUNCH.md`
 - `Documentation/APP-STORE.md`
+- [Release notes](Documentation/RELEASE-NOTES.md)
 
 ## Development
 

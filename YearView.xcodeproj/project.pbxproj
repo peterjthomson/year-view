@@ -51,6 +51,8 @@
 		F2000001008 /* YearViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002008 /* YearViewModelTests.swift */; };
 		F2000001020 /* GoToTodayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002020 /* GoToTodayTests.swift */; };
 		F2000001009 /* CalendarEventDayRangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002009 /* CalendarEventDayRangeTests.swift */; };
+		F2000001021 /* MonthRowEventDisplayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2000002021 /* MonthRowEventDisplayTests.swift */; };
+		E1000001039 /* EventBarMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1000002039 /* EventBarMetrics.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -115,6 +117,8 @@
 		F2000002020 /* GoToTodayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoToTodayTests.swift; sourceTree = "<group>"; };
 		F2000002009 /* CalendarEventDayRangeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarEventDayRangeTests.swift; sourceTree = "<group>"; };
 		F2000002010 /* YearViewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = YearViewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2000002021 /* MonthRowEventDisplayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthRowEventDisplayTests.swift; sourceTree = "<group>"; };
+		E1000002039 /* EventBarMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventBarMetrics.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,6 +208,7 @@
 				E1000002036 /* YearPickerView.swift */,
 				E1000002037 /* SearchView.swift */,
 				E1000002038 /* SettingsView.swift */,
+				E1000002039 /* EventBarMetrics.swift */,
 				E1000007016 /* Layouts */,
 			);
 			path = Views;
@@ -265,6 +270,7 @@
 				F2000002007 /* DayViewModelTests.swift */,
 				F2000002008 /* YearViewModelTests.swift */,
 				F2000002020 /* GoToTodayTests.swift */,
+				F2000002021 /* MonthRowEventDisplayTests.swift */,
 			);
 			path = YearViewTests;
 			sourceTree = "<group>";
@@ -397,6 +403,7 @@
 				E1000001036 /* YearPickerView.swift in Sources */,
 				E1000001037 /* SearchView.swift in Sources */,
 				E1000001038 /* SettingsView.swift in Sources */,
+				E1000001039 /* EventBarMetrics.swift in Sources */,
 				E1000001040 /* StandardGridLayout.swift in Sources */,
 				E1000001041 /* ContinuousRowLayout.swift in Sources */,
 				E1000001042 /* VerticalListLayout.swift in Sources */,
@@ -429,6 +436,7 @@
 				F2000001007 /* DayViewModelTests.swift in Sources */,
 				F2000001008 /* YearViewModelTests.swift in Sources */,
 				F2000001020 /* GoToTodayTests.swift in Sources */,
+				F2000001021 /* MonthRowEventDisplayTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -569,7 +577,7 @@
 				CODE_SIGN_ENTITLEMENTS = YearView/YearView.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = R4RRG93J68;
@@ -592,7 +600,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.yearview.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -614,7 +622,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = R4RRG93J68;
@@ -637,7 +645,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.3;
+				MARKETING_VERSION = 1.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.yearview.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

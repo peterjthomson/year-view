@@ -76,6 +76,22 @@ Year View requires calendar access to function. On first launch:
 2. Grant "Full Access" when prompted
 3. If denied, direct users to Settings → Privacy → Calendars
 
+## Event Display
+
+Open **Settings → Event Display → Event Text Size** to adjust event titles in
+the **Months** and **Year** views from 1–24 points. The default is 10 pt. At 1 pt,
+events appear as thin colored lines without titles. Sizes use native display
+points, which may span more than one physical pixel on Retina displays.
+
+Overlapping events occupy separate rows. When the available space cannot fit
+all events, a **+N** indicator shows how many are hidden on that day. Very
+compact cells use a small dot instead. Select the day to see its full event list.
+The Months view also shows overflow when event titles are turned off.
+
+The text size is saved between launches and restored to 10 pt by **Reset to
+Defaults**. The all-day and time-based event toggles still control which events
+are included.
+
 ### Testing with Sample Data
 
 For development without real calendar data, you can:

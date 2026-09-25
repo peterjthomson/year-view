@@ -78,7 +78,7 @@ final class AppSettings {
     // MARK: - Color Settings
     // All defaults use system-adaptive colors that work in both light and dark mode
 
-    private let cache = CalendarCacheService.shared
+    private let cache: CalendarCacheService
 
     static let defaultLightGray: Color = Color.gray.opacity(0.06)
 
@@ -190,9 +190,15 @@ final class AppSettings {
         didSet { cache.showTimeBasedEvents = showTimeBasedEvents }
     }
 
+    /// Font size in points for calendar event bars; 1 pt displays a thin line.
+    var eventFontSize: Double {
+        didSet { cache.eventFontSize = eventFontSize }
+    }
+
     // MARK: - Initialization
 
-    init() {
+    init(cache: CalendarCacheService = .shared) {
+        self.cache = cache
         // Load all settings from cache
         self.pageBackgroundColor = cache.pageBackgroundColor
         self.weekdayBackgroundColor = cache.weekdayBackgroundColor
@@ -212,6 +218,7 @@ final class AppSettings {
         self.monthLabelFormat = MonthLabelFormat(rawValue: cache.monthLabelFormat) ?? .letter
         self.monthLabelFontSize = MonthLabelFontSize(rawValue: cache.monthLabelFontSize) ?? .medium
         self.showMonthRowEvents = cache.showMonthRowEvents
+        self.eventFontSize = cache.eventFontSize
         self.showAllDayEvents = cache.showAllDayEvents
         self.showTimeBasedEvents = cache.showTimeBasedEvents
     }
@@ -293,6 +300,7 @@ final class AppSettings {
         monthLabelFormat = .letter
         monthLabelFontSize = .medium
         showMonthRowEvents = true
+        eventFontSize = 10
         showAllDayEvents = true
         showTimeBasedEvents = false
     }

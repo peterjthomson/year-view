@@ -75,7 +75,7 @@ EventKit (Apple Calendar) → EventKitService → CalendarViewModel → Views
 Google Calendar API → GoogleCalendarService → CalendarViewModel → Views
 ```
 
-- ViewModels own and instantiate services (no dependency injection)
+- ViewModels own and instantiate services; AppSettings accepts a cache and CalendarCacheService accepts isolated UserDefaults for preference tests
 - Services encapsulate external dependencies (EventKit, Google API, UserDefaults)
 - State changes in `@Observable` ViewModels automatically trigger SwiftUI updates
 - All calendar data is read-only; mutations defer to native apps via deep links
@@ -214,10 +214,14 @@ No event creation/editing in Year View. All mutations defer to native apps via `
 
 ### Multi-Day and All-Day Events
 
-Multi-day event logic in `CalendarViewModel.events(for:)`:
-- **All-day events**: Check if date falls within `[startDate, endDate)` range
-- **Multi-day timed events**: Check if date falls within `[startOfDay(startDate), startOfDay(endDate)]`
-- **Single-day events**: Use `Calendar.isDate(_:inSameDayAs:)`
+`CalendarEvent.displayedDayInterval(calendar:)` is the shared source of occupied
+days. `CalendarViewModel` indexes these days for `events(for:)`, and layouts use
+`displayedDayOffsets(in:calendar:)` to clip events to a visible month or week.
+- All-day end dates are exclusive.
+- Timed events ending exactly at midnight do not occupy the following day.
+- Calendar-day arithmetic preserves spans across DST and month boundaries.
+- Overlapping bars use separate lanes; shared EventBarMetrics reserves space for
+  overflow counts when all lanes do not fit.
 
 ### Calendar Preferences Persistence
 
@@ -225,6 +229,7 @@ Multi-day event logic in `CalendarViewModel.events(for:)`:
 - Enabled calendar IDs (`saveEnabledCalendarIDs`, `loadEnabledCalendarIDs`)
 - Layout style (`saveSelectedLayout`, `loadSelectedLayout`)
 - Show weekends/week numbers
+- Event text size (1–24 pt, default 10; 1 pt draws thin lines in Months/Year)
 - Last viewed year (saved but **not** restored on launch—app always starts on current year)
 
 ### Accessibility
@@ -237,8 +242,9 @@ Multi-day event logic in `CalendarViewModel.events(for:)`:
 
 ## Testing Notes
 
-- Test files exist in `YearViewTests/` but are not part of a test target yet
+- `YearViewTests` is part of the shared `YearView` scheme and runs locally and in CI
 - Tests cover: models, ViewModels, services, date utilities, color utilities
+- Event-display tests cover layout and preference behavior, with focused macOS rendered-image checks for visible bars and overflow
 - SwiftUI previews used for visual testing during development
 - Manual testing required for: calendar permissions, deep links, VoiceOver
 

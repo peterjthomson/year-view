@@ -31,6 +31,21 @@ Represents a calendar event from any source. Conforms to `Identifiable` and `Has
 
 Can be initialized directly or from an `EKEvent` (EventKit).
 
+`displayedDayInterval(calendar:)` returns the half-open range of occupied days.
+All-day end dates and timed events ending at midnight exclude the following day.
+`displayedDayOffsets(in:calendar:)` clips that range to a visible interval and
+returns its start column offset and day span, or `nil` when there is no overlap.
+
+### AppSettings
+
+Observable display preferences backed by `CalendarCacheService`.
+`init(cache:)` accepts an isolated cache for tests and defaults to the shared cache.
+
+`eventFontSize` is a saved `Double` in points for Months and Year event bars:
+1–24 pt, default 10. A size of 1 draws lines without text. Saved values outside
+the range are clamped when loaded; non-finite values fall back to the default.
+`resetToDefaults()` restores the default text size along with other preferences.
+
 ---
 
 ### CalendarSource

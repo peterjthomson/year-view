@@ -53,6 +53,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Release ZIP checks
+        run: python3 -m unittest discover -s scripts/release -p 'test_*.py'
+
       - name: Unit tests
         run: |
           set -o pipefail

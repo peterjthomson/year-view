@@ -8,7 +8,7 @@ not build output, and belong in version control.
   download (`method: developer-id`, automatic signing)
 - `ExportOptions-AppStore.plist` — App Store export
 
-Release procedure is the shared five-stage protocol in `../RELEASE-PROTOCOL.md`:
+Archive, export and notarize the direct-download candidate:
 
 ```bash
 xcodebuild archive -project YearView.xcodeproj -scheme YearView \
@@ -31,10 +31,12 @@ xcrun stapler validate build/github-export/YearView.app
 ditto -c -k --keepParent "build/github-export/YearView.app" build/YearView.zip
 ```
 
-Note `verify-mac-artifact.sh` is DMG-oriented; Year View ships a zip, so verify
-the exported app directly:
+Verify the final ZIP, including the app extracted from it:
 
 ```bash
-spctl --assess --type execute -v build/github-export/YearView.app
-xcrun stapler validate build/github-export/YearView.app
+python3 scripts/release/verify-zip.py build/YearView.zip --version <app-version>
 ```
+
+Complete the native walkthrough in [RELEASE-PROTOCOL.md](../RELEASE-PROTOCOL.md)
+before uploading. The ZIP verifier requires macOS, Xcode command-line tools and
+Python 3; it does not change the Xcode build or notarization steps above.

@@ -411,7 +411,7 @@ private struct EventBarsOverlay: View {
             let monthEvents = eventsForMonth
             let laidOutEvents = layoutEvents(monthEvents)
             let metrics = EventBarMetrics(barHeight: 4, cellHeight: cellSize.height, topInset: 24)
-            let capacity = metrics.visibleCapacity(requiredRows: (laidOutEvents.map(\.row).max() ?? -1) + 1)
+            let capacity = metrics.visibleCapacity(requiredRows: (laidOutEvents.map(\.row).max() ?? -1) + 1, cellWidth: cellSize.width)
             let hidden = laidOutEvents.filter { $0.row >= capacity }
 
             ForEach(laidOutEvents.filter { $0.row < capacity }, id: \.event.id) { (event, row, startCol, span) in
@@ -564,7 +564,7 @@ private struct FeaturedEventOverlay: View {
     var body: some View {
         let totalWidth = CGFloat(totalColumns) * cellSize.width
         let metrics = EventBarMetrics(fontSize: CGFloat(fontSize), cellHeight: cellSize.height)
-        let capacity = metrics.visibleCapacity(requiredRows: (segments.map(\.row).max() ?? -1) + 1)
+        let capacity = metrics.visibleCapacity(requiredRows: (segments.map(\.row).max() ?? -1) + 1, cellWidth: cellSize.width)
         let hidden = segments.filter { $0.row >= capacity }
 
         ZStack(alignment: .topLeading) {

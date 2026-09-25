@@ -23,9 +23,10 @@ struct EventBarMetrics {
 
     var capacity: Int { capacity(bottomInset: 2) }
 
-    /// Keep entire lanes aligned, reserving room for a count if any lane is hidden.
-    func visibleCapacity(requiredRows: Int) -> Int {
-        requiredRows > capacity ? capacity(bottomInset: 12) : capacity
+    /// Reserve bottom space only when overflow uses a count, not a corner dot.
+    func visibleCapacity(requiredRows: Int, cellWidth: CGFloat) -> Int {
+        let showsCount = EventOverflowIndicator.showsCount(in: CGSize(width: cellWidth, height: cellHeight))
+        return requiredRows > capacity && showsCount ? capacity(bottomInset: 12) : capacity
     }
 
     private func capacity(bottomInset: CGFloat) -> Int {
@@ -38,11 +39,13 @@ struct EventOverflowIndicator: View {
     let cellSize: CGSize
     var color: Color = .primary
 
-    private var showsCount: Bool { cellSize.width >= 28 && cellSize.height >= 30 }
+    static func showsCount(in cellSize: CGSize) -> Bool {
+        cellSize.width >= 28 && cellSize.height >= 30
+    }
 
     var body: some View {
         Group {
-            if showsCount {
+            if Self.showsCount(in: cellSize) {
                 Text("+\(count)")
                     .font(.system(size: 8, weight: .semibold))
                     .lineLimit(1)

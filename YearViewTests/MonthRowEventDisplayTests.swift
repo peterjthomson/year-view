@@ -212,6 +212,16 @@ final class MonthRowEventDisplayTests: XCTestCase {
     }
 
     @MainActor
+    func testCompactOverflowKeepsThinEventLinesVisible() throws {
+        defaults.set(1, forKey: "eventFontSize")
+        let events = (0..<5).map {
+            event("Event \($0)", start: date(6), end: date(11), color: Color(red: 1, green: 0, blue: 0))
+        }
+        XCTAssertGreaterThan(redPixels(try renderedRow(events, height: 24), on: 9), 0,
+                             "A corner overflow dot must not displace the thin event lines that fit")
+    }
+
+    @MainActor
     func testIssue10OnePointPreferenceRendersThinEventLine() throws {
         let trip = event("Trip", start: date(6), end: date(11), color: Color(red: 1, green: 0, blue: 0))
 

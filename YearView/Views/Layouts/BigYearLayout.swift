@@ -281,7 +281,7 @@ struct BigYearEventBarsOverlay: View {
     var body: some View {
         let layouts = layoutEvents
         let metrics = EventBarMetrics(fontSize: CGFloat(fontSize), cellHeight: rowHeight, topInset: topOffset)
-        let capacity = metrics.visibleCapacity(requiredRows: (layouts.map(\.row).max() ?? -1) + 1)
+        let capacity = metrics.visibleCapacity(requiredRows: (layouts.map(\.row).max() ?? -1) + 1, cellWidth: dayColumnWidth)
         ZStack(alignment: .topLeading) {
             ForEach(layouts.filter { $0.row < capacity }, id: \.event.id) { eventLayout in
                 EventBar(

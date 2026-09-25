@@ -11,7 +11,8 @@
   from the week after they end, and prevent timed events ending at midnight from
   extending into the next day.
 - Show hidden-event counts, or a dot in very compact cells, when events do not
-  fit. Select a day to see all its events.
+  fit. Compact corner dots preserve the space available for thin event lines.
+  Select a day to see all its events.
 - Fix an empty day-detail sheet on the first day selection after launch.
 - Open day details from search results while preserving the search underneath.
 

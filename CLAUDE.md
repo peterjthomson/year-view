@@ -289,3 +289,9 @@ See `Documentation/` for detailed reference:
 - `GETTING_STARTED.md` - Setup, Google Calendar OAuth, troubleshooting
 - `APP-STORE.md` - App Store submission details
 - `LAUNCH.md` - Release checklist
+
+## Release verification
+
+Follow `RELEASE-PROTOCOL.md` and `scripts/release/LOCAL-COMPUTER-USE.md`.
+Use the final extracted signed package for the native walkthrough. Run the
+shared script checks with `python3 -m unittest discover -s scripts/release -p "test_*.py"`.
